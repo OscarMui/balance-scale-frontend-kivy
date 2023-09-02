@@ -1,0 +1,13 @@
+kivy_venv
+venv
+bin
+.buildozer
+__pycache__
+
+.vscode
+
+output
+*.zip
+.DS_Store
+build
+dist
