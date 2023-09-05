@@ -1,10 +1,12 @@
 import asyncio
 
-# A simple skeleton for hosting the game, this function will be run in parallel with main.py. 
+# import from other project files
+from game.onlineGame import OnlineGame
+
 async def logic(qGame, qMain):
-    '''This method is also run by the asyncio loop and periodically prints
-    something.
+    '''This method is also run by the asyncio loop. A simple skeleton for hosting the game.
     '''
+
     try:
         while True:
             event = await qGame.get()
@@ -12,6 +14,16 @@ async def logic(qGame, qMain):
             assert(event["event"]=="modeSelection")
             print(f'Mode selected: {event["mode"]}')
 
+            game = None
+            if event["mode"] == "online":
+                print("Online mode selected")
+                game = OnlineGame(qGame, qMain, event["nickname"])
+            else:
+                assert(event["mode"] == "solo")
+                print("Solo mode selected")
+                raise("solo mode not yet available")
+            await game.play()
+            
     except asyncio.CancelledError as e:
         print('Wasting time was canceled', e)
     finally:
