@@ -72,9 +72,12 @@ async def recvMsg(ws):
 
 # asynchronus input copied from web
 async def ainput(prompt: str = ''):
-    with ThreadPoolExecutor(1, 'ainput') as executor:
-        return (await asyncio.get_event_loop().run_in_executor(executor, input, prompt)).rstrip()
-
+    try:
+        with ThreadPoolExecutor(1, 'ainput') as executor:
+            return (await asyncio.get_event_loop().run_in_executor(executor, input, prompt)).rstrip()
+    except asyncio.CancelledError as e:
+        print("ainput cancelled")
+        return ""
 # responsible for sending pings
 async def pingpong(ws):
     while True:
@@ -137,7 +140,7 @@ async def submitGuesses(ws,id):
             # Green
             print(f'\033[32m>>> Guess {guess} registered.\033[0m')
 
-async def main(): 
+async def body(): 
     global globalEndTime, globalGuess, globalStartTime
     # variables
     nickname = ""
@@ -367,4 +370,12 @@ async def main():
     else:
         print(f'\033[91m>>> There is no winner. GAME OVER for everyone.\033[0m')
     ws.close()
-asyncio.run(main())
+
+async def game():
+    try:
+        await body()
+    except asyncio.CancelledError as e:
+        print('Game was canceled', e)
+    finally:
+        # when canceled, print that it finished
+        print('Done game')
