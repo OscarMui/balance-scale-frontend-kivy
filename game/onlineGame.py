@@ -49,6 +49,13 @@ class OnlineGame:
 
             # consume the response of websocket connection feedback
             res = await self.qGame.get()
+            if(res["result"]=="error"):
+                print("result: error")
+                self.qApp.put_nowait({
+                    "event": "serverConnectionFailed",
+                    "errorMsg": res["errorMsg"]
+                })
+                return
             assert(res["result"]=="success")
 
             print("Joined websocket")
@@ -61,8 +68,15 @@ class OnlineGame:
 
             # wait for response
             res = await self.qGame.get()
+            if(res["result"]=="error"):
+                print("result: error")
+                self.qApp.put_nowait({
+                    "event": "serverConnectionFailed",
+                    "errorMsg": res["errorMsg"]
+                })
+                return
             assert(res["result"]=="success")
-            
+
             self.qApp.put_nowait({
                 "event": "serverConnected",
                 "participantsCount": res["participantsCount"],
@@ -81,10 +95,34 @@ class OnlineGame:
         event = await self.qGame.get()
 
         while event["event"] != "gameStart":
-            assert(event["event"] == "updateParticipantsCount")
-            # forward this event to app
-            self.qApp.put_nowait(event)
-            event = await self.qGame.get()
+            if(event["event"] == "quitGame"):
+                return
+            else:
+                assert(event["event"] == "updateParticipantsCount")
+                # forward this event to app
+                self.qApp.put_nowait(event)
+                event = await self.qGame.get()
+        
+        assert(event["event"]=="gameStart")
+        # forward gameStart event to app
+        self.qApp.put_nowait(event)
+
+        gameInfo = event
+
+        while True:
+            await asyncio.sleep(1)
+
+        # while not gameInfo["gameEnded"]:
+        #     if not self.isDead:
+        #         if gameInfo["roundStartTime"]-now() > 0:
+        #             print("Waiting for round start")
+        #             await asyncio.sleep((gameInfo["roundStartTime"]-now())/1000)
+        #         self.qApp.put_nowait({
+        #             "event": "roundStart"
+        #         })
+        #         self.endTime = gameInfo["roundEndTime"]
+        #         self.startTime = gameInfo["roundStartTime"]
+
 
     async def __obtainToken(self):
         async with aiohttp.ClientSession() as session:

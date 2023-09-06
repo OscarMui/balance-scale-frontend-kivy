@@ -71,7 +71,9 @@ class JoinRoomScreen(Screen):
     def __init__(self, qGame, qApp, name):
         super().__init__(name=name)
         self.qGame = qGame  
-        self.qApp = qApp  
+        self.qApp = qApp 
+        self.gameStarted = False
+        self.hasError = False
 
     def on_enter(self):
         self.joinRoomTask = asyncio.create_task(self.__joinRoom())
@@ -86,19 +88,58 @@ class JoinRoomScreen(Screen):
 
         while event["event"] != "gameStart":
             if event["event"] == "serverConnected":
-                titleLabel.text = f'Waiting for participants to join ({event["participantsCount"]}/{event["participantsPerGame"]})'
+                participantCount = event["participantsCount"]
+                participantsPerGame = event["participantsPerGame"]
+                titleLabel.text = f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
                 for i in range(min(5,event["participantsCount"])):
                     show(self.ids[f'pfp{i}'])
             elif event["event"] == "serverConnectionFailed":
                 titleLabel.text = "An error occured"
                 bodyLabel.text = event["errorMsg"]
+                self.hasError = True
+                return
             else:
                 assert(event["event"]=="updateParticipantsCount")
-                titleLabel.text = f'Waiting for participants to join ({event["participantsCount"]}/{event["participantsPerGame"]})'
+                participantCount = event["participantsCount"]
+                participantsPerGame = event["participantsPerGame"]
+                titleLabel.text = f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
                 for i in range(min(5,event["participantsCount"])):
                     show(self.ids[f'pfp{i}'])
             event = await self.qApp.get()
-            
+
+        assert(event["event"]=="gameStart")
+        print("gameStart event received by app")
+        self.gameStarted = True
+        gameInfo = event
+        titleLabel.text = f'Game is starting ({participantCount}/{participantsPerGame})'
+        print(self.ids["exitButton"].background_color)
+        self.ids["exitButton"].background_color = [0.5,0.5,0.5, 1]
+        print(self.ids["exitButton"].background_color)
+        for i in range(min(5,len(gameInfo["participants"]))):
+            p = gameInfo["participants"][i]
+            self.ids[f'participantNickname{i}'].text = p["nickname"]
+
+        await asyncio.sleep(1)
+        self.manager.current = "game"
+    
+    def exitGame(self):
+        if(self.gameStarted):
+            print("Game started cannot exit")
+        else:
+            print("quit game")
+            if(not self.hasError):
+                self.qGame.put_nowait({
+                    "event": "quitGame"
+                })
+            self.manager.current = "home"
+            return
+        
+class GameScreen(Screen):
+    def __init__(self, qGame, qApp, name):
+        super().__init__(name=name)
+        self.qGame = qGame  
+        self.qApp = qApp  
+
 class SettingsScreen(Screen):
     def __init__(self, qGame, qApp, name):
         super().__init__(name=name)
@@ -118,6 +159,7 @@ class TenbinApp(App):
         # add screens
         sm.add_widget(HomeScreen(self.qGame,self.qApp,name='home'))
         sm.add_widget(JoinRoomScreen(self.qGame,self.qApp,name='joinRoom'))
+        sm.add_widget(GameScreen(self.qGame,self.qApp,name='game'))
         sm.add_widget(SettingsScreen(self.qGame,self.qApp,name='settings'))
 
         # remember to return the screen manager

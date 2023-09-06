@@ -22,7 +22,11 @@ async def logic(qGame, qMain):
                 assert(event["mode"] == "solo")
                 print("Solo mode selected")
                 raise("solo mode not yet available")
+            
             await game.play()
+            
+            #destruction
+            game = None
             
     except asyncio.CancelledError as e:
         print('Logic was canceled', e)
