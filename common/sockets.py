@@ -3,7 +3,6 @@ import json
 
 # send a message to the websocket
 def sendMsg(ws,msg):
-    print("sent: ", msg)
     ws.send(json.dumps(msg))
 
 # ws.recv() will stop the ping pongs

@@ -25,7 +25,7 @@ async def logic(qGame, qMain):
             await game.play()
             
     except asyncio.CancelledError as e:
-        print('Wasting time was canceled', e)
+        print('Logic was canceled', e)
     finally:
         # when canceled, print that it finished
-        print('Done wasting time')
+        print('Done logic')

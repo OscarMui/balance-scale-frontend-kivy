@@ -53,17 +53,38 @@ class OnlineGame:
 
             print("Joined websocket")
 
+            # send joinGame request
+            sendMsg(self.ws,{
+                "method": "joinGame",
+                "nickname": self.nickname,
+            })
+
+            # wait for response
+            res = await self.qGame.get()
+            assert(res["result"]=="success")
+            
+            self.qApp.put_nowait({
+                "event": "serverConnected",
+                "participantsCount": res["participantsCount"],
+                "participantsPerGame": res["participantsPerGame"],
+            })
+
         except Exception as e:
             print("Exception",e)
-            await self.qApp.put({
+            self.qApp.put_nowait({
                 "event": "serverConnectionFailed",
                 "errorMsg": str(e)
             })
             return
-    
-        await self.qApp.put({
-            "event": "serverConnected"
-        })
+
+        # repeatedly get event from our own queue
+        event = await self.qGame.get()
+
+        while event["event"] != "gameStart":
+            assert(event["event"] == "updateParticipantsCount")
+            # forward this event to app
+            self.qApp.put_nowait(event)
+            event = await self.qGame.get()
 
     async def __obtainToken(self):
         async with aiohttp.ClientSession() as session:
@@ -89,10 +110,10 @@ class OnlineGame:
                     print("Time in sync")
 
     def __del__(self):
-        if self.pingPongTask:
+        if hasattr(self,"pingPongTask"):
             self.pingPongTask.cancel()
-        if self.recvMsgsTask:
+        if hasattr(self,"recvMsgsTask"):
             self.recvMsgsTask.cancel()  
-        if self.ws:
+        if hasattr(self,"ws"):
             self.ws.close()
         print("onlineGame destructor finished")

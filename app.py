@@ -5,10 +5,19 @@ from kivy.lang.builder import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
+from kivy.core.window import Window
+from kivy.animation import Animation
+from kivy.uix.effectwidget import HorizontalBlurEffect
+from kivy.core.text import LabelBase
+
+from common.visibility import show, hide
 from logic import logic
 
 # Load static template
 Builder.load_file("app.kv")
+
+# Set default screen size to a landscape phone
+Window.size = (667, 375)
 
 class HomeScreen(Screen):
     def __init__(self, qGame, qApp, name):
@@ -16,6 +25,9 @@ class HomeScreen(Screen):
         self.qGame = qGame  
         self.qApp = qApp
         self.app = App.get_running_app()
+
+    def on_enter(self):
+        pass
 
     def modeSelection(self, mode):
         NICKNAME = self.ids["nickname"].text
@@ -54,7 +66,7 @@ class HomeScreen(Screen):
         })
 
         self.manager.current = "joinRoom"
-        
+
 class JoinRoomScreen(Screen):
     def __init__(self, qGame, qApp, name):
         super().__init__(name=name)
@@ -74,12 +86,19 @@ class JoinRoomScreen(Screen):
 
         while event["event"] != "gameStart":
             if event["event"] == "serverConnected":
-                titleLabel.text = "Waiting for participants to join"
+                titleLabel.text = f'Waiting for participants to join ({event["participantsCount"]}/{event["participantsPerGame"]})'
+                for i in range(min(5,event["participantsCount"])):
+                    show(self.ids[f'pfp{i}'])
             elif event["event"] == "serverConnectionFailed":
                 titleLabel.text = "An error occured"
                 bodyLabel.text = event["errorMsg"]
+            else:
+                assert(event["event"]=="updateParticipantsCount")
+                titleLabel.text = f'Waiting for participants to join ({event["participantsCount"]}/{event["participantsPerGame"]})'
+                for i in range(min(5,event["participantsCount"])):
+                    show(self.ids[f'pfp{i}'])
             event = await self.qApp.get()
-
+            
 class SettingsScreen(Screen):
     def __init__(self, qGame, qApp, name):
         super().__init__(name=name)
@@ -120,6 +139,10 @@ class TenbinApp(App):
         return asyncio.gather(run_wrapper(), self.other_task)
 
 if __name__ == '__main__':
+    # register our google font
+    LabelBase.register(name='Noto Sans',
+                      fn_regular='fonts/Noto_Sans_TC/static/NotoSansTC-Regular.ttf')
+    
     loop = asyncio.get_event_loop()
     loop.run_until_complete(TenbinApp().app_func())
     loop.close()

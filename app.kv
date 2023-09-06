@@ -1,27 +1,60 @@
 #:kivy 1.0.9
+#: import ew kivy.uix.effectwidget
+
+<Label>:
+    font_size:"20sp"
+    font_name: "Noto Sans"
+    halign: "center"
 <HomeScreen>:
-    BoxLayout:
-        orientation: "vertical"
+    canvas:
+        Rectangle:
+            id: background
+            source: 'assets/background-blur.jpg'
+            pos: self.pos
+            size: self.size
+            
+    RelativeLayout:
+        Label:
+            text: "[ GAME ]"
+            pos_hint: {'center_x': 0.5, 'y': 0.85}
+            size_hint: 1, None
+
+        Label:
+            text: "Tenbin"
+            font: "Noto Sans"
+            font_size: "35sp"
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            size_hint: 1, None
         TextInput:
             id: nickname
             hint_text:"Enter your name"
-            pos_hint: {"center_x": 0.5, "center_y": 0.705}
-            size_hint: 0.95, 0.5
+            font_name: "Noto Sans"
+            font_size:"20sp"
+            halign: 'center'
+            valign: 'middle'
             multiline: False
-            background_color: "#666666"
+            background_color: 0.6, 0.6, 0.6, 0.5
             foreground_color: "white"
             hint_text_color: "#AAAAAA"
-            # on_text: app.process()
+            pos_hint: {'center_x': 0.5, 'y': 0.25}
+            size_hint: 0.4, 0.125
         BoxLayout:
+            pos_hint: {'center_x': 0.5, 'y': 0.05}
+            size_hint: 0.4, 0.15
+            spacing: 10
             Button:
                 text: "Play Online"
+                background_color: 0, 0.7, 0
+                halign: 'center'
                 on_press: root.modeSelection("online")
             Button:
                 text: "Play Solo"
+                background_color: 0.7, 0, 0
+                halign: 'center'
                 on_press: root.modeSelection("solo")
-            Button:
-                text: "Goto settings"
-                on_press: root.manager.current = "settings"
+            # Button:
+            #     text: "Goto settings"
+            #     on_press: root.manager.current = "settings"
 
 <JoinRoomScreen>:
     BoxLayout:
@@ -32,17 +65,39 @@
         Label:
             id: bodyLabel
             text: "Please wait..."
+
+            # wrap text
+            size_hint_y: None
+            text_size: self.width, None
+            height: self.texture_size[1]
         BoxLayout:
-            Label:
-                text: "1"
-            Label:
-                text: "2"
-            Label:
-                text: "3"
-            Label:
-                text: "4"
-            Label:
-                text: "5"
+            padding: 0, 35, 0, 35 # space between the layout and other components outside 
+            spacing: 35 # space between children
+            Image:
+                id: pfp0
+                source: "assets/pfp.jpg"
+                opacity: 0 # hide
+                fit_mode: "scale-down"
+            Image:
+                id: pfp1
+                source: "assets/pfp.jpg"
+                opacity: 0 # hide
+                fit_mode: "scale-down"
+            Image:
+                id: pfp2
+                source: "assets/pfp.jpg"
+                opacity: 0 # hide
+                fit_mode: "scale-down"
+            Image:
+                id: pfp3
+                source: "assets/pfp.jpg"
+                opacity: 0 # hide
+                fit_mode: "scale-down"
+            Image:
+                id: pfp4
+                source: "assets/pfp.jpg"
+                opacity: 0 # hide
+                fit_mode: "scale-down"
 <SettingsScreen>:
     BoxLayout:
         Button:
