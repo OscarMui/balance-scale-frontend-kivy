@@ -10,8 +10,12 @@ async def logic(qGame, qMain):
     try:
         while True:
             event = await qGame.get()
-            print(event)
-            assert(event["event"]=="modeSelection")
+
+            # There might be some events/ responses left over after an error
+            while(event["event"]!="modeSelection"):
+                print(event)
+                event = await qGame.get()
+
             print(f'Mode selected: {event["mode"]}')
 
             game = None

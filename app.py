@@ -2,7 +2,7 @@ import asyncio
 
 from kivy.app import App
 from kivy.lang.builder import Builder
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 from kivy.core.window import Window
@@ -73,7 +73,6 @@ class JoinRoomScreen(Screen):
         self.qGame = qGame  
         self.qApp = qApp 
         self.gameStarted = False
-        self.hasError = False
 
     def on_enter(self):
         self.joinRoomTask = asyncio.create_task(self.__joinRoom())
@@ -96,7 +95,6 @@ class JoinRoomScreen(Screen):
             elif event["event"] == "serverConnectionFailed":
                 titleLabel.text = "An error occured"
                 bodyLabel.text = event["errorMsg"]
-                self.hasError = True
                 return
             else:
                 assert(event["event"]=="updateParticipantsCount")
@@ -127,10 +125,9 @@ class JoinRoomScreen(Screen):
             print("Game started cannot exit")
         else:
             print("quit game")
-            if(not self.hasError):
-                self.qGame.put_nowait({
-                    "event": "quitGame"
-                })
+            self.qGame.put_nowait({
+                "event": "quitGame"
+            })
             self.manager.current = "home"
             return
         
@@ -154,7 +151,7 @@ class TenbinApp(App):
 
     def build(self):
         # Create the manager
-        sm = ScreenManager()
+        sm = ScreenManager(transition=FadeTransition())
         
         # add screens
         sm.add_widget(HomeScreen(self.qGame,self.qApp,name='home'))
