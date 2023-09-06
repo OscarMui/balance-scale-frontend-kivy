@@ -1,10 +1,10 @@
 #:kivy 1.0.9
-#: import ew kivy.uix.effectwidget
 
 <Label>:
     font_size:"20sp"
     font_name: "Noto Sans"
     halign: "center"
+
 <HomeScreen>:
     canvas:
         Rectangle:
@@ -23,7 +23,7 @@
             text: "Tenbin"
             font: "Noto Sans"
             font_size: "35sp"
-            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            pos_hint: {'center_x': 0.5, 'y': 0.7}
             size_hint: 1, None
         TextInput:
             id: nickname
@@ -57,22 +57,33 @@
             #     on_press: root.manager.current = "settings"
 
 <JoinRoomScreen>:
-    BoxLayout:
-        orientation: "vertical"
+    # canvas:
+    #     Rectangle:
+    #         id: background
+    #         source: 'assets/background-blur.jpg'
+    #         pos: self.pos
+    #         size: self.size
+    RelativeLayout:
         Label:
             id: titleLabel
             text: "Connecting to server"
+            pos_hint: {'center_x': 0.5, 'y': 0.85}
+            size_hint: 1, None
         Label:
             id: bodyLabel
+            font_size:"14sp"
             text: "Please wait..."
+            pos_hint: {'center_x': 0.5, 'y': 0.7}
+            size_hint: 1, None
 
             # wrap text
             size_hint_y: None
             text_size: self.width, None
             height: self.texture_size[1]
         BoxLayout:
-            padding: 0, 35, 0, 35 # space between the layout and other components outside 
             spacing: 35 # space between children
+            pos_hint: {'center_x': 0.5, 'y': 0.1}
+            size_hint: 0.8, 0.2
             Image:
                 id: pfp0
                 source: "assets/pfp.jpg"
