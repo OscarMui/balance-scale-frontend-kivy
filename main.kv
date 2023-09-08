@@ -1,10 +1,35 @@
-#:kivy 1.0.9
+#:kivy 2.2.1
 
 <Label>:
     font_size:"14sp"
     font_name: "Noto Sans"
     halign: "center"
 
+<DigitButton>:
+    text: str(self.digit)
+    font_size:"26sp"
+    # border: 0,0,0,0
+    background_color: "#000000"
+    background_normal: "" # The default texture is grey, so just setting the background color will give a darker result. To set a plain color, set the background_normal to ''.
+    background_down: ""
+    canvas.before:
+        Color:
+            rgba: 1,1,1,1
+        Line:
+            width: 5
+            rectangle: self.x, self.y, self.width, self.height
+    
+# <CircularButton>:
+#     size: 50, 50 
+#     canvas:
+#         Color:
+#             rgb: self.background_color if self.state == 'normal' else self.background_down
+#         Ellipse:
+#             pos: self.pos
+#             size: self.size
+#     on_release:
+#         print("This is the button made up by the canvas")
+        
 <HomeScreen>:
     canvas:
         Rectangle:
@@ -134,7 +159,7 @@
                 Label:
                     id: participantNickname4
         Button:
-            pos_hint: {'x': 0.85, 'y': 0.05}
+            pos_hint: {'x': 0.87, 'y': 0.05}
             size_hint: 0.1, None
             id: exitButton
             text: "Exit"
@@ -142,9 +167,77 @@
             halign: 'center'
             on_press: root.exitGame()
 <GameScreen>:
-    BoxLayout:
+    RelativeLayout:
+        BoxLayout:
+            pos_hint: {'x': 0.07, 'y': 0.1}
+            size_hint: 0.35,0.8
+            orientation: "vertical"
+            Label:
+                id: guessLabel
+                text: "40"
+            Label:
+                id: infoLabel
+                text: "info"
+        GridLayout:
+            cols: 3
+            pos_hint: {'x': 0.45, 'y': 0.1}
+            size_hint: 0.35,0.8
+            Label:
+                text: ""
+            Label:
+                text: ""
+            DigitButton:
+                digit: 0
+            DigitButton:
+                digit: 1
+            DigitButton:
+                digit: 2
+            DigitButton:
+                digit: 3
+            DigitButton:
+                digit: 4
+            DigitButton:
+                digit: 5
+            DigitButton:
+                digit: 6
+            DigitButton:
+                digit: 7
+            DigitButton:
+                digit: 8
+            DigitButton:
+                digit: 9
+        Button:
+            background_normal: "assets/cancel.png"
+            background_down: "assets/cancel_down.png"
+            border: 0,0,0,0 # Or else the image would look weird
+            pos_hint: {'x': 0.87, 'y': 0.74}
+            size_hint: 0.073125,0.13
+            # size: 70,70
+        Button:
+            background_normal: "assets/backspace.png"
+            background_down: "assets/backspace_down.png"
+            border: 0,0,0,0
+            pos_hint: {'x': 0.87, 'y': 0.58}
+            size_hint: 0.073125,0.13
+            # size: 70,70
+        Image:
+            source: "assets/clock.png"
+            pos_hint: {'x': 0.87, 'y': 0.37}
+            size_hint: 0.073125,0.13
+            # size: 70,70
         Label:
-            text: "Welcome to game"
+            text: "1m30s"
+            font_size:"20sp"
+            pos_hint: {'x': 0.87, 'y': 0.27}
+            size_hint: 0.073125,0.13
+            # size: 70,70
+        Button:
+            background_normal: "assets/confirm.png"
+            background_down: "assets/confirm_down.png"
+            border: 0,0,0,0
+            pos_hint: {'x': 0.87, 'y': 0.12}
+            size_hint: 0.073125,0.13
+            # size: 70,70
 <SettingsScreen>:
     BoxLayout:
         Button:

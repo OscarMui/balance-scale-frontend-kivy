@@ -3,21 +3,41 @@ import asyncio
 from kivy.app import App
 from kivy.lang.builder import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
+from kivy.uix.widget import Widget
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 from kivy.core.window import Window
 from kivy.animation import Animation
 from kivy.uix.effectwidget import HorizontalBlurEffect
 from kivy.core.text import LabelBase
+from kivy.uix.button import ButtonBehavior, Button
+from kivy.properties import (NumericProperty)
 
 from common.visibility import show, hide
 from logic import logic
 
 # Load static template
-Builder.load_file("app.kv")
+Builder.load_file("main.kv")
 
 # Set default screen size to a landscape phone
 Window.size = (667, 375)
+
+class DigitButton(Button):
+    digit = NumericProperty(0)
+    
+    def on_press(self):
+        self.background_color = (1, 1, 1, 1) 
+        self.color = (0, 0, 0, 1) 
+        print(f'digitButton{self.digit} pressed')
+    def on_release(self):
+        self.background_color = (0, 0, 0, 1) 
+        self.color = (1, 1, 1, 1)
+        
+    
+# class CircularButton(ButtonBehavior, Label):
+#     background_color = (0, 1, 0, 1)
+#     background_down = (1, 0, 0, 1)
+#     text = "hello world"
 
 class HomeScreen(Screen):
     def __init__(self, qGame, qApp, name):
@@ -110,9 +130,9 @@ class JoinRoomScreen(Screen):
         self.gameStarted = True
         gameInfo = event
         titleLabel.text = f'Game is starting ({participantCount}/{participantsPerGame})'
-        print(self.ids["exitButton"].background_color)
+        # print(self.ids["exitButton"].background_color)
         self.ids["exitButton"].background_color = [0.5,0.5,0.5, 1]
-        print(self.ids["exitButton"].background_color)
+        # print(self.ids["exitButton"].background_color)
         for i in range(min(5,len(gameInfo["participants"]))):
             p = gameInfo["participants"][i]
             self.ids[f'participantNickname{i}'].text = p["nickname"]

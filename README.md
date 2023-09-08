@@ -6,28 +6,46 @@ The frontend of a game based on Alice in Borderland, a TV show on Netflix.
 
 Written in Python mainly using the asyncio library to handle communication with the server via websocket.
 
-## Installation
+## Installation (for running the game)
 
-Requires Python and pip
+Requires Python 3.10 and pip
 
 [Check out how to install pip](https://pip.pypa.io/en/stable/installation/)
 
 [Follow the Kivy installation guide](https://kivy.org/doc/stable/gettingstarted/installation.html)
 
-Here is the commands for MacOS.
+Here are the commands for MacOS.
 
 ```bash
-python3.11 -m virtualenv kivy_venv
-source venv/bin/activate
-pip3.11 install -r requirements.txt
+python3.10 -m virtualenv build_venv
+source build_venv/bin/activate
+python -m pip install "kivy[base]" aiohttp websocket_client
+
 ```
 
-## Usage
+## Installation (for Android build)
+
+First finish the normal installation.
 
 ```bash
-source venv/bin/activate
-python3.11 client.py
+python -m pip install buildozer
+python -m pip install --upgrade Cython==0.29.36 virtualenv
+
 ```
+
+## Build for Android
+
+Using buildozer 
+
+Docs:
+
+https://kivy.org/doc/stable/guide/packaging-android.html#packaging-android
+
+https://buildozer.readthedocs.io/en/latest/installation.html#targeting-android
+
+(BUT please use cython version 0.29.36 instead)
+
+https://buildozer.readthedocs.io/en/latest/quickstart.html
 
 ## Game Rules
 
