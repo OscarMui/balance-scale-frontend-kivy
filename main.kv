@@ -179,6 +179,7 @@
                 id: infoLabel
                 text: "info"
         GridLayout:
+            id: numpad
             cols: 3
             pos_hint: {'x': 0.45, 'y': 0.1}
             size_hint: 0.35,0.8
@@ -186,26 +187,27 @@
                 text: ""
             Label:
                 text: ""
-            DigitButton:
-                digit: 0
-            DigitButton:
-                digit: 1
-            DigitButton:
-                digit: 2
-            DigitButton:
-                digit: 3
-            DigitButton:
-                digit: 4
-            DigitButton:
-                digit: 5
-            DigitButton:
-                digit: 6
-            DigitButton:
-                digit: 7
-            DigitButton:
-                digit: 8
-            DigitButton:
-                digit: 9
+            # DigitButtons will be rendered in code
+            # DigitButton:
+            #     digit: 0
+            # DigitButton:
+            #     digit: 1
+            # DigitButton:
+            #     digit: 2
+            # DigitButton:
+            #     digit: 3
+            # DigitButton:
+            #     digit: 4
+            # DigitButton:
+            #     digit: 5
+            # DigitButton:
+            #     digit: 6
+            # DigitButton:
+            #     digit: 7
+            # DigitButton:
+            #     digit: 8
+            # DigitButton:
+            #     digit: 9
         Button:
             background_normal: "assets/cancel.png"
             background_down: "assets/cancel_down.png"
@@ -226,6 +228,7 @@
             size_hint: 0.073125,0.13
             # size: 70,70
         Label:
+            id: timer
             text: "1m30s"
             font_size:"20sp"
             pos_hint: {'x': 0.87, 'y': 0.27}
@@ -238,6 +241,13 @@
             pos_hint: {'x': 0.87, 'y': 0.12}
             size_hint: 0.073125,0.13
             # size: 70,70
+
+<StatusScreen>:
+    BoxLayout:
+        Label:
+            text: "hello"
+
+
 <SettingsScreen>:
     BoxLayout:
         Button:

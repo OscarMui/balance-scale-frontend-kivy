@@ -12,6 +12,7 @@ from kivy.uix.effectwidget import HorizontalBlurEffect
 from kivy.core.text import LabelBase
 from kivy.uix.button import ButtonBehavior, Button
 from kivy.properties import (NumericProperty)
+from common.now import now
 
 from common.visibility import show, hide
 from logic import logic
@@ -24,11 +25,20 @@ Window.size = (667, 375)
 
 class DigitButton(Button):
     digit = NumericProperty(0)
+
+    def __init__(self, qApp, digit):
+        super().__init__()
+        self.digit = digit
+        self.qApp = qApp
     
     def on_press(self):
         self.background_color = (1, 1, 1, 1) 
         self.color = (0, 0, 0, 1) 
-        print(f'digitButton{self.digit} pressed')
+        self.qApp.put_nowait({
+            "event": "digitPressed",
+            "digit": self.digit
+        })
+
     def on_release(self):
         self.background_color = (0, 0, 0, 1) 
         self.color = (1, 1, 1, 1)
@@ -93,52 +103,63 @@ class JoinRoomScreen(Screen):
         self.qGame = qGame  
         self.qApp = qApp 
         self.gameStarted = False
+        self.app = App.get_running_app()
 
     def on_enter(self):
         self.joinRoomTask = asyncio.create_task(self.__joinRoom())
     
     async def __joinRoom(self):
-        titleLabel = self.ids["titleLabel"]
-        bodyLabel = self.ids["bodyLabel"]
+        try:
+            titleLabel = self.ids["titleLabel"]
+            bodyLabel = self.ids["bodyLabel"]
 
-        print("In join room")
+            print("In join room")
 
-        event = await self.qApp.get()
-
-        while event["event"] != "gameStart":
-            if event["event"] == "serverConnected":
-                participantCount = event["participantsCount"]
-                participantsPerGame = event["participantsPerGame"]
-                titleLabel.text = f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
-                for i in range(min(5,event["participantsCount"])):
-                    show(self.ids[f'pfp{i}'])
-            elif event["event"] == "serverConnectionFailed":
-                titleLabel.text = "An error occured"
-                bodyLabel.text = event["errorMsg"]
-                return
-            else:
-                assert(event["event"]=="updateParticipantsCount")
-                participantCount = event["participantsCount"]
-                participantsPerGame = event["participantsPerGame"]
-                titleLabel.text = f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
-                for i in range(min(5,event["participantsCount"])):
-                    show(self.ids[f'pfp{i}'])
             event = await self.qApp.get()
 
-        assert(event["event"]=="gameStart")
-        print("gameStart event received by app")
-        self.gameStarted = True
-        gameInfo = event
-        titleLabel.text = f'Game is starting ({participantCount}/{participantsPerGame})'
-        # print(self.ids["exitButton"].background_color)
-        self.ids["exitButton"].background_color = [0.5,0.5,0.5, 1]
-        # print(self.ids["exitButton"].background_color)
-        for i in range(min(5,len(gameInfo["participants"]))):
-            p = gameInfo["participants"][i]
-            self.ids[f'participantNickname{i}'].text = p["nickname"]
+            while event["event"] != "gameStart":
+                if event["event"] == "serverConnected":
+                    participantCount = event["participantsCount"]
+                    participantsPerGame = event["participantsPerGame"]
+                    titleLabel.text = f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
+                    for i in range(min(5,event["participantsCount"])):
+                        show(self.ids[f'pfp{i}'])
+                elif event["event"] == "serverConnectionFailed":
+                    titleLabel.text = "An error occured"
+                    bodyLabel.text = event["errorMsg"]
+                    return
+                else:
+                    assert(event["event"]=="updateParticipantsCount")
+                    participantCount = event["participantsCount"]
+                    participantsPerGame = event["participantsPerGame"]
+                    titleLabel.text = f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
+                    for i in range(min(5,event["participantsCount"])):
+                        show(self.ids[f'pfp{i}'])
+                event = await self.qApp.get()
 
-        await asyncio.sleep(1)
-        self.manager.current = "game"
+            assert(event["event"]=="gameStart")
+            print("gameStart event received by app")
+            self.gameStarted = True
+            gameInfo = event
+            titleLabel.text = f'Game is starting ({participantCount}/{participantsPerGame})'
+            bodyLabel.text = "The game will start shortly"
+            # print(self.ids["exitButton"].background_color)
+            self.ids["exitButton"].background_color = [0.5,0.5,0.5, 1]
+            # print(self.ids["exitButton"].background_color)
+            for i in range(min(5,len(gameInfo["participants"]))):
+                p = gameInfo["participants"][i]
+                self.ids[f'participantNickname{i}'].text = p["nickname"]
+
+            if gameInfo["roundStartTime"]-now() > 0:
+                print("Waiting for round start")
+                await asyncio.sleep((gameInfo["roundStartTime"]-now())/1000)
+
+            self.app.globalGameInfo = gameInfo
+            self.manager.current = "game"
+
+        except Exception as e:
+            # We need to print the exception or else it will fail silently
+            print("ERROR __joinRoom",str(e))
     
     def exitGame(self):
         if(self.gameStarted):
@@ -152,11 +173,93 @@ class JoinRoomScreen(Screen):
             return
         
 class GameScreen(Screen):
+    endTime = None
+
+    def __init__(self, qGame, qApp, name):
+        super().__init__(name=name)
+        self.qGame = qGame  
+        self.qApp = qApp 
+        self.app = App.get_running_app()
+
+        numpad = self.ids["numpad"]
+
+        for i in range(0,10): # [0..9]
+            numpad.add_widget(DigitButton(self.qApp,i))
+    
+    def on_enter(self):
+        print("game on_enter")
+        # get gameInfo back from a previous screen
+        gameInfo = self.app.globalGameInfo
+        
+        print(gameInfo)
+        # make sure the game is still in progress
+        assert(gameInfo["gameEnded"] == False)
+        print("Game in progress")
+
+        # make sure we are not dead
+        isDead = gameInfo["us"]["isDead"] 
+        assert(isDead == False)
+        print("We are not dead")
+
+        # assert round has started
+        assert(gameInfo["roundStartTime"] <= now())
+        print("Round has started")
+
+        print("in game screen (after assertions)")
+        
+        # setup end time first, so that handleTimer works correctly
+        self.endTime = gameInfo["roundEndTime"]
+
+        # handle events
+        self.handleGameTask = asyncio.create_task(self.__handleGame())
+
+        # handle timer
+        self.handleTimerTask = asyncio.create_task(self.__handleTimer())
+    
+    async def __handleTimer(self):
+        try:
+            timer = self.ids["timer"]
+            while now() < self.endTime: 
+                seconds = (self.endTime-now())//1000
+                if seconds <= 15: 
+                    # if globalGuess != None:
+                    #     print(f'{seconds}s (Your guess is {globalGuess}.)')
+                    # else:
+                    #     print(f'\033[91m>>>{seconds}s remaining. You have not submitted your guess. It is a GAME OVER for you if you do not submit a guess before the timer runs out.\033[0m')
+                    timer.text = f'{seconds}s'
+                elif seconds < 60:
+                    timer.text = f'{seconds}s'
+                else:
+                    timer.text = f'{seconds//60}m{seconds%60}s'
+                await asyncio.sleep(1)
+        except Exception as e:
+            # We need to print the exception or else it will fail silently
+            print("ERROR __handleTimer",str(e))
+
+    async def __handleGame(self):
+        try:
+            # get gameInfo back from a previous screen
+            gameInfo = self.app.globalGameInfo
+
+            endTime = gameInfo["roundEndTime"]
+
+            event = await self.qApp.get()
+
+            while event["event"] != "gameStart":
+                print(event)
+                event = await self.qApp.get()
+                # if event["event"] == "digitPressed":
+                #     pass
+        
+        except Exception as e:
+            # We need to print the exception or else it will fail silently
+            print("ERROR __handleGame",str(e))
+
+class StatusScreen(Screen):
     def __init__(self, qGame, qApp, name):
         super().__init__(name=name)
         self.qGame = qGame  
         self.qApp = qApp  
-
 class SettingsScreen(Screen):
     def __init__(self, qGame, qApp, name):
         super().__init__(name=name)
@@ -168,6 +271,8 @@ class TenbinApp(App):
     qGame = asyncio.Queue()
     qApp = asyncio.Queue()
     globalNickname = None
+    globalId = None
+    globalGameInfo = None
 
     def build(self):
         # Create the manager
@@ -177,6 +282,7 @@ class TenbinApp(App):
         sm.add_widget(HomeScreen(self.qGame,self.qApp,name='home'))
         sm.add_widget(JoinRoomScreen(self.qGame,self.qApp,name='joinRoom'))
         sm.add_widget(GameScreen(self.qGame,self.qApp,name='game'))
+        sm.add_widget(StatusScreen(self.qGame,self.qApp,name='status'))
         sm.add_widget(SettingsScreen(self.qGame,self.qApp,name='settings'))
 
         # remember to return the screen manager

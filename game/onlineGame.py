@@ -11,14 +11,11 @@ class OnlineGame:
     guessSuccessEvent = asyncio.Event()
 
     # endTime and a lock for mutex
-    endTime = 0
-    startTime = 0
+    # endTime = 0
+    # startTime = 0
     # endTimeLock = asyncio.Lock()
 
-    guess = None
-
-    id = ""
-    isDead = False
+    nickname = None
     gameInfo = None
 
     def __init__(self, qGame, qApp, nickname):
@@ -57,6 +54,7 @@ class OnlineGame:
                 })
                 return
             assert(res["result"]=="success")
+            pid = res["id"]
 
             print("Joined websocket")
 
@@ -104,24 +102,42 @@ class OnlineGame:
                 event = await self.qGame.get()
         
         assert(event["event"]=="gameStart")
-        # forward gameStart event to app
-        self.qApp.put_nowait(event)
+
+        # Find our own info
+        ps = event["participants"]
+        event["us"] = list(filter(lambda p: p["id"]==pid,ps))[0]
 
         gameInfo = event
 
-        while True:
-            await asyncio.sleep(1)
+        # forward gameStart event to app
+        self.qApp.put_nowait(gameInfo)
 
-        # while not gameInfo["gameEnded"]:
-        #     if not self.isDead:
-        #         if gameInfo["roundStartTime"]-now() > 0:
-        #             print("Waiting for round start")
-        #             await asyncio.sleep((gameInfo["roundStartTime"]-now())/1000)
-        #         self.qApp.put_nowait({
-        #             "event": "roundStart"
-        #         })
-        #         self.endTime = gameInfo["roundEndTime"]
-        #         self.startTime = gameInfo["roundStartTime"]
+        while not gameInfo["gameEnded"]:
+            # acts as a middleman between the server and the UI
+            event = await self.qGame.get() 
+            while event["event"]!="gameInfo":
+                if event["event"] == "submitGuess":
+                    # this event is from the app, pass it on to the server
+                    sendMsg(event)
+                    res = await self.qGame.get()
+                    while not "result" in event:
+                        # in case other events get in the way, enqueue the event again
+                        self.qGame.put_nowait(res)
+                        res = await self.qGame.get()
+                    assert(res["result"]=="success")
+                elif event["event"] == "participantDisconnectedMidgame":
+                    # this event is from server, pass it on to app
+                    self.qApp.put_nowait(res)
+                else:
+                    assert(event["event"] == "changeCountdown")
+                    self.qApp.put_nowait(res)
+                event = await self.qGame.get() 
+
+            # Find our own info
+            ps = event["participants"]
+            event["us"] = list(filter(lambda p: p["id"]==id,ps))[0]
+
+            gameInfo = event
 
 
     async def __obtainToken(self):
