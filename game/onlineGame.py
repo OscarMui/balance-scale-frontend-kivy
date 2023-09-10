@@ -1,10 +1,9 @@
 import asyncio
 import aiohttp 
-import websocket
 
 from common.constants import SERVER_URL, WSS_URL, CLIENT_VERSION
 from common.now import now
-from common.sockets import sendMsg, recvMsgs, pingpong
+from common.socket import Socket
 
 class OnlineGame:
     # an event for receiving the success message after submitGuess
@@ -36,13 +35,7 @@ class OnlineGame:
             print("finished obtainToken")
 
             # establish ws connection
-            self.ws = websocket.create_connection(WSS_URL)
-
-             # spawns off ping pong task
-            self.pingPongTask = asyncio.create_task(pingpong(self.ws))
-
-            # spawns off a task to put all msgs received in an event queue
-            self.recvMsgsTask = asyncio.create_task(recvMsgs(self.ws, self.qGame))
+            self.socket = Socket(WSS_URL,self.qGame)
 
             # consume the response of websocket connection feedback
             res = await self.qGame.get()
@@ -59,7 +52,7 @@ class OnlineGame:
             print("Joined websocket")
 
             # send joinGame request
-            sendMsg(self.ws,{
+            self.socket.sendMsg({
                 "method": "joinGame",
                 "nickname": self.nickname,
             })
@@ -123,7 +116,7 @@ class OnlineGame:
                         "id": pid,
                         "guess": event["guess"],
                     }
-                    sendMsg(self.ws,req)
+                    self.socket.sendMsg(req)
                     res = await self.qGame.get()
                     while not "result" in res:
                         print(res)
@@ -170,10 +163,7 @@ class OnlineGame:
                     print("Time in sync")
 
     def __del__(self):
-        if hasattr(self,"pingPongTask"):
-            self.pingPongTask.cancel()
-        if hasattr(self,"recvMsgsTask"):
-            self.recvMsgsTask.cancel()  
-        if hasattr(self,"ws"):
-            self.ws.close()
+        if(hasattr(self,"socket")):
+            # call destructor of the socket
+            self.socket.stop()
         print("onlineGame destructor finished")

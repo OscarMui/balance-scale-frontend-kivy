@@ -30,7 +30,7 @@ async def logic(qGame, qMain):
             await game.play()
             
             #destruction
-            game = None
+            del game
             
     except asyncio.CancelledError as e:
         print('Logic was canceled', e)
