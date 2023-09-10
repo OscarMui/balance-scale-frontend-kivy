@@ -118,19 +118,25 @@ class OnlineGame:
             while event["event"]!="gameInfo":
                 if event["event"] == "submitGuess":
                     # this event is from the app, pass it on to the server
-                    sendMsg(event)
+                    req = {
+                        "method": "submitGuess",
+                        "id": pid,
+                        "guess": event["guess"],
+                    }
+                    sendMsg(self.ws,req)
                     res = await self.qGame.get()
-                    while not "result" in event:
+                    while not "result" in res:
+                        print(res)
                         # in case other events get in the way, enqueue the event again
                         self.qGame.put_nowait(res)
                         res = await self.qGame.get()
                     assert(res["result"]=="success")
                 elif event["event"] == "participantDisconnectedMidgame":
                     # this event is from server, pass it on to app
-                    self.qApp.put_nowait(res)
+                    self.qApp.put_nowait(event)
                 else:
                     assert(event["event"] == "changeCountdown")
-                    self.qApp.put_nowait(res)
+                    self.qApp.put_nowait(event)
                 event = await self.qGame.get() 
 
             # Find our own info

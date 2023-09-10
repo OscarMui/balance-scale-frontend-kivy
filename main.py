@@ -11,9 +11,10 @@ from kivy.animation import Animation
 from kivy.uix.effectwidget import HorizontalBlurEffect
 from kivy.core.text import LabelBase
 from kivy.uix.button import ButtonBehavior, Button
-from kivy.properties import (NumericProperty)
-from common.now import now
+from kivy.properties import (NumericProperty, ColorProperty)
+from kivy.graphics import Color, Rectangle
 
+from common.now import now
 from common.visibility import show, hide
 from logic import logic
 
@@ -23,6 +24,30 @@ Builder.load_file("main.kv")
 # Set default screen size to a landscape phone
 Window.size = (667, 375)
 
+class GuessLabel(Label):
+    border_color = ColorProperty((1, 0, 0, 1)) # Default border color (red)
+    background_color = ColorProperty((0, 1, 0, 1)) # Default background color (green)
+
+    def __init__(self, **kwargs):
+        super(GuessLabel, self).__init__(**kwargs)
+        self.bind(size=self.update_canvas)
+        self.bind(border_color=self.update_canvas)
+        self.bind(background_color=self.update_canvas)
+
+    def update_canvas(self, *args):
+        self.canvas.before.clear()
+        with self.canvas.before:
+            # Border color
+            Color(*self.border_color)
+            # Border rectangle
+            border_width = 2
+            Rectangle(pos=self.pos, size=self.size)
+            # Background color
+            Color(*self.background_color)
+            # Background rectangle (inside border)
+            Rectangle(pos=(self.pos[0] + border_width, self.pos[1] + border_width),
+                      size=(self.size[0] - 2 * border_width, self.size[1] - 2 * border_width))
+            
 class DigitButton(Button):
     digit = NumericProperty(0)
 
@@ -36,7 +61,7 @@ class DigitButton(Button):
         self.color = (0, 0, 0, 1) 
         self.qApp.put_nowait({
             "event": "digitPressed",
-            "digit": self.digit
+            "digit": str(self.digit)
         })
 
     def on_release(self):
@@ -173,8 +198,6 @@ class JoinRoomScreen(Screen):
             return
         
 class GameScreen(Screen):
-    endTime = None
-
     def __init__(self, qGame, qApp, name):
         super().__init__(name=name)
         self.qGame = qGame  
@@ -186,6 +209,21 @@ class GameScreen(Screen):
         for i in range(0,10): # [0..9]
             numpad.add_widget(DigitButton(self.qApp,i))
     
+    def confirmPressed(self):
+        self.qApp.put_nowait({
+            "event": "confirmPressed"
+        })
+
+    def backspacePressed(self):
+        self.qApp.put_nowait({
+            "event": "backspacePressed"
+        })
+
+    def cancelPressed(self):
+        self.qApp.put_nowait({
+            "event": "cancelPressed"
+        })
+
     def on_enter(self):
         print("game on_enter")
         # get gameInfo back from a previous screen
@@ -219,18 +257,21 @@ class GameScreen(Screen):
     async def __handleTimer(self):
         try:
             timer = self.ids["timer"]
+            guessLabel = self.ids["guessLabel"]
             while now() < self.endTime: 
                 seconds = (self.endTime-now())//1000
-                if seconds <= 15: 
-                    # if globalGuess != None:
-                    #     print(f'{seconds}s (Your guess is {globalGuess}.)')
-                    # else:
-                    #     print(f'\033[91m>>>{seconds}s remaining. You have not submitted your guess. It is a GAME OVER for you if you do not submit a guess before the timer runs out.\033[0m')
-                    timer.text = f'{seconds}s'
-                elif seconds < 60:
+
+                # modify timer
+                if seconds < 60:
                     timer.text = f'{seconds}s'
                 else:
                     timer.text = f'{seconds//60}m{seconds%60}s'
+                
+                # modify color of guessLabel
+                if hasattr(self,"confirmedGuess") and hasattr(self,"lastPressTime") and self.confirmedGuess != int(guessLabel.text) and self.lastPressTime + 10*1000 < now():
+                    guessLabel.background_color = (1,0,0,1) # red
+
+                # Rember to await!
                 await asyncio.sleep(1)
         except Exception as e:
             # We need to print the exception or else it will fail silently
@@ -241,16 +282,51 @@ class GameScreen(Screen):
             # get gameInfo back from a previous screen
             gameInfo = self.app.globalGameInfo
 
+            guessLabel = self.ids["guessLabel"]
+            guessLabel.text = ""
+
             endTime = gameInfo["roundEndTime"]
 
             event = await self.qApp.get()
 
             while event["event"] != "gameStart":
                 print(event)
+                if event["event"] == "digitPressed":
+                    if int(guessLabel.text + event["digit"]) <= 100 and int(guessLabel.text + event["digit"]) >= 0:
+                        guessLabel.background_color = (0,0,0,1) # black
+                        self.lastPressTime = now()
+                        guessLabel.text = str(int(guessLabel.text + event["digit"])) # the str(int) is there to let us change from 0 to 4, lets say
+                    else:
+                        print(f'{int(guessLabel.text + event["digit"])} is not a valid guess')
+                elif event["event"] == "confirmPressed":
+                    guess = int(guessLabel.text)
+                    assert(isinstance(guess, int) and guess <= 100 and guess >= 0)
+
+                    # pass to logic thread
+                    self.qGame.put_nowait({
+                        "event": "submitGuess",
+                        "guess": guess,
+                    })
+
+                    guessLabel.background_color = (0,1,0,1) # green
+                    self.confirmedGuess = guess
+                    self.lastPressTime = now()
+
+                elif event["event"] == "backspacePressed":
+                    l = len(guessLabel.text)
+                    if l > 0:
+                        guessLabel.background_color = (0,0,0,1) # black
+                        self.lastPressTime = now()
+                        guessLabel.text = guessLabel.text[:-1]
+                elif event["event"] == "cancelPressed":
+                    guessLabel.background_color = (0,0,0,1) # black
+                    self.lastPressTime = now()
+                    guessLabel.text = ""
+                else:
+                    print("unhandled event", event["event"])
+
                 event = await self.qApp.get()
-                # if event["event"] == "digitPressed":
-                #     pass
-        
+
         except Exception as e:
             # We need to print the exception or else it will fail silently
             print("ERROR __handleGame",str(e))
