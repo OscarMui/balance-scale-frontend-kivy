@@ -1,0 +1,55 @@
+#:kivy 2.2.1
+
+<HomeScreen>:
+    canvas:
+        Rectangle:
+            id: background
+            source: 'assets/background-blur.jpg'
+            pos: self.pos
+            size: self.size
+            
+    RelativeLayout:
+        Label:
+            text: "[ GAME ]"
+            font_size:"20sp"
+            pos_hint: {'center_x': 0.5, 'y': 0.85}
+            size_hint: 1, None
+
+        Label:
+            text: "Tenbin"
+            font: "Noto Sans"
+            font_size: "35sp"
+            pos_hint: {'center_x': 0.5, 'y': 0.7}
+            size_hint: 1, None
+        TextInput:
+            id: nickname
+            hint_text:"Enter your name"
+            font_name: "Noto Sans"
+            font_size:"20sp"
+            halign: 'center'
+            valign: 'middle'
+            multiline: False
+            background_color: 0.6, 0.6, 0.6, 0.5
+            foreground_color: "white"
+            hint_text_color: "#AAAAAA"
+            pos_hint: {'center_x': 0.5, 'y': 0.25}
+            size_hint: 0.4, 0.125
+        BoxLayout:
+            pos_hint: {'center_x': 0.5, 'y': 0.05}
+            size_hint: 0.4, 0.15
+            spacing: 10
+            Button:
+                text: "Play Online"
+                font_size:"20sp"
+                background_color: 0, 0.7, 0, 1
+                halign: 'center'
+                on_press: root.modeSelection("online")
+            Button:
+                text: "Play Solo"
+                font_size:"20sp"
+                background_color: 0.7, 0, 0, 1
+                halign: 'center'
+                on_press: root.modeSelection("solo")
+            # Button:
+            #     text: "Goto settings"
+            #     on_press: root.manager.current = "settings"

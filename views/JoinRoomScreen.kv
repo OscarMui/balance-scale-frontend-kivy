@@ -1,0 +1,84 @@
+#:kivy 2.2.1
+
+<JoinRoomScreen>:
+    # canvas:
+    #     Rectangle:
+    #         id: background
+    #         source: 'assets/background-blur.jpg'
+    #         pos: self.pos
+    #         size: self.size
+    RelativeLayout:
+        Label:
+            id: titleLabel
+            text: "Connecting to server"
+            font_size:"20sp"
+            pos_hint: {'center_x': 0.5, 'y': 0.85}
+            size_hint: 1, None
+        Label:
+            id: bodyLabel
+            font_size:"14sp"
+            text: "Please wait..."
+            pos_hint: {'center_x': 0.5, 'y': 0.7}
+            size_hint: 1, None
+
+            # wrap text
+            size_hint_y: None
+            text_size: self.width, None
+            height: self.texture_size[1]
+        BoxLayout:
+            spacing: 35 # space between children
+            pos_hint: {'center_x': 0.5, 'y': 0.2}
+            size_hint: 0.8, 0.3
+            BoxLayout:
+                orientation: "vertical"
+                Image:
+                    id: pfp0
+                    source: "assets/pfp.jpg"
+                    opacity: 0 # hide
+                    fit_mode: "scale-down"
+                Label:
+                    id: participantNickname0
+            BoxLayout:
+                orientation: "vertical"
+                Image:
+                    id: pfp1
+                    source: "assets/pfp.jpg"
+                    opacity: 0 # hide
+                    fit_mode: "scale-down"
+                Label:
+                    id: participantNickname1
+            BoxLayout:
+                orientation: "vertical"
+                Image:
+                    id: pfp2
+                    source: "assets/pfp.jpg"
+                    opacity: 0 # hide
+                    fit_mode: "scale-down"
+                Label:
+                    id: participantNickname2
+            BoxLayout:
+                orientation: "vertical"
+                Image:
+                    id: pfp3
+                    source: "assets/pfp.jpg"
+                    opacity: 0 # hide
+                    fit_mode: "scale-down"
+                Label:
+                    id: participantNickname3
+            BoxLayout:
+                orientation: "vertical"
+                Image:
+                    id: pfp4
+                    source: "assets/pfp.jpg"
+                    opacity: 0 # hide
+                    fit_mode: "scale-down"
+                Label:
+                    id: participantNickname4
+        Button:
+            pos_hint: {'x': 0.87, 'y': 0.05}
+            size_hint: 0.1, None
+            id: exitButton
+            text: "Exit"
+            background_color: 1, 0, 0
+            halign: 'center'
+            on_press: root.exitGame()
