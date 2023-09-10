@@ -10,15 +10,24 @@ from kivy.graphics import Color, Rectangle
 from common.now import now
 
 class GuessLabel(Label):
-    border_color = ColorProperty((1, 0, 0, 1)) # Default border color (red)
-    background_color = ColorProperty((0, 1, 0, 1)) # Default background color (green)
+    border_color = ColorProperty((1, 1, 1, 1)) # Default border color (white)
+    background_color = ColorProperty((0, 0, 0, 1)) # Default background color (black)
 
     def __init__(self, **kwargs):
         super(GuessLabel, self).__init__(**kwargs)
+        self.changeColor("red")
         self.bind(size=self.update_canvas)
         self.bind(border_color=self.update_canvas)
         self.bind(background_color=self.update_canvas)
 
+    def changeColor(self,color):
+        if color == "red":
+            self.background_color = (89.0/255,0,0,5)
+        elif color == "green":
+            self.background_color = (0,89.0/255,0,5)
+        else: # black
+            self.background_color = (0,0,0,1)
+            
     def update_canvas(self, *args):
         self.canvas.before.clear()
         with self.canvas.before:
@@ -120,18 +129,26 @@ class GameScreen(Screen):
         try:
             timer = self.ids["timer"]
             guessLabel = self.ids["guessLabel"]
-            while now() < self.endTime: 
-                seconds = (self.endTime-now())//1000
+            while True: 
+                if now() < self.endTime:
+                    seconds = (self.endTime-now())//1000
 
-                # modify timer
-                if seconds < 60:
-                    timer.text = f'{seconds}s'
-                else:
-                    timer.text = f'{seconds//60}m{seconds%60}s'
-                
-                # modify color of guessLabel
-                if hasattr(self,"confirmedGuess") and hasattr(self,"lastPressTime") and self.confirmedGuess != int(guessLabel.text) and self.lastPressTime + 10*1000 < now():
-                    guessLabel.background_color = (1,0,0,1) # red
+                    # modify timer
+                    if seconds < 60:
+                        timer.text = f'{seconds}s'
+                    else:
+                        timer.text = f'{seconds//60}m{seconds%60}s'
+                    
+                    # modify color of guessLabel
+                    # print(hasattr(self,"lastPressTime"))
+                    # print(not hasattr(self,"confirmedGuess") or guessLabel.text == "" or self.confirmedGuess != int(guessLabel.text))
+                    # if hasattr(self,"lastPressTime"):
+                    #     print(self.lastPressTime + 10*1000)
+                    #     print(now())
+                    if not hasattr(self,"lastPressTime"):
+                        guessLabel.changeColor("red")
+                    elif self.lastPressTime + 10*1000 < now() and (not hasattr(self,"confirmedGuess") or guessLabel.text == "" or self.confirmedGuess != int(guessLabel.text)):
+                        guessLabel.changeColor("red")
 
                 # Rember to await!
                 await asyncio.sleep(1)
@@ -155,7 +172,7 @@ class GameScreen(Screen):
                 print(event)
                 if event["event"] == "digitPressed":
                     if int(guessLabel.text + event["digit"]) <= 100 and int(guessLabel.text + event["digit"]) >= 0:
-                        guessLabel.background_color = (0,0,0,1) # black
+                        guessLabel.changeColor("black")
                         self.lastPressTime = now()
                         guessLabel.text = str(int(guessLabel.text + event["digit"])) # the str(int) is there to let us change from 0 to 4, lets say
                     else:
@@ -170,18 +187,18 @@ class GameScreen(Screen):
                         "guess": guess,
                     })
 
-                    guessLabel.background_color = (0,1,0,1) # green
+                    guessLabel.changeColor("green")
                     self.confirmedGuess = guess
                     self.lastPressTime = now()
 
                 elif event["event"] == "backspacePressed":
                     l = len(guessLabel.text)
                     if l > 0:
-                        guessLabel.background_color = (0,0,0,1) # black
+                        guessLabel.changeColor("black")
                         self.lastPressTime = now()
                         guessLabel.text = guessLabel.text[:-1]
                 elif event["event"] == "cancelPressed":
-                    guessLabel.background_color = (0,0,0,1) # black
+                    guessLabel.changeColor("black")
                     self.lastPressTime = now()
                     guessLabel.text = ""
                 else:
