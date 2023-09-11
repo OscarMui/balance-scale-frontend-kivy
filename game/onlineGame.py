@@ -1,5 +1,5 @@
 import asyncio
-import aiohttp 
+import httpx
 
 from common.constants import SERVER_URL, WSS_URL, CLIENT_VERSION
 from common.now import now
@@ -149,27 +149,21 @@ class OnlineGame:
 
 
     async def __obtainToken(self):
-        async with aiohttp.ClientSession() as session:
-            headers = {
-                "Content-Type": "application/json"
-            } 
-            
-            async with session.get(
-                SERVER_URL + "/api/version"
-            ) as resp:
-                response = await resp.json()
-                assert(response["result"]=="success")
-                acceptedClientVersions = response["acceptedClientVersions"]
-                if CLIENT_VERSION not in acceptedClientVersions:
-                    raise Exception("VERSION ERROR: Incompatible version with server. Please obtain the latest code.")
-                else:
-                    print("Version compatible")
-                networkDelay = now()-response["currentTime"]
-                print("Network delay (ms): ",networkDelay)
-                if networkDelay > response["allowedNetworkDelay"] or networkDelay < 0:
-                    raise Exception(print("SYSTEM TIME ERROR: Your network connection is unstable, or your system time is wrong."))
-                else:
-                    print("Time in sync")
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(SERVER_URL + "/api/version")
+            response = resp.json()
+            assert(response["result"]=="success")
+            acceptedClientVersions = response["acceptedClientVersions"]
+            if CLIENT_VERSION not in acceptedClientVersions:
+                raise Exception("VERSION ERROR: Incompatible version with server. Please obtain the latest code.")
+            else:
+                print("Version compatible")
+            networkDelay = now()-response["currentTime"]
+            print("Network delay (ms): ",networkDelay)
+            if networkDelay > response["allowedNetworkDelay"] or networkDelay < 0:
+                raise Exception(print("SYSTEM TIME ERROR: Your network connection is unstable, or your system time is wrong."))
+            else:
+                print("Time in sync")
 
     def __del__(self):
         if(hasattr(self,"socket")):

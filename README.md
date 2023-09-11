@@ -19,7 +19,7 @@ Here are the commands for MacOS.
 ```bash
 python3.10 -m virtualenv build_venv
 source build_venv/bin/activate
-python -m pip install "kivy[base]" aiohttp websocket_client
+python -m pip install "kivy[base]" httpx websocket_client
 
 ```
 
