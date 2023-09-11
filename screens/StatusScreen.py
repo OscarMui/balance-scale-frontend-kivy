@@ -3,7 +3,6 @@ import asyncio
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
-from kivy.animation import Animation
 
 from common.now import now
 from common.visibility import show,hide
@@ -20,10 +19,21 @@ class ParticipantUI(BoxLayout):
         show(win,animation=True)
 
     def declareGameOver(self):
-        self.ids["win"].text = "GAME OVER"
-    
+        win = self.ids["win"]
+        win.text = "GAME OVER"
+        win.color = (1,0,0,1)
+        show(win,animation=True)    
+
     def changeInfoText(self,text):
         self.ids["info"].text = text
+
+    def changeInfoColor(self,color):
+        if color == "red":
+            self.ids["info"].color = (1,0,0,1)
+            # print("label color changed to red")
+        else:
+            # white
+            self.ids["info"].color = (1,1,1,1)
 
 class StatusScreen(Screen):
     def __init__(self, qGame, qApp, name):
@@ -31,72 +41,127 @@ class StatusScreen(Screen):
         self.qGame = qGame  
         self.qApp = qApp  
         self.app = App.get_running_app()
+        self.scores = None
+        self.isDeads = None
 
     def on_pre_enter(self):
-        participantUIs = self.ids["participantUIs"]
-        participantUIs.clear_widgets()
-        hide(self.ids["calculationLabel"])
-
         self.statusTask = asyncio.create_task(self.__status())
     
     async def __status(self):
         try:
-            titleLabel = self.ids["titleLabel"]
-            calculationLabel = self.ids["calculationLabel"]
-            infoLabel = self.ids["infoLabel"]
-            participantUIs = self.ids["participantUIs"]
+            while True:
+                # declare shorthands
+                titleLabel = self.ids["titleLabel"]
+                calculationLabel = self.ids["calculationLabel"]
+                infoLabel = self.ids["infoLabel"]
+                participantUIs = self.ids["participantUIs"]
 
-            print("In status")
+                print("In status")
 
-            gameInfo = self.app.globalGameInfo
+                # clear prev state
+                participantUIs.clear_widgets()
+                hide(calculationLabel)
+                calculationLabel.text = ""
+                titleLabel.text = "[ROUND OVER]"
 
-            ps = gameInfo["participants"]
+                gameInfo = self.app.globalGameInfo
 
-            pus = list(map(lambda p: {**p, "ui": ParticipantUI(p["nickname"])},ps))
+                ps = gameInfo["participants"]
 
-            guessSum = 0
-            for i in range(len(pus)):
-                pu = pus[i]
-                guess = pu["guess"]
+                pus = list(map(lambda p: {**p, "ui": ParticipantUI(p["nickname"])},ps))
+                
+                # prepare prevScore - clear it if round == 2 (first time visiting this screen in a game)
+                # for animation only, persists between rounds
+                if gameInfo["round"] == 2:
+                    self.scores = [0 for p in ps]
+                    self.isDeads = [False for p in ps]
 
-                # Calculate sum
-                guessSum += guess
+                guessSum = 0
+                for i in range(len(pus)):
+                    pu = pus[i]
+                    guess = pu["guess"]
 
-                # Gradually prepare for the calculationLabel
-                pu["ui"].changeInfoText(str(guess))
-                if i == 0:
-                    calculationLabel.text = "(" + str(guess)
-                else:
-                    calculationLabel.text = calculationLabel.text + " + "  + str(guess)
-                participantUIs.add_widget(pu["ui"])
+                    if self.isDeads[i]:
+                        pu["ui"].declareGameOver()
+                    if guess != None:
+                        # Calculate sum
+                        guessSum += guess
 
-            # finish preparing calculationLabel
-            average = round(guessSum/len(pus),2)
-            target = round(gameInfo["target"],2)
-            calculationLabel.text = calculationLabel.text + f')/{len(pus)} = {average}\n{average} * 0.8 = {target}'
-        
-            await asyncio.sleep(1)
+                        # Gradually prepare for the calculationLabel
+                        pu["ui"].changeInfoText(str(guess))
+                        if i == 0:
+                            calculationLabel.text = "(" + str(guess)
+                        else:
+                            calculationLabel.text = calculationLabel.text + " + "  + str(guess)
+                    participantUIs.add_widget(pu["ui"])
 
-            # Show calculationLabel
-            show(calculationLabel,animation=True)
-
-            await asyncio.sleep(1)
-
-            for i in range(len(pus)):
-                pu = pus[i]
-                if pu["id"] in gameInfo["winners"]:
-                    pu["ui"].declareWin()
-
-
-            await asyncio.sleep(2)
+                # finish preparing calculationLabel
+                average = round(guessSum/len(pus),2)
+                target = round(gameInfo["target"],2)
+                calculationLabel.text = calculationLabel.text + f')/{len(pus)} = {average}\n{average} * 0.8 = {target}'
             
-            if gameInfo["roundStartTime"]-now() > 0:
-                print("Waiting for round start")
-                await asyncio.sleep((gameInfo["roundStartTime"]-now())/1000)
+                await asyncio.sleep(1)
 
-            self.app.globalGameInfo = gameInfo
-            self.manager.current = "game"
+                # Show calculationLabel
+                show(calculationLabel,animation=True)
+
+                await asyncio.sleep(1)
+
+                for i in range(len(pus)):
+                    pu = pus[i]
+                    if pu["id"] in gameInfo["winners"]:
+                        pu["ui"].declareWin()
+
+                await asyncio.sleep(2)
+
+                for i in range(len(pus)):
+                    pu = pus[i]
+                    pu["ui"].changeInfoText(str(self.scores[i]))
+
+                await asyncio.sleep(1)
+
+                for i in range(len(pus)):
+                    pu = pus[i]
+                    if pu["id"] not in gameInfo["winners"]:
+                        pu["ui"].changeInfoColor("red")
+                    pu["ui"].changeInfoText(str(pu["score"]))
+                    self.scores[i] = pu["score"]
+
+                await asyncio.sleep(1)
+
+                for i in range(len(pus)):
+                    pu = pus[i]
+                    print(pu["isDead"])
+                    if pu["isDead"]:
+                        pu["ui"].declareGameOver()
+                        self.isDeads[i] = True
+                
+                if gameInfo["gameEnded"]:
+                    # show quit button
+                    show(self.ids["exitButton"],animation=True)
+                    return
+
+                if gameInfo["us"]["isDead"]:
+                    titleLabel.text = "You are dead :("
+                    infoLabel.text = "You are spectating, waiting for others to make their guesses. You can leave the game at any time."
+                    event = await self.qApp.get()
+                    assert(event["event"]=="gameInfo")
+                    gameInfo = event
+
+                    # show quit button
+                    show(self.ids["exitButton"],animation=True)
+                else:
+                    if gameInfo["roundStartTime"]-now() > 0:
+                        print("Waiting for round start")
+                        await asyncio.sleep((gameInfo["roundStartTime"]-now())/1000)
+
+                    self.manager.current = "game"
+                    return
 
         except Exception as e:
             # We need to print the exception or else it will fail silently
             print("ERROR __status",str(e))
+
+    def exitGame(self):
+        self.app.globalGameInfo = None
+        self.manager.current = "home"

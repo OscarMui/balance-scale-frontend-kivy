@@ -23,10 +23,10 @@ class JoinRoomScreen(Screen):
         super().__init__(name=name)
         self.qGame = qGame  
         self.qApp = qApp 
-        self.gameStarted = False
         self.app = App.get_running_app()
 
     def on_pre_enter(self):
+        self.gameStarted = False
         joinRoomParticipantUIs = self.ids["joinRoomParticipantUIs"]
         joinRoomParticipantUIs.clear_widgets()
         self.joinRoomTask = asyncio.create_task(self.__joinRoom())

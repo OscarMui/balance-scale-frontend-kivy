@@ -5,14 +5,20 @@
     Label:
         id: win
         opacity: 0 # hide
+        font_size: "20sp"
+        size_hint: (1,.15)
     Image:
         id: pfp
+        size_hint: (1,.6)
         source: "assets/pfp.jpg"
         fit_mode: "scale-down"
     Label:
         id: nickname
+        size_hint: (1,.1)
     Label:
         id: info
+        font_size: "20sp"
+        size_hint: (1,.15)
 <StatusScreen>:
     # canvas:
     #     Rectangle:
@@ -30,14 +36,14 @@
         BoxLayout:
             id: participantUIs
             spacing: 35 # space between children
-            pos_hint: {'center_x': 0.5, 'y': 0.4}
-            size_hint: 0.8, 0.3
+            pos_hint: {'center_x': 0.5, 'y': 0.3}
+            size_hint: 0.8, 0.5
             
         Label:
             id: calculationLabel
             font_size:"14sp"
             text: ""
-            pos_hint: {'center_x': 0.5, 'y': 0.25}
+            pos_hint: {'center_x': 0.5, 'y': 0.15}
             size_hint: 1, None
         Label:
             id: infoLabel
@@ -50,3 +56,12 @@
             size_hint_y: None
             text_size: self.width, None
             height: self.texture_size[1]
+        Button:
+            pos_hint: {'x': 0.87, 'y': 0.05}
+            size_hint: 0.1, None
+            id: exitButton
+            text: "Exit"
+            opacity: 0 # hide
+            background_color: 0, 1, 0
+            halign: 'center'
+            on_press: root.exitGame()

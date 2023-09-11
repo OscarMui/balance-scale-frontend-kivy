@@ -22,9 +22,9 @@ class GuessLabel(Label):
 
     def changeColor(self,color):
         if color == "red":
-            self.background_color = (89.0/255,0,0,5)
+            self.background_color = (89.0/255,0,0,1)
         elif color == "green":
-            self.background_color = (0,89.0/255,0,5)
+            self.background_color = (0,89.0/255,0,1)
         else: # black
             self.background_color = (0,0,0,1)
 
@@ -214,6 +214,8 @@ class GameScreen(Screen):
                         self.__changeProposedGuess(self.proposedGuess[:-1])
                 elif event["event"] == "cancelPressed":
                     self.__changeProposedGuess("")
+                elif event["event"] == "participantDisconnectedMidgame":
+                    pass
                 else:
                     assert(event["event"] == "changeCountdown")
                     self.endTime = event["endTime"]
