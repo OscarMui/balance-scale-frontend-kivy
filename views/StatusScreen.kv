@@ -1,8 +1,52 @@
 #:kivy 2.2.1
 
+<ParticipantUI>:
+    orientation: "vertical"
+    Label:
+        id: win
+        opacity: 0 # hide
+    Image:
+        id: pfp
+        source: "assets/pfp.jpg"
+        fit_mode: "scale-down"
+    Label:
+        id: nickname
+    Label:
+        id: info
 <StatusScreen>:
-    BoxLayout:
+    # canvas:
+    #     Rectangle:
+    #         id: background
+    #         source: 'assets/background-blur.jpg'
+    #         pos: self.pos
+    #         size: self.size
+    RelativeLayout:
         Label:
-            text: "hello"
+            id: titleLabel
+            text: "[ROUND OVER]"
+            font_size:"20sp"
+            pos_hint: {'center_x': 0.5, 'y': 0.85}
+            size_hint: 1, None
+        BoxLayout:
+            id: participantUIs
+            spacing: 35 # space between children
+            pos_hint: {'center_x': 0.5, 'y': 0.4}
+            size_hint: 0.8, 0.3
+            
+        Label:
+            id: calculationLabel
+            font_size:"14sp"
+            text: ""
+            pos_hint: {'center_x': 0.5, 'y': 0.25}
+            size_hint: 1, None
+        Label:
+            id: infoLabel
+            font_size:"14sp"
+            text: ""
+            pos_hint: {'center_x': 0.5, 'y': 0.05}
+            size_hint: 1, None
 
-
+            # wrap text
+            size_hint_y: None
+            text_size: self.width, None
+            height: self.texture_size[1]

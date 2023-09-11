@@ -12,7 +12,7 @@ class HomeScreen(Screen):
         self.qApp = qApp
         self.app = App.get_running_app()
 
-    def on_enter(self):
+    def on_pre_enter(self):
         pass
 
     def modeSelection(self, mode):

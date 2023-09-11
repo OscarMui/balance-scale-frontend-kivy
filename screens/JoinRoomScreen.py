@@ -2,9 +2,21 @@ import asyncio
 
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
+from kivy.uix.boxlayout import BoxLayout
 
 from common.now import now
 from common.visibility import show, hide
+
+class JoinRoomParticipantUI(BoxLayout):
+    def __init__(self):
+        super().__init__()
+
+    def showPfp(self):
+        show(self)
+
+    def showNickname(self,nickname):
+        self.ids["nickname"].text = nickname
+    
 
 class JoinRoomScreen(Screen):
     def __init__(self, qGame, qApp, name):
@@ -14,13 +26,17 @@ class JoinRoomScreen(Screen):
         self.gameStarted = False
         self.app = App.get_running_app()
 
-    def on_enter(self):
+    def on_pre_enter(self):
+        joinRoomParticipantUIs = self.ids["joinRoomParticipantUIs"]
+        joinRoomParticipantUIs.clear_widgets()
         self.joinRoomTask = asyncio.create_task(self.__joinRoom())
     
     async def __joinRoom(self):
         try:
             titleLabel = self.ids["titleLabel"]
             bodyLabel = self.ids["bodyLabel"]
+            joinRoomParticipantUIs = self.ids["joinRoomParticipantUIs"]
+            pus = [] # list of joinRoomParticipantUIs
 
             print("In join room")
 
@@ -31,8 +47,13 @@ class JoinRoomScreen(Screen):
                     participantCount = event["participantsCount"]
                     participantsPerGame = event["participantsPerGame"]
                     titleLabel.text = f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
-                    for i in range(min(5,event["participantsCount"])):
-                        show(self.ids[f'pfp{i}'])
+                    # Create that many participants
+                    for i in range(participantsPerGame):
+                        pu = JoinRoomParticipantUI()
+                        pus.append(pu)
+                        joinRoomParticipantUIs.add_widget(pu)
+                    for i in range(participantCount):
+                        pus[i].showPfp()
                 elif event["event"] == "serverConnectionFailed":
                     titleLabel.text = "An error occured"
                     bodyLabel.text = event["errorMsg"]
@@ -42,8 +63,8 @@ class JoinRoomScreen(Screen):
                     participantCount = event["participantsCount"]
                     participantsPerGame = event["participantsPerGame"]
                     titleLabel.text = f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
-                    for i in range(min(5,event["participantsCount"])):
-                        show(self.ids[f'pfp{i}'])
+                    for i in range(participantCount):
+                        pus[i].showPfp()
                 event = await self.qApp.get()
 
             assert(event["event"]=="gameStart")
@@ -55,9 +76,9 @@ class JoinRoomScreen(Screen):
             # print(self.ids["exitButton"].background_color)
             self.ids["exitButton"].background_color = [0.5,0.5,0.5, 1]
             # print(self.ids["exitButton"].background_color)
-            for i in range(min(5,len(gameInfo["participants"]))):
+            for i in range(len(gameInfo["participants"])):
                 p = gameInfo["participants"][i]
-                self.ids[f'participantNickname{i}'].text = p["nickname"]
+                pus[i].showNickname(p["nickname"])
 
             if gameInfo["roundStartTime"]-now() > 0:
                 print("Waiting for round start")

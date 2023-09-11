@@ -4,7 +4,7 @@ from kivy.app import App
 from kivy.uix.screenmanager import Screen
 from kivy.uix.label import Label
 from kivy.uix.button import Button
-from kivy.properties import (NumericProperty, ColorProperty)
+from kivy.properties import (NumericProperty, ColorProperty, ListProperty)
 from kivy.graphics import Color, Rectangle
 
 from common.now import now
@@ -27,14 +27,14 @@ class GuessLabel(Label):
             self.background_color = (0,89.0/255,0,5)
         else: # black
             self.background_color = (0,0,0,1)
-            
+
     def update_canvas(self, *args):
         self.canvas.before.clear()
         with self.canvas.before:
             # Border color
             Color(*self.border_color)
             # Border rectangle
-            border_width = 2
+            border_width = 4
             Rectangle(pos=self.pos, size=self.size)
             # Background color
             Color(*self.background_color)
@@ -95,8 +95,34 @@ class GameScreen(Screen):
             "event": "cancelPressed"
         })
 
-    def on_enter(self):
-        print("game on_enter")
+    def __changeProposedGuess(self,guess, color="black",isClear=False):
+        self.proposedGuess = guess
+        
+        guessLabel = self.ids["guessLabel"]
+        guessLabel.changeColor(color)
+        self.lastPressTime = now()
+        
+        if isClear and guess=="" and self.confirmedGuess != None:
+            # Display the confirmedGuess instead if it exists, but internally the proposedGuess is empty
+            guessLabel.changeColor("green")
+            guessLabel.text = str(self.confirmedGuess)
+        else:
+            guessLabel.changeColor(color)
+            guessLabel.text = guess
+        
+
+    def on_pre_enter(self):
+        print("game on_pre_enter")
+
+        # Clear variables
+        self.proposedGuess = ""
+        self.confirmedGuess = None
+        self.lastPressTime = None
+        self.infos = ListProperty([]) 
+
+        self.ids["guessLabel"].text = ""
+        self.ids["guessLabel"].changeColor("red")
+        
         # get gameInfo back from a previous screen
         gameInfo = self.app.globalGameInfo
         
@@ -140,15 +166,12 @@ class GameScreen(Screen):
                         timer.text = f'{seconds//60}m{seconds%60}s'
                     
                     # modify color of guessLabel
-                    # print(hasattr(self,"lastPressTime"))
-                    # print(not hasattr(self,"confirmedGuess") or guessLabel.text == "" or self.confirmedGuess != int(guessLabel.text))
-                    # if hasattr(self,"lastPressTime"):
-                    #     print(self.lastPressTime + 10*1000)
-                    #     print(now())
-                    if not hasattr(self,"lastPressTime"):
+                    if self.lastPressTime == None:
                         guessLabel.changeColor("red")
-                    elif self.lastPressTime + 10*1000 < now() and (not hasattr(self,"confirmedGuess") or guessLabel.text == "" or self.confirmedGuess != int(guessLabel.text)):
+                    elif self.lastPressTime + 10*1000 < now() and self.confirmedGuess == None:
                         guessLabel.changeColor("red")
+                    elif self.lastPressTime + 10*1000 < now() and (self.proposedGuess == "" or self.confirmedGuess != int(self.proposedGuess)):
+                        self.__changeProposedGuess("",isClear=True)
 
                 # Rember to await!
                 await asyncio.sleep(1)
@@ -162,23 +185,19 @@ class GameScreen(Screen):
             gameInfo = self.app.globalGameInfo
 
             guessLabel = self.ids["guessLabel"]
-            guessLabel.text = ""
-
-            endTime = gameInfo["roundEndTime"]
 
             event = await self.qApp.get()
 
-            while event["event"] != "gameStart":
+            while event["event"] != "gameInfo":
                 print(event)
                 if event["event"] == "digitPressed":
-                    if int(guessLabel.text + event["digit"]) <= 100 and int(guessLabel.text + event["digit"]) >= 0:
-                        guessLabel.changeColor("black")
-                        self.lastPressTime = now()
-                        guessLabel.text = str(int(guessLabel.text + event["digit"])) # the str(int) is there to let us change from 0 to 4, lets say
+                    if int(self.proposedGuess + event["digit"]) <= 100 and int(self.proposedGuess + event["digit"]) >= 0:
+                        self.__changeProposedGuess(str(int(self.proposedGuess + event["digit"])))# the str(int) is there to let us change from 0 to 4, lets say
                     else:
-                        print(f'{int(guessLabel.text + event["digit"])} is not a valid guess')
+                        pass
+                        # print(f'{int(guessLabel.text + event["digit"])} is not a valid guess')
                 elif event["event"] == "confirmPressed":
-                    guess = int(guessLabel.text)
+                    guess = int(self.proposedGuess)
                     assert(isinstance(guess, int) and guess <= 100 and guess >= 0)
 
                     # pass to logic thread
@@ -186,26 +205,30 @@ class GameScreen(Screen):
                         "event": "submitGuess",
                         "guess": guess,
                     })
-
-                    guessLabel.changeColor("green")
                     self.confirmedGuess = guess
-                    self.lastPressTime = now()
+                    self.__changeProposedGuess("",isClear=True)
 
                 elif event["event"] == "backspacePressed":
-                    l = len(guessLabel.text)
+                    l = len(self.proposedGuess)
                     if l > 0:
-                        guessLabel.changeColor("black")
-                        self.lastPressTime = now()
-                        guessLabel.text = guessLabel.text[:-1]
+                        self.__changeProposedGuess(self.proposedGuess[:-1])
                 elif event["event"] == "cancelPressed":
-                    guessLabel.changeColor("black")
-                    self.lastPressTime = now()
-                    guessLabel.text = ""
+                    self.__changeProposedGuess("")
                 else:
-                    print("unhandled event", event["event"])
+                    assert(event["event"] == "changeCountdown")
+                    self.endTime = event["endTime"]
+                    
 
                 event = await self.qApp.get()
+
+            assert(event["event"]=="gameInfo")
+            self.app.globalGameInfo = event
+            self.manager.current = "status"
 
         except Exception as e:
             # We need to print the exception or else it will fail silently
             print("ERROR __handleGame",str(e))
+
+    def on_leave(self):
+        if hasattr(self,"handleTimerTask"):
+            self.handleTimerTask.cancel()

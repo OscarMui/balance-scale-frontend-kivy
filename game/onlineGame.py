@@ -98,7 +98,9 @@ class OnlineGame:
 
         # Find our own info
         ps = event["participants"]
-        event["us"] = list(filter(lambda p: p["id"]==pid,ps))[0]
+        p = list(filter(lambda p: p["id"]==pid,ps))[0]
+        p["nickname"] = p["nickname"] + " (YOU)"
+        event["us"] = p
 
         gameInfo = event
 
@@ -119,24 +121,31 @@ class OnlineGame:
                     self.socket.sendMsg(req)
                     res = await self.qGame.get()
                     while not "result" in res:
-                        print(res)
+                        # print(res)
                         # in case other events get in the way, enqueue the event again
                         self.qGame.put_nowait(res)
                         res = await self.qGame.get()
+                        await asyncio.sleep(0.1) # necessary or else it will enter an infinite loop when waiting for the response, so the response cannot get through
                     assert(res["result"]=="success")
                 elif event["event"] == "participantDisconnectedMidgame":
                     # this event is from server, pass it on to app
                     self.qApp.put_nowait(event)
                 else:
                     assert(event["event"] == "changeCountdown")
+                    # this event is from server, pass it on to app
                     self.qApp.put_nowait(event)
+
                 event = await self.qGame.get() 
 
             # Find our own info
             ps = event["participants"]
-            event["us"] = list(filter(lambda p: p["id"]==id,ps))[0]
+            p = list(filter(lambda p: p["id"]==pid,ps))[0]
+            p["nickname"] = p["nickname"] + " (YOU)"
+            event["us"] = p
 
             gameInfo = event
+            # inform the UI
+            self.qApp.put_nowait(gameInfo)
 
 
     async def __obtainToken(self):
