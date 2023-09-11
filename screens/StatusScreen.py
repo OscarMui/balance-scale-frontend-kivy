@@ -49,22 +49,21 @@ class StatusScreen(Screen):
     
     async def __status(self):
         try:
+            # declare shorthands
+            titleLabel = self.ids["titleLabel"]
+            calculationLabel = self.ids["calculationLabel"]
+            infoLabel = self.ids["infoLabel"]
+            participantUIs = self.ids["participantUIs"]
+
+            print("In status")
+            
+            gameInfo = self.app.globalGameInfo
             while True:
-                # declare shorthands
-                titleLabel = self.ids["titleLabel"]
-                calculationLabel = self.ids["calculationLabel"]
-                infoLabel = self.ids["infoLabel"]
-                participantUIs = self.ids["participantUIs"]
-
-                print("In status")
-
                 # clear prev state
                 participantUIs.clear_widgets()
                 hide(calculationLabel)
                 calculationLabel.text = ""
                 titleLabel.text = "[ROUND OVER]"
-
-                gameInfo = self.app.globalGameInfo
 
                 ps = gameInfo["participants"]
 
@@ -137,6 +136,7 @@ class StatusScreen(Screen):
                         self.isDeads[i] = True
                 
                 if gameInfo["gameEnded"]:
+                    infoLabel.text = "Game ended."
                     # show quit button
                     show(self.ids["exitButton"],animation=True)
                     return
@@ -144,12 +144,13 @@ class StatusScreen(Screen):
                 if gameInfo["us"]["isDead"]:
                     titleLabel.text = "You are dead :("
                     infoLabel.text = "You are spectating, waiting for others to make their guesses. You can leave the game at any time."
+                    
+                    # show quit button
+                    show(self.ids["exitButton"],animation=True)
+
                     event = await self.qApp.get()
                     assert(event["event"]=="gameInfo")
                     gameInfo = event
-
-                    # show quit button
-                    show(self.ids["exitButton"],animation=True)
                 else:
                     if gameInfo["roundStartTime"]-now() > 0:
                         print("Waiting for round start")
