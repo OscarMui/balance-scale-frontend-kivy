@@ -75,7 +75,7 @@ class OnlineGame:
             })
 
         except Exception as e:
-            print("Exception",e)
+            print("Exception in onlineGame",e)
             self.qApp.put_nowait({
                 "event": "serverConnectionFailed",
                 "errorMsg": str(e)

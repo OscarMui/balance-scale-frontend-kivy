@@ -27,11 +27,53 @@ python -m pip install "kivy[base]" httpx websocket_client
 
 First finish the normal installation.
 
+Documentation for p4a:
+
+https://python-for-android.readthedocs.io/en/latest/quickstart/?highlight=archs
+
 ```bash
-python -m pip install multidict sniffio
-python -m pip install buildozer
+pip install python-for-android
+
+brew install autoconf automake libtool openssl pkg-config
+brew tap homebrew/cask-versions
+brew install --cask homebrew/cask-versions/adoptopenjdk8
+
 python -m pip install --upgrade Cython==0.29.36 virtualenv
 ```
+
+In `.zshrc`:
+
+```bash
+# Android
+export ANDROIDSDK="$HOME/Library/Android/sdk"
+export ANDROIDNDK="$HOME/Library/Android/sdk/ndk/25.2.9519653"
+export ANDROIDAPI="34"  # Target API version of your application
+export NDKAPI="21"  # Minimum supported API version of your application
+```
+
+Remember to `source ~/.zshrc`
+
+I also mofified `venv/lib/setuptools/_distutils/version.py` because there are .DS_Store files getting in the way creating an error.
+
+```python
+def _cmp(self, other):
+    if isinstance(other, str):
+        other = LooseVersion(other)
+    elif not isinstance(other, LooseVersion):
+        return NotImplemented
+
+    print(str(self),str(self)== ".DS_Store")
+    print(str(other),str(other) == ".DS_Store")
+    if str(self) == ".DS_Store" or str(other) == ".DS_Store":
+        return 0
+    if self.version == other.version:
+        return 0
+    if self.version < other.version:
+        return -1
+    if self.version > other.version:
+        return 1
+```
+
 
 ## Build for Android
 
@@ -48,7 +90,7 @@ https://buildozer.readthedocs.io/en/latest/installation.html#targeting-android
 https://buildozer.readthedocs.io/en/latest/quickstart.html
 
 ```bash
-buildozer -v android debug run logcat
+p4a apk --private . --arch arm64-v8a --arch armeabi-v7a --package=com.kidprof.tenbin --name "Tenbin" --version 0.2.0 --bootstrap=sdl2 --requirements=python3,kivy,httpx,websocket_client,certifi,httpcore,idna,sniffio,anyio,exceptiongroup,h11
 ```
 
 ## Installation for Windows/MacOS build
