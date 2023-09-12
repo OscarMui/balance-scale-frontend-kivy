@@ -90,7 +90,7 @@ https://buildozer.readthedocs.io/en/latest/installation.html#targeting-android
 https://buildozer.readthedocs.io/en/latest/quickstart.html
 
 ```bash
-p4a apk --private . --arch arm64-v8a --arch armeabi-v7a --permission INTERNET --permission ACCESS_NETWORK_STATE --package=com.kidprof.tenbin --name "Tenbin" --version 0.2.2 --bootstrap=sdl2 --requirements=python3,kivy,httpx,websocket_client,certifi,httpcore,idna,sniffio,anyio,exceptiongroup,h11 
+p4a apk --private . --arch arm64-v8a --arch armeabi-v7a --permission android.permission.INTERNET --permission android.permission.ACCESS_NETWORK_STATE --package=com.kidprof.tenbin --name "Tenbin" --version 0.2.2 --bootstrap=sdl2 --requirements=python3,kivy,httpx,websocket_client,certifi,httpcore,idna,sniffio,anyio,exceptiongroup,h11 
 ```
 
 ```bash

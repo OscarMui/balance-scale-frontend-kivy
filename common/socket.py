@@ -1,13 +1,14 @@
 import asyncio
 import json
 import websocket
+import ssl
 
 class Socket:
     # A websocket connection, it has a public method for sending messages, and it will put all messages recevied in the specified queue
     
     def __init__(self,url,queue):
         # establish connection
-        self.ws = websocket.create_connection(url)
+        self.ws = websocket.create_connection(url,sslopt={"cert_reqs": ssl.CERT_NONE})
 
         # spawns off ping pong task
         self.pingPongTask = asyncio.create_task(self.pingpong())
