@@ -29,6 +29,11 @@ class JoinRoomScreen(Screen):
         self.gameStarted = False
         joinRoomParticipantUIs = self.ids["joinRoomParticipantUIs"]
         joinRoomParticipantUIs.clear_widgets()
+
+        titleLabel = self.ids["titleLabel"]
+        bodyLabel = self.ids["bodyLabel"]
+        titleLabel.text = "Connecting to server"
+        bodyLabel.text = "Please wait..."
         self.joinRoomTask = asyncio.create_task(self.__joinRoom())
     
     async def __joinRoom(self):

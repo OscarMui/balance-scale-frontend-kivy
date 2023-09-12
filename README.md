@@ -17,8 +17,8 @@ Requires Python 3.10 and pip
 Here are the commands for MacOS.
 
 ```bash
-python3.10 -m virtualenv build_venv
-source build_venv/bin/activate
+python3.10 -m virtualenv venv
+source venv/bin/activate
 python -m pip install "kivy[base]" httpx websocket_client
 
 ```
@@ -28,9 +28,9 @@ python -m pip install "kivy[base]" httpx websocket_client
 First finish the normal installation.
 
 ```bash
+python -m pip install multidict sniffio
 python -m pip install buildozer
 python -m pip install --upgrade Cython==0.29.36 virtualenv
-
 ```
 
 ## Build for Android
@@ -46,6 +46,22 @@ https://buildozer.readthedocs.io/en/latest/installation.html#targeting-android
 (BUT please use cython version 0.29.36 instead)
 
 https://buildozer.readthedocs.io/en/latest/quickstart.html
+
+```bash
+buildozer -v android debug run logcat
+```
+
+## Installation for Windows/MacOS build
+
+```bash
+pip install pyinstaller
+```
+
+## Build for Windows/MacOS
+
+```bash
+pyinstaller main.spec
+```
 
 ## Game Rules
 

@@ -22,7 +22,7 @@ source.include_exts = py,png,jpg,kv,atlas
 #source.exclude_exts = spec
 
 # (list) List of directory to exclude (let empty to not exclude anything)
-#source.exclude_dirs = tests, bin, venv
+source.exclude_dirs = bin, venv, build, dist, output
 
 # (list) List of exclusions using pattern matching
 # Do not prefix with './'
@@ -37,7 +37,8 @@ version = 0.1.0
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy,websocket-client, multidict, httpx
+requirements = python3,kivy 
+# ,websocket-client, multidict, sniffio, httpx
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
