@@ -161,7 +161,9 @@ class OnlineGame:
             networkDelay = now()-response["currentTime"]
             print("Network delay (ms): ",networkDelay)
             if networkDelay > response["allowedNetworkDelay"] or networkDelay < 0:
-                raise Exception(print("SYSTEM TIME ERROR: Your network connection is unstable, or your system time is wrong."))
+                # raise Exception("SYSTEM TIME ERROR: Your network connection is unstable, or your system time is wrong.")
+                # Disable clock check for now, probably has to figure out another method
+                print("SYSTEM TIME ERROR: Your network connection is unstable, or your system time is wrong.")
             else:
                 print("Time in sync")
 
