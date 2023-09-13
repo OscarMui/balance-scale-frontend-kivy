@@ -16,6 +16,7 @@ Requires Python 3.10 and pip
 
 Here are the commands for MacOS.
 
+You need to create the venv outside of the project directory
 ```bash
 python3.10 -m virtualenv venv
 source venv/bin/activate
@@ -32,6 +33,8 @@ python main.py
 ## Installation (for Android build)
 
 First finish the normal installation.
+
+I tried using Buildozer but there are too many errors. I used the hardcore python for android module instead.
 
 Documentation for p4a:
 
@@ -83,27 +86,19 @@ def _cmp(self, other):
 
 ## Build for Android
 
-Using buildozer 
-
-Docs:
-
-https://kivy.org/doc/stable/guide/packaging-android.html#packaging-android
-
-https://buildozer.readthedocs.io/en/latest/installation.html#targeting-android
-
-(BUT please use cython version 0.29.36 instead)
-
-https://buildozer.readthedocs.io/en/latest/quickstart.html
-
 ```bash
-p4a apk --private . --arch arm64-v8a --arch armeabi-v7a --permission android.permission.INTERNET --permission android.permission.ACCESS_NETWORK_STATE --package=com.kidprof.tenbin --name "Tenbin"  --bootstrap=sdl2 --requirements=python3,kivy,httpx,websocket_client,certifi,httpcore,idna,sniffio,anyio,exceptiongroup,h11 --orientation landscape --orientation landscape-reverse --icon assets/icon.jpg --presplash assets/background.jpg --version 0.3.0
+p4a apk --private . --arch arm64-v8a --arch armeabi-v7a --permission android.permission.INTERNET --permission android.permission.ACCESS_NETWORK_STATE --package=com.kidprof.tenbin --name "Tenbin"  --bootstrap=sdl2 --requirements=python3,kivy,httpx,websocket_client,certifi,httpcore,idna,sniffio,anyio,exceptiongroup,h11 --orientation landscape --orientation landscape-reverse --icon assets/icon.png --presplash assets/background.jpg --blacklist-requirements=sqlite3,libffi,openssl --version 0.3.1
 ```
 
-```bash
+Clean:
 
+```bash
+rm **/*.pyc
+mv *.apk bin
 ```
 
 View logs:
+
 ```bash
 $ANDROIDSDK/platform-tools/adb logcat | grep python
 ```

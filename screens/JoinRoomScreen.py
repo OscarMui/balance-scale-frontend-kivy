@@ -18,6 +18,10 @@ class JoinRoomParticipantUI(BoxLayout):
         hide(self)
 
     def showNickname(self,nickname):
+        if len(nickname) > 10:
+            self.ids["nickname"].font_size = "12sp"
+        else:
+            self.ids["nickname"].font_size = "14sp"
         self.ids["nickname"].text = nickname
     
 
@@ -37,6 +41,8 @@ class JoinRoomScreen(Screen):
         bodyLabel = self.ids["bodyLabel"]
         titleLabel.text = "Connecting to server"
         bodyLabel.text = "Please wait..."
+
+        self.ids["exitButton"].background_color = [1,0,0,1]
         self.joinRoomTask = asyncio.create_task(self.__joinRoom())
     
     async def __joinRoom(self):

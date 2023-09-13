@@ -11,3 +11,5 @@ output
 .DS_Store
 build
 dist
+
+**/*.pyc

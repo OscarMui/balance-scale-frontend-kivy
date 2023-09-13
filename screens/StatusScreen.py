@@ -11,6 +11,10 @@ class ParticipantUI(BoxLayout):
 
     def __init__(self,nickname):
         super().__init__()
+        if len(nickname) > 10:
+            self.ids["nickname"].font_size = "12sp"
+        else:
+            self.ids["nickname"].font_size = "14sp"
         self.ids["nickname"].text = nickname
 
     def declareWin(self):
@@ -118,7 +122,7 @@ class StatusScreen(Screen):
                     infoLabel.text = "Rule applied: If someone chooses 0, a player who chooses 100 automatically wins the round."
                 elif 4 in gameInfo["justAppliedRules"]:
                     infoLabel.color = (0,1,1,0)
-                    "Rule applied: If two or more players choose the same number, the number is invalid and all players who selected the number will lose a point."
+                    infoLabel.text = "Rule applied: If two or more players choose the same number, the number is invalid and all players who selected the number will lose a point."
                 
                 for i in range(len(pus)):
                     pu = pus[i]
@@ -156,29 +160,37 @@ class StatusScreen(Screen):
                         self.isDeads[i] = True
                         calculationLabel.color = (1,0,0,1)
                         calculationLabel.text = "One or more players reached -5 score. GAME OVER for them."
-                
-                if gameInfo["gameEnded"]:
-                    infoLabel.text = "Game ended."
-                    # show quit button
-                    show(self.ids["exitButton"],animation=True)
-                    infoLabel.pos_hint= {'center_x': 0.45, 'y': 0.07}
-                    infoLabel.size_hint= (1, None)
-                    return
 
+                # Display special stuff based on special events
                 if gameInfo["us"]["isDead"]:
                     titleLabel.color = (1,0,0,1)
                     titleLabel.text = "You are dead :("
-                    infoLabel.text = "You are spectating, waiting for others to make their guesses. You can leave the game at any time."
-                    
+
                     # show quit button
                     infoLabel.pos_hint= {'center_x': 0.45, 'y': 0.07}
                     infoLabel.size_hint= (1, None)
                     show(self.ids["exitButton"],animation=True)
 
+                if gameInfo["gameEnded"]:
+                    infoLabel.text = "Game ended."
+
+                    # show quit button
+                    show(self.ids["exitButton"],animation=True)
+                    infoLabel.pos_hint= {'center_x': 0.45, 'y': 0.07}
+                    infoLabel.size_hint= (1, None)
+
+                    # stop working
+                    return
+                
+                # Determine what to do afterwards
+                if gameInfo["us"]["isDead"]:
+                    # Continue looping in the StatusScreen
+                    infoLabel.text = "You are spectating, waiting for others to make their guesses. You can leave the game at any time."
                     event = await self.qApp.get()
                     assert(event["event"]=="gameInfo")
                     gameInfo = event
                 else:
+                    # Move to the game screen when it is time
                     if gameInfo["roundStartTime"]-now() > 0:
                         print("Waiting for round start")
                         await asyncio.sleep((gameInfo["roundStartTime"]-now())/1000)

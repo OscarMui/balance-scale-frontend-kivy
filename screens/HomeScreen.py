@@ -1,8 +1,9 @@
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
-from kivy.uix.widget import Widget
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
+
+import re # regex
 
 
 class HomeScreen(Screen):
@@ -30,6 +31,27 @@ class HomeScreen(Screen):
             popup.open()
             return 
         
+        if(len(NICKNAME) > 12):
+            popup = Popup(
+                title='Error', 
+                content=Label(text='Nickname cannot be longer than 12 characters.'),
+                size_hint=(None, None), # deactivate relative sizes
+                size = (500,300)
+            )
+            popup.open()
+            return 
+        
+        regex = re.compile(r'^[A-Za-z0-9_]+$')
+        if(regex.match(NICKNAME) == None):
+            popup = Popup(
+                title='Error', 
+                content=Label(text='Nickname can only contain English letters, digits and underscores.'),
+                size_hint=(None, None), # deactivate relative sizes
+                size = (None,300)
+            )
+            popup.open()
+            return 
+            
         if(mode=="solo"):
             popup = Popup(
                 title='Coming soon', 
