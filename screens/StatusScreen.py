@@ -16,13 +16,16 @@ class ParticipantUI(BoxLayout):
     def declareWin(self):
         win = self.ids["win"]
         win.text = "WIN"
+        win.font_size = "20sp"
+        win.color = (0,1,1,1)
         show(win,animation=True)
 
-    def declareGameOver(self):
+    def declareGameOver(self,animation=True):
         win = self.ids["win"]
         win.text = "GAME OVER"
+        win.font_size = "18sp"
         win.color = (1,0,0,1)
-        show(win,animation=True)    
+        show(win,animation=animation)    
 
     def changeInfoText(self,text):
         self.ids["info"].text = text
@@ -63,8 +66,10 @@ class StatusScreen(Screen):
                 participantUIs.clear_widgets()
                 hide(calculationLabel)
                 calculationLabel.text = ""
+                calculationLabel.color=(1,1,1,1)
                 titleLabel.text = "[ROUND OVER]"
-
+                infoLabel.text = "The player that is closest to the target (average times 0.8) wins this round."
+                infoLabel.color=(1,1,1,1)
                 ps = gameInfo["participants"]
 
                 pus = list(map(lambda p: {**p, "ui": ParticipantUI(p["nickname"])},ps))
@@ -81,23 +86,24 @@ class StatusScreen(Screen):
                     guess = pu["guess"]
 
                     if self.isDeads[i]:
-                        pu["ui"].declareGameOver()
+                        pu["ui"].declareGameOver(animation=False)
                     if guess != None:
                         # Calculate sum
                         guessSum += guess
 
                         # Gradually prepare for the calculationLabel
                         pu["ui"].changeInfoText(str(guess))
-                        if i == 0:
+                        if calculationLabel.text == "":
                             calculationLabel.text = "(" + str(guess)
                         else:
                             calculationLabel.text = calculationLabel.text + " + "  + str(guess)
                     participantUIs.add_widget(pu["ui"])
 
                 # finish preparing calculationLabel
-                average = round(guessSum/len(pus),2)
+                numAlive = len(list(filter(lambda x: not x,self.isDeads)))
+                average = round(guessSum/numAlive,2)
                 target = round(gameInfo["target"],2)
-                calculationLabel.text = calculationLabel.text + f')/{len(pus)} = {average}\n{average} * 0.8 = {target}'
+                calculationLabel.text = calculationLabel.text + f')/{numAlive} = {average}\n{average} * 0.8 = {target}'
             
                 await asyncio.sleep(1)
 
@@ -106,18 +112,32 @@ class StatusScreen(Screen):
 
                 await asyncio.sleep(1)
 
+                # Either 2 or 4 will be in justAppliedRules
+                if 2 in gameInfo["justAppliedRules"]:
+                    infoLabel.color = (0,1,1,0)
+                    infoLabel.text = "Rule applied: If someone chooses 0, a player who chooses 100 automatically wins the round."
+                elif 4 in gameInfo["justAppliedRules"]:
+                    infoLabel.color = (0,1,1,0)
+                    "Rule applied: If two or more players choose the same number, the number is invalid and all players who selected the number will lose a point."
+                
                 for i in range(len(pus)):
                     pu = pus[i]
                     if pu["id"] in gameInfo["winners"]:
                         pu["ui"].declareWin()
 
-                await asyncio.sleep(2)
+                await asyncio.sleep(3)
 
+                infoLabel.color = (1,1,1,1)
+                infoLabel.text = "All non-winners will have their scores deducted."
                 for i in range(len(pus)):
                     pu = pus[i]
                     pu["ui"].changeInfoText(str(self.scores[i]))
 
                 await asyncio.sleep(1)
+
+                if 3 in gameInfo["justAppliedRules"]:
+                    infoLabel.color = (0,1,1,0)
+                    infoLabel.text = "Rule applied: If a player chooses the exact correct number, they win the round and all other players lose two points."
 
                 for i in range(len(pus)):
                     pu = pus[i]
@@ -134,18 +154,25 @@ class StatusScreen(Screen):
                     if pu["isDead"]:
                         pu["ui"].declareGameOver()
                         self.isDeads[i] = True
+                        calculationLabel.color = (1,0,0,1)
+                        calculationLabel.text = "One or more players reached -5 score. GAME OVER for them."
                 
                 if gameInfo["gameEnded"]:
                     infoLabel.text = "Game ended."
                     # show quit button
                     show(self.ids["exitButton"],animation=True)
+                    infoLabel.pos_hint= {'center_x': 0.45, 'y': 0.07}
+                    infoLabel.size_hint= (1, None)
                     return
 
                 if gameInfo["us"]["isDead"]:
+                    titleLabel.color = (1,0,0,1)
                     titleLabel.text = "You are dead :("
                     infoLabel.text = "You are spectating, waiting for others to make their guesses. You can leave the game at any time."
                     
                     # show quit button
+                    infoLabel.pos_hint= {'center_x': 0.45, 'y': 0.07}
+                    infoLabel.size_hint= (1, None)
                     show(self.ids["exitButton"],animation=True)
 
                     event = await self.qApp.get()

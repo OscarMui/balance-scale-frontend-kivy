@@ -5,6 +5,7 @@ from kivy.lang.builder import Builder
 from kivy.uix.screenmanager import ScreenManager, FadeTransition
 from kivy.core.window import Window
 from kivy.core.text import LabelBase
+from kivy.utils import platform
 
 from screens.GameScreen import GameScreen
 from screens.HomeScreen import HomeScreen
@@ -25,7 +26,10 @@ Builder.load_file(os.path.join("views","SettingsScreen.kv"))
 Builder.load_file(os.path.join("views","StatusScreen.kv"))
 
 # Set default screen size to a landscape phone
-Window.size = (667, 375)
+if platform == 'android' :
+    Window.fullscreen = 'auto'
+else:
+    Window.size = (667, 375)
 
 class TenbinApp(App):
 
@@ -67,7 +71,7 @@ class TenbinApp(App):
 if __name__ == '__main__':
     # register our google font
     LabelBase.register(name='Noto Sans',
-                      fn_regular='fonts/Noto_Sans_TC/static/NotoSansTC-Regular.ttf')
+                      fn_regular='fonts/Noto_Sans_TC/NotoSansTC-Regular.ttf')
     
     loop = asyncio.get_event_loop()
     loop.run_until_complete(TenbinApp().app_func())

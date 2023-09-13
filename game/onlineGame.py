@@ -101,6 +101,8 @@ class OnlineGame:
         p = list(filter(lambda p: p["id"]==pid,ps))[0]
         p["nickname"] = p["nickname"] + " (YOU)"
         event["us"] = p
+        event["roundStartTime"] += now()
+        event["roundEndTime"] += now()
 
         gameInfo = event
 
@@ -142,6 +144,8 @@ class OnlineGame:
             p = list(filter(lambda p: p["id"]==pid,ps))[0]
             p["nickname"] = p["nickname"] + " (YOU)"
             event["us"] = p
+            event["roundStartTime"] += now()
+            event["roundEndTime"] += now()
 
             gameInfo = event
             # inform the UI
@@ -150,7 +154,7 @@ class OnlineGame:
 
     async def __obtainToken(self):
         async with httpx.AsyncClient() as client:
-            resp = await client.get(SERVER_URL + "/api/version")
+            resp = await client.get(SERVER_URL + "/api/version", timeout=10.0)
             response = resp.json()
             assert(response["result"]=="success")
             acceptedClientVersions = response["acceptedClientVersions"]

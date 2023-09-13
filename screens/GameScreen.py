@@ -197,16 +197,17 @@ class GameScreen(Screen):
                         pass
                         # print(f'{int(guessLabel.text + event["digit"])} is not a valid guess')
                 elif event["event"] == "confirmPressed":
-                    guess = int(self.proposedGuess)
-                    assert(isinstance(guess, int) and guess <= 100 and guess >= 0)
+                    if self.proposedGuess != "":
+                        guess = int(self.proposedGuess)
+                        assert(isinstance(guess, int) and guess <= 100 and guess >= 0)
 
-                    # pass to logic thread
-                    self.qGame.put_nowait({
-                        "event": "submitGuess",
-                        "guess": guess,
-                    })
-                    self.confirmedGuess = guess
-                    self.__changeProposedGuess("",isClear=True)
+                        # pass to logic thread
+                        self.qGame.put_nowait({
+                            "event": "submitGuess",
+                            "guess": guess,
+                        })
+                        self.confirmedGuess = guess
+                        self.__changeProposedGuess("",isClear=True)
 
                 elif event["event"] == "backspacePressed":
                     l = len(self.proposedGuess)

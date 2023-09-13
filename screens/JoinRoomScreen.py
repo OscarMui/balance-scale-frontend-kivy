@@ -14,6 +14,9 @@ class JoinRoomParticipantUI(BoxLayout):
     def showPfp(self):
         show(self)
 
+    def hidePfp(self):
+        hide(self)
+
     def showNickname(self,nickname):
         self.ids["nickname"].text = nickname
     
@@ -59,6 +62,8 @@ class JoinRoomScreen(Screen):
                         joinRoomParticipantUIs.add_widget(pu)
                     for i in range(participantCount):
                         pus[i].showPfp()
+                    for i in range(participantCount,participantsPerGame):
+                        pus[i].hidePfp()
                 elif event["event"] == "serverConnectionFailed":
                     titleLabel.text = "An error occured"
                     bodyLabel.text = event["errorMsg"]
@@ -70,6 +75,8 @@ class JoinRoomScreen(Screen):
                     titleLabel.text = f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
                     for i in range(participantCount):
                         pus[i].showPfp()
+                    for i in range(participantCount,participantsPerGame):
+                        pus[i].hidePfp()
                 event = await self.qApp.get()
 
             assert(event["event"]=="gameStart")
