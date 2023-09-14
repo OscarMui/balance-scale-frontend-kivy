@@ -97,6 +97,20 @@ class GameScreen(Screen):
             "event": "cancelPressed"
         })
 
+    def __addInfo(self,text,color=(0,0,0,1)):
+        infoLayout = self.ids["infoLayout"]
+        label = WrapLabel(
+            text=text,
+            color=color
+        )
+
+        infoLayout.add_widget(label)
+
+        height = 50
+        print(label.texture_size,label.text_size)
+        print(infoLayout.size)
+        infoLayout.size = (0, infoLayout.size[1]+height)
+        
     def __changeProposedGuess(self,guess, color="black",isClear=False):
         self.proposedGuess = guess
         
@@ -172,27 +186,23 @@ class GameScreen(Screen):
                     # modify color of guessLabel
                     if self.lastPressTime == None:
                         guessLabel.changeColor("red")
-                        if not problemTriggered:
-                            infoLayout.add_widget(WrapLabel(
-                                text="Please make a guess.",
-                                color=(1,0,0,1)
-                            ))
-                        problemTriggered = True
                     elif self.lastPressTime + 10*1000 < now() and self.confirmedGuess == None:
                         guessLabel.changeColor("red")
                         if not problemTriggered:
-                            infoLayout.add_widget(WrapLabel(
-                                text="You need to press the tick button on the bottom right to register the guess.",
+                            self.__addInfo(
+                                "You need to press the tick button on the bottom right to register the guess.",
                                 color=(1,0,0,1)
-                            ))
+                            )
                         problemTriggered = True
-                    elif self.lastPressTime + 10*1000 < now() and (self.proposedGuess == "" or self.confirmedGuess != int(self.proposedGuess)):
+                    elif self.lastPressTime + 10*1000 < now() and self.proposedGuess == "":
+                        self.__changeProposedGuess("",isClear=True)
+                    elif self.lastPressTime + 10*1000 < now() and self.confirmedGuess != int(self.proposedGuess):
                         self.__changeProposedGuess("",isClear=True)
                         if not problemTriggered:
-                            infoLayout.add_widget(WrapLabel(
-                                text="Confirm button not pressed, we reverted your guess back to your last confirmed guess.",
+                            self.__addInfo(
+                                "Confirm button not pressed, we reverted your guess back to your last confirmed guess.",
                                 color=(1,0,0,1)
-                            ))
+                            )
                         problemTriggered = True
                     else:
                         # Reset problem triggered once there are no more problems 
@@ -216,7 +226,7 @@ class GameScreen(Screen):
             if gameInfo["round"] == 1:
                 infoLayout.clear_widgets()
 
-            infoLayout.add_widget(WrapLabel(text=f'Round {gameInfo["round"]}, you can make a guess between 0 and 100.'))
+            self.__addInfo(f'Round {gameInfo["round"]}, you can make a guess between 0 and 100.')
 
             event = await self.qApp.get()
             print(event)
@@ -240,10 +250,10 @@ class GameScreen(Screen):
                         self.confirmedGuess = guess
                         self.__changeProposedGuess("",isClear=True)
 
-                        infoLayout.add_widget(WrapLabel(
-                            text=f"Guess {guess} registered.",
+                        self.__addInfo(
+                            f"Guess {guess} registered.",
                             color=(0,1,0,1)
-                        ))
+                        )
 
                 elif event["event"] == "backspacePressed":
                     l = len(self.proposedGuess)
@@ -265,17 +275,17 @@ class GameScreen(Screen):
                     assert(event["event"] == "changeCountdown")
                     #! start time delay of the changeCountdown if participantDisconnectedMidgame is enforced by the 5-second popup window on the participantDisconnectedMidgame event. Will change that behaviour when we handle reconnection.
                     self.endTime = event["endTime"]+now()
-                    if event["reason"] == "participantDisconnected":
-                        infoLayout.add_widget(WrapLabel(
-                            text="Based on the new rules, you now have 15 seconds to amend your guess.",
+                    if event["reason"] == "participantDisconnectedMidgame":
+                        self.__addInfo(
+                            "Based on the new rules, you now have 15 seconds to amend your guess.",
                             color=(1,1,0,1)
-                        ))
+                        )
                     else:
                         assert(event["reason"] == "allDecided")
-                        infoLayout.add_widget(WrapLabel(
-                            text="Every player has submitted their guess, the timer is changed to 15 seconds.",
+                        self.__addInfo(
+                            "Every player has submitted their guess, the timer is changed to 15 seconds.",
                             color=(1,1,0,1)
-                        ))
+                        )
 
                     
                     

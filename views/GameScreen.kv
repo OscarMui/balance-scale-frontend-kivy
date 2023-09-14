@@ -27,11 +27,14 @@
                 text: ""
         ScrollView:
             pos_hint: {'x': 0.07, 'y': 0.1}
-            size_hint: 0.35,0.6
+            size_hint: 0.35,0.5
+            do_scroll_x: False
             BoxLayout:
                 id: infoLayout
                 orientation: "vertical"
-                size_hint_y: None
+                size_hint: 1, None
+                size: 0,0
+                spacing: 10
         GridLayout:
             id: numpad
             cols: 3
