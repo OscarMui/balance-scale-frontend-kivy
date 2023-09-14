@@ -56,36 +56,39 @@ class JoinRoomScreen(Screen):
 
             event = await self.qApp.get()
 
+            if event["event"] == "serverConnected":
+                participantCount = event["participantsCount"]
+                participantsPerGame = event["participantsPerGame"]
+                titleLabel.text = f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
+                # Create that many participants
+                for i in range(participantsPerGame):
+                    pu = JoinRoomParticipantUI()
+                    pus.append(pu)
+                    joinRoomParticipantUIs.add_widget(pu)
+                for i in range(participantCount):
+                    pus[i].showPfp()
+                for i in range(participantCount,participantsPerGame):
+                    pus[i].hidePfp()
+            else:
+                assert(event["event"] == "serverConnectionFailed",'condition event["event"] == "serverConnectionFailed" not met')
+                titleLabel.text = "An error occured"
+                bodyLabel.text = event["errorMsg"]
+                return
+            
+            event = await self.qApp.get()
+
             while event["event"] != "gameStart":
-                if event["event"] == "serverConnected":
-                    participantCount = event["participantsCount"]
-                    participantsPerGame = event["participantsPerGame"]
-                    titleLabel.text = f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
-                    # Create that many participants
-                    for i in range(participantsPerGame):
-                        pu = JoinRoomParticipantUI()
-                        pus.append(pu)
-                        joinRoomParticipantUIs.add_widget(pu)
-                    for i in range(participantCount):
-                        pus[i].showPfp()
-                    for i in range(participantCount,participantsPerGame):
-                        pus[i].hidePfp()
-                elif event["event"] == "serverConnectionFailed":
-                    titleLabel.text = "An error occured"
-                    bodyLabel.text = event["errorMsg"]
-                    return
-                else:
-                    assert(event["event"]=="updateParticipantsCount")
-                    participantCount = event["participantsCount"]
-                    participantsPerGame = event["participantsPerGame"]
-                    titleLabel.text = f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
-                    for i in range(participantCount):
-                        pus[i].showPfp()
-                    for i in range(participantCount,participantsPerGame):
-                        pus[i].hidePfp()
+                assert(event["event"]=="updateParticipantsCount",'condition event["event"]=="updateParticipantsCount" not met')
+                participantCount = event["participantsCount"]
+                participantsPerGame = event["participantsPerGame"]
+                titleLabel.text = f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
+                for i in range(participantCount):
+                    pus[i].showPfp()
+                for i in range(participantCount,participantsPerGame):
+                    pus[i].hidePfp()
                 event = await self.qApp.get()
 
-            assert(event["event"]=="gameStart")
+            assert(event["event"]=="gameStart",'condition event["event"]=="gameStart" not met')
             print("gameStart event received by app")
             self.gameStarted = True
             gameInfo = event
@@ -107,7 +110,7 @@ class JoinRoomScreen(Screen):
 
         except Exception as e:
             # We need to print the exception or else it will fail silently
-            print("ERROR __joinRoom",str(e))
+            print("ERROR __joinRoom",repr(e))
     
     def exitGame(self):
         if(self.gameStarted):

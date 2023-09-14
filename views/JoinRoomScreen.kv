@@ -24,17 +24,12 @@
             font_size:"20sp"
             pos_hint: {'center_x': 0.5, 'y': 0.85}
             size_hint: 1, None
-        Label:
+        WrapLabel:
             id: bodyLabel
             font_size:"14sp"
             text: "Please wait..."
             pos_hint: {'center_x': 0.5, 'y': 0.7}
             size_hint: 1, None
-
-            # wrap text
-            size_hint_y: None
-            text_size: self.width, None
-            height: self.texture_size[1]
         BoxLayout:
             id: joinRoomParticipantUIs
             spacing: 35 # space between children

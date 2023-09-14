@@ -24,6 +24,8 @@ Builder.load_file(os.path.join("views","GameScreen.kv"))
 Builder.load_file(os.path.join("views","JoinRoomScreen.kv"))
 Builder.load_file(os.path.join("views","SettingsScreen.kv"))
 Builder.load_file(os.path.join("views","StatusScreen.kv"))
+Builder.load_file(os.path.join("widgets","NewRulesPopup.kv"))
+Builder.load_file(os.path.join("widgets","WrapLabel.kv"))
 
 # Set default screen size to a landscape phone
 if platform == 'android' :

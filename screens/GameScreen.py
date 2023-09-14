@@ -7,6 +7,8 @@ from kivy.uix.button import Button
 from kivy.properties import (NumericProperty, ColorProperty, ListProperty)
 from kivy.graphics import Color, Rectangle
 
+from widgets.NewRulesPopup import NewRulesPopup
+from widgets.WrapLabel import WrapLabel
 from common.now import now
 
 class GuessLabel(Label):
@@ -118,7 +120,6 @@ class GameScreen(Screen):
         self.proposedGuess = ""
         self.confirmedGuess = None
         self.lastPressTime = None
-        self.infos = ListProperty([]) 
 
         self.ids["guessLabel"].text = ""
         self.ids["guessLabel"].changeColor("red")
@@ -155,6 +156,9 @@ class GameScreen(Screen):
         try:
             timer = self.ids["timer"]
             guessLabel = self.ids["guessLabel"]
+            infoLayout = self.ids["infoLayout"]
+            problemTriggered = False
+
             while True: 
                 if now() < self.endTime:
                     seconds = (self.endTime-now())//1000
@@ -168,28 +172,55 @@ class GameScreen(Screen):
                     # modify color of guessLabel
                     if self.lastPressTime == None:
                         guessLabel.changeColor("red")
+                        if not problemTriggered:
+                            infoLayout.add_widget(WrapLabel(
+                                text="Please make a guess.",
+                                color=(1,0,0,1)
+                            ))
+                        problemTriggered = True
                     elif self.lastPressTime + 10*1000 < now() and self.confirmedGuess == None:
                         guessLabel.changeColor("red")
+                        if not problemTriggered:
+                            infoLayout.add_widget(WrapLabel(
+                                text="You need to press the tick button on the bottom right to register the guess.",
+                                color=(1,0,0,1)
+                            ))
+                        problemTriggered = True
                     elif self.lastPressTime + 10*1000 < now() and (self.proposedGuess == "" or self.confirmedGuess != int(self.proposedGuess)):
                         self.__changeProposedGuess("",isClear=True)
-
+                        if not problemTriggered:
+                            infoLayout.add_widget(WrapLabel(
+                                text="Confirm button not pressed, we reverted your guess back to your last confirmed guess.",
+                                color=(1,0,0,1)
+                            ))
+                        problemTriggered = True
+                    else:
+                        # Reset problem triggered once there are no more problems 
+                        problemTriggered = False
                 # Rember to await!
                 await asyncio.sleep(1)
         except Exception as e:
             # We need to print the exception or else it will fail silently
-            print("ERROR __handleTimer",str(e))
+            print("ERROR __handleTimer",repr(e))
 
     async def __handleGame(self):
         try:
             # get gameInfo back from a previous screen
             gameInfo = self.app.globalGameInfo
+            aliveCount = gameInfo["aliveCount"]
 
             guessLabel = self.ids["guessLabel"]
+            infoLayout = self.ids["infoLayout"]
+
+            # only clear when it is the first round
+            if gameInfo["round"] == 1:
+                infoLayout.clear_widgets()
+
+            infoLayout.add_widget(WrapLabel(text=f'Round {gameInfo["round"]}, you can make a guess between 0 and 100.'))
 
             event = await self.qApp.get()
-
+            print(event)
             while event["event"] != "gameInfo":
-                print(event)
                 if event["event"] == "digitPressed":
                     if int(self.proposedGuess + event["digit"]) <= 100 and int(self.proposedGuess + event["digit"]) >= 0:
                         self.__changeProposedGuess(str(int(self.proposedGuess + event["digit"])))# the str(int) is there to let us change from 0 to 4, lets say
@@ -209,6 +240,11 @@ class GameScreen(Screen):
                         self.confirmedGuess = guess
                         self.__changeProposedGuess("",isClear=True)
 
+                        infoLayout.add_widget(WrapLabel(
+                            text=f"Guess {guess} registered.",
+                            color=(0,1,0,1)
+                        ))
+
                 elif event["event"] == "backspacePressed":
                     l = len(self.proposedGuess)
                     if l > 0:
@@ -216,13 +252,35 @@ class GameScreen(Screen):
                 elif event["event"] == "cancelPressed":
                     self.__changeProposedGuess("")
                 elif event["event"] == "participantDisconnectedMidgame":
-                    pass
+                    # Print person died
+                    ps = gameInfo["participants"]
+                    p = list(filter(lambda p: p["id"]==event["id"],ps))[0]
+
+                    popup = NewRulesPopup(aliveCount,aliveCount-1,titleText=f'{p["nickname"]} died')
+                    aliveCount -= 1
+                    popup.open()
+                    await asyncio.sleep(5)
+                    popup.dismiss()
                 else:
                     assert(event["event"] == "changeCountdown")
-                    self.endTime = event["endTime"]
-                    
+                    #! start time delay of the changeCountdown if participantDisconnectedMidgame is enforced by the 5-second popup window on the participantDisconnectedMidgame event. Will change that behaviour when we handle reconnection.
+                    self.endTime = event["endTime"]+now()
+                    if event["reason"] == "participantDisconnected":
+                        infoLayout.add_widget(WrapLabel(
+                            text="Based on the new rules, you now have 15 seconds to amend your guess.",
+                            color=(1,1,0,1)
+                        ))
+                    else:
+                        assert(event["reason"] == "allDecided")
+                        infoLayout.add_widget(WrapLabel(
+                            text="Every player has submitted their guess, the timer is changed to 15 seconds.",
+                            color=(1,1,0,1)
+                        ))
 
+                    
+                    
                 event = await self.qApp.get()
+                print(event)
 
             assert(event["event"]=="gameInfo")
             self.app.globalGameInfo = event
@@ -230,7 +288,7 @@ class GameScreen(Screen):
 
         except Exception as e:
             # We need to print the exception or else it will fail silently
-            print("ERROR __handleGame",str(e))
+            print("ERROR __handleGame",repr(e))
 
     def on_leave(self):
         if hasattr(self,"handleTimerTask"):

@@ -117,6 +117,7 @@ class StatusScreen(Screen):
                 await asyncio.sleep(1)
 
                 # Either 2 or 4 will be in justAppliedRules
+                print(gameInfo["justAppliedRules"],2 in gameInfo["justAppliedRules"], 4 in gameInfo["justAppliedRules"])
                 if 2 in gameInfo["justAppliedRules"]:
                     infoLabel.color = (0,1,1,0)
                     infoLabel.text = "Rule applied: If someone chooses 0, a player who chooses 100 automatically wins the round."
@@ -188,6 +189,7 @@ class StatusScreen(Screen):
                     infoLabel.text = "You are spectating, waiting for others to make their guesses. You can leave the game at any time."
                     event = await self.qApp.get()
                     assert(event["event"]=="gameInfo")
+                    print(event)
                     gameInfo = event
                 else:
                     # Move to the game screen when it is time
@@ -200,7 +202,7 @@ class StatusScreen(Screen):
 
         except Exception as e:
             # We need to print the exception or else it will fail silently
-            print("ERROR __status",str(e))
+            print("ERROR __status",repr(e))
 
     def exitGame(self):
         self.app.globalGameInfo = None

@@ -35,8 +35,7 @@ class HomeScreen(Screen):
             popup = Popup(
                 title='Error', 
                 content=Label(text='Nickname cannot be longer than 12 characters.'),
-                size_hint=(None, None), # deactivate relative sizes
-                size = (500,300)
+                size_hint=(0.8, 0.3), # deactivate relative sizes
             )
             popup.open()
             return 
@@ -46,8 +45,7 @@ class HomeScreen(Screen):
             popup = Popup(
                 title='Error', 
                 content=Label(text='Nickname can only contain English letters, digits and underscores.'),
-                size_hint=(None, None), # deactivate relative sizes
-                size = (None,300)
+                size_hint=(0.8, 0.3), 
             )
             popup.open()
             return 
@@ -56,8 +54,7 @@ class HomeScreen(Screen):
             popup = Popup(
                 title='Coming soon', 
                 content=None,
-                size_hint=(None, None), # deactivate relative sizes
-                size = (500,300)
+                size_hint=(0.8, 0.3), 
             )
             popup.open()
             return

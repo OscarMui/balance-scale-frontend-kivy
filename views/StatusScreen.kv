@@ -45,17 +45,12 @@
             text: ""
             pos_hint: {'center_x': 0.5, 'y': 0.2}
             size_hint: 1, None
-        Label:
+        WrapLabel:
             id: infoLabel
             font_size:"14sp"
             text: ""
             pos_hint: {'center_x': 0.5, 'y': 0.1}
             size_hint: 1, None
-
-            # wrap text
-            size_hint_y: None
-            text_size: self.width, None
-            height: self.texture_size[1]
         Button:
             pos_hint: {'x': 0.87, 'y': 0.05}
             size_hint: 0.1, None
