@@ -55,7 +55,7 @@ class JoinRoomScreen(Screen):
             print("In join room")
 
             event = await self.qApp.get()
-
+            print(event)
             if event["event"] == "serverConnected":
                 participantCount = event["participantsCount"]
                 participantsPerGame = event["participantsPerGame"]

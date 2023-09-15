@@ -15,6 +15,10 @@ async def logic(qGame, qMain):
             while(event["event"]!="modeSelection"):
                 print(event)
                 event = await qGame.get()
+            
+            # Clear qMain
+            while(not qMain.empty()):
+                await qMain.get()
 
             print(f'Mode selected: {event["mode"]}')
 

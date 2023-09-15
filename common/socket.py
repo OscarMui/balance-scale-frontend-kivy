@@ -42,5 +42,5 @@ class Socket:
             self.ws.close()
         print("socket destructor finished")
 
-    def __del__(self):
-        self.stop()
+    # def __del__(self):
+    #     self.stop()

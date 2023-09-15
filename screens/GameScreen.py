@@ -6,6 +6,7 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.properties import (NumericProperty, ColorProperty, ListProperty)
 from kivy.graphics import Color, Rectangle
+from kivy.uix.popup import Popup
 
 from widgets.NewRulesPopup import NewRulesPopup
 from widgets.WrapLabel import WrapLabel
@@ -97,19 +98,18 @@ class GameScreen(Screen):
             "event": "cancelPressed"
         })
 
-    def __addInfo(self,text,color=(0,0,0,1)):
+    def __addInfo(self,text,color=(1,1,1,1)):
         infoLayout = self.ids["infoLayout"]
+
+        # A line copied from the kivy docs which is crucial
+        infoLayout.bind(minimum_height=infoLayout.setter('height'))
+
         label = WrapLabel(
             text=text,
             color=color
         )
 
         infoLayout.add_widget(label)
-
-        height = 50
-        print(label.texture_size,label.text_size)
-        print(infoLayout.size)
-        infoLayout.size = (0, infoLayout.size[1]+height)
         
     def __changeProposedGuess(self,guess, color="black",isClear=False):
         self.proposedGuess = guess
@@ -127,6 +127,27 @@ class GameScreen(Screen):
             guessLabel.text = guess
         
 
+    def __submitGuess(self):
+        timer = self.ids["timer"]
+
+        guess = int(self.proposedGuess)
+        assert(isinstance(guess, int) and guess <= 100 and guess >= 0)
+
+        # pass to logic thread
+        self.qGame.put_nowait({
+            "event": "submitGuess",
+            "guess": guess,
+        })
+        self.confirmedGuess = guess
+        self.__changeProposedGuess("",isClear=True)
+
+        self.__addInfo(
+            f"Guess {guess} registered.",
+            color=(0,1,0,1)
+        )
+
+        timer.color = (0,1,0,1)
+        
     def on_pre_enter(self):
         print("game on_pre_enter")
 
@@ -172,6 +193,9 @@ class GameScreen(Screen):
             guessLabel = self.ids["guessLabel"]
             infoLayout = self.ids["infoLayout"]
             problemTriggered = False
+            fifteenSecondsTriggered = False
+
+            timer.color = (1,1,1,1)
 
             while True: 
                 if now() < self.endTime:
@@ -183,8 +207,27 @@ class GameScreen(Screen):
                     else:
                         timer.text = f'{seconds//60}m{seconds%60}s'
                     
-                    # modify color of guessLabel
-                    if self.lastPressTime == None:
+                    # modify color of guessLabel and give relevant infos
+                    if seconds < 15 and self.confirmedGuess == None and self.proposedGuess == "":
+                        guessLabel.changeColor("red")
+                        timer.color = (1,0,0,1)
+                        if not fifteenSecondsTriggered:
+                            self.__addInfo(
+                                "You have not make a guess. It will be a game over if you do not submit a guess before time is up.",
+                                color=(1,0,0,1)
+                            )
+                        fifteenSecondsTriggered = True
+                    elif seconds < 15 and self.confirmedGuess == None and self.proposedGuess != "":
+                        if not fifteenSecondsTriggered:
+                            self.__addInfo(
+                                "Confirm button not pressed, we auto-submitted your guess as there is not much time left.",
+                                color=(1,1,0,1)
+                            )
+
+                        self.__submitGuess()
+
+                        fifteenSecondsTriggered = True
+                    elif self.lastPressTime == None:
                         guessLabel.changeColor("red")
                     elif self.lastPressTime + 10*1000 < now() and self.confirmedGuess == None:
                         guessLabel.changeColor("red")
@@ -207,6 +250,24 @@ class GameScreen(Screen):
                     else:
                         # Reset problem triggered once there are no more problems 
                         problemTriggered = False
+                elif now() >= self.endTime+5000: # -5s
+                    # go back to home screen with a popup
+                    if self.confirmedGuess == None:
+                        popup = Popup(
+                            title='GAME OVER', 
+                            content=Label(text='You did not submit a guess in time. We brought you back to the home screen.'),
+                            size_hint=(0.8, 0.3), 
+                        )
+                        popup.open()
+                        
+                    else:
+                        popup = Popup(
+                            title='Sorry an error occured', 
+                            content=Label(text='We brought you back to the home screen.'),
+                            size_hint=(0.8, 0.3), 
+                        )
+                        popup.open()
+                        self.manager.current = "home"
                 # Rember to await!
                 await asyncio.sleep(1)
         except Exception as e:
@@ -239,21 +300,7 @@ class GameScreen(Screen):
                         # print(f'{int(guessLabel.text + event["digit"])} is not a valid guess')
                 elif event["event"] == "confirmPressed":
                     if self.proposedGuess != "":
-                        guess = int(self.proposedGuess)
-                        assert(isinstance(guess, int) and guess <= 100 and guess >= 0)
-
-                        # pass to logic thread
-                        self.qGame.put_nowait({
-                            "event": "submitGuess",
-                            "guess": guess,
-                        })
-                        self.confirmedGuess = guess
-                        self.__changeProposedGuess("",isClear=True)
-
-                        self.__addInfo(
-                            f"Guess {guess} registered.",
-                            color=(0,1,0,1)
-                        )
+                        self.__submitGuess()
 
                 elif event["event"] == "backspacePressed":
                     l = len(self.proposedGuess)
@@ -266,7 +313,7 @@ class GameScreen(Screen):
                     ps = gameInfo["participants"]
                     p = list(filter(lambda p: p["id"]==event["id"],ps))[0]
 
-                    popup = NewRulesPopup(aliveCount,aliveCount-1,titleText=f'{p["nickname"]} died')
+                    popup = NewRulesPopup(aliveCount,aliveCount-1,titleText=f'{p["nickname"]} disconnected midgame')
                     aliveCount -= 1
                     popup.open()
                     await asyncio.sleep(5)

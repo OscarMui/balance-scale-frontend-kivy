@@ -6,6 +6,7 @@ from kivy.uix.boxlayout import BoxLayout
 
 from common.now import now
 from common.visibility import show,hide
+from widgets.NewRulesPopup import NewRulesPopup
 
 class ParticipantUI(BoxLayout):
 
@@ -84,6 +85,14 @@ class StatusScreen(Screen):
                     self.scores = [0 for p in ps]
                     self.isDeads = [False for p in ps]
 
+                # update the isDeads list at the start if it is disconnectedMidgame
+                for d in gameInfo["justDiedParticipants"]:
+                    if d["reason"]=="disconnectedMidgame":
+                        for i in range(len(pus)):
+                            if pus[i]["id"] == d["id"]:
+                                self.isDeads[i] = True
+                                print("found justDiedParticipantMidgame")
+
                 guessSum = 0
                 for i in range(len(pus)):
                     pu = pus[i]
@@ -117,12 +126,11 @@ class StatusScreen(Screen):
                 await asyncio.sleep(1)
 
                 # Either 2 or 4 will be in justAppliedRules
-                print(gameInfo["justAppliedRules"],2 in gameInfo["justAppliedRules"], 4 in gameInfo["justAppliedRules"])
                 if 2 in gameInfo["justAppliedRules"]:
-                    infoLabel.color = (0,1,1,0)
+                    infoLabel.color = (0,1,1,1)
                     infoLabel.text = "Rule applied: If someone chooses 0, a player who chooses 100 automatically wins the round."
                 elif 4 in gameInfo["justAppliedRules"]:
-                    infoLabel.color = (0,1,1,0)
+                    infoLabel.color = (0,1,1,1)
                     infoLabel.text = "Rule applied: If two or more players choose the same number, the number is invalid and all players who selected the number will lose a point."
                 
                 for i in range(len(pus)):
@@ -132,16 +140,19 @@ class StatusScreen(Screen):
 
                 await asyncio.sleep(3)
 
+                calculationLabel.text = ""
                 infoLabel.color = (1,1,1,1)
                 infoLabel.text = "All non-winners will have their scores deducted."
                 for i in range(len(pus)):
                     pu = pus[i]
                     pu["ui"].changeInfoText(str(self.scores[i]))
+                    if self.isDeads[i]:
+                        pu["ui"].changeInfoColor("red")
 
                 await asyncio.sleep(1)
 
                 if 3 in gameInfo["justAppliedRules"]:
-                    infoLabel.color = (0,1,1,0)
+                    infoLabel.color = (0,1,1,1)
                     infoLabel.text = "Rule applied: If a player chooses the exact correct number, they win the round and all other players lose two points."
 
                 for i in range(len(pus)):
@@ -150,17 +161,20 @@ class StatusScreen(Screen):
                         pu["ui"].changeInfoColor("red")
                     pu["ui"].changeInfoText(str(pu["score"]))
                     self.scores[i] = pu["score"]
+                    self.isDeads[i] = pu["isDead"]
 
                 await asyncio.sleep(1)
 
-                for i in range(len(pus)):
-                    pu = pus[i]
-                    print(pu["isDead"])
-                    if pu["isDead"]:
+                for d in gameInfo["justDiedParticipants"]:
+                    pu = list(filter(lambda p: p["id"]==d["id"],pus))[0]
+                    if d["reason"]=="deadLimit":
                         pu["ui"].declareGameOver()
-                        self.isDeads[i] = True
                         calculationLabel.color = (1,0,0,1)
-                        calculationLabel.text = "One or more players reached -5 score. GAME OVER for them."
+                        calculationLabel.text += f'{pu["nickname"]} reached -5 score, GAME OVER.\n'
+                    elif d["reason"]=="disconnected":
+                        pu["ui"].declareGameOver()
+                        calculationLabel.color = (1,0,0,1)
+                        calculationLabel.text += f'{pu["nickname"]} disconnected, GAME OVER.\n'
 
                 # Display special stuff based on special events
                 if gameInfo["us"]["isDead"]:
@@ -173,7 +187,18 @@ class StatusScreen(Screen):
                     show(self.ids["exitButton"],animation=True)
 
                 if gameInfo["gameEnded"]:
-                    infoLabel.text = "Game ended."
+                    infoLabel.text = "Game ended"
+                    ps = gameInfo["participants"]
+                    filteredP = list(filter(lambda p: not p["isDead"],ps))
+                    if(len(filteredP)>0):
+                        p = filteredP[0]
+                        titleLabel.color=(0,1,1,1)
+                        titleLabel.text = f'The winner is {p["nickname"]}'
+                    else:
+                        titleLabel.color=(1,0,0,1)
+                        infoLabel.text = f'GAME OVER for everyone'
+                       
+                    
 
                     # show quit button
                     show(self.ids["exitButton"],animation=True)
@@ -187,17 +212,40 @@ class StatusScreen(Screen):
                 if gameInfo["us"]["isDead"]:
                     # Continue looping in the StatusScreen
                     infoLabel.text = "You are spectating, waiting for others to make their guesses. You can leave the game at any time."
+                    
+                    dpLen = len(list(filter(lambda dp : dp["reason"]!="disconnectedMidgame",gameInfo["justDiedParticipants"])))
+                    if dpLen > 0:
+                        await asyncio.sleep(3)
+                        popup = NewRulesPopup(dpLen + gameInfo["aliveCount"],gameInfo["aliveCount"],titleText="Someone died")
+                        popup.open()
+                        await asyncio.sleep(5)
+                        popup.dismiss()
+                    
                     event = await self.qApp.get()
                     assert(event["event"]=="gameInfo")
                     print(event)
                     gameInfo = event
                 else:
-                    # Move to the game screen when it is time
-                    if gameInfo["roundStartTime"]-now() > 0:
-                        print("Waiting for round start")
-                        await asyncio.sleep((gameInfo["roundStartTime"]-now())/1000)
+                    dpLen = len(list(filter(lambda dp : dp["reason"]!="disconnectedMidgame",gameInfo["justDiedParticipants"])))
+                    if dpLen > 0:
+                        # Display the someone died popup until it is time
+                        await asyncio.sleep(3)
+                        popup = NewRulesPopup(dpLen + gameInfo["aliveCount"],gameInfo["aliveCount"],titleText="Someone died")
+                        popup.open()
+                        if gameInfo["roundStartTime"]-now() > 0:
+                            print("Waiting for round start while displaying the popup")
+                            await asyncio.sleep((gameInfo["roundStartTime"]-now())/1000)
+                        self.manager.current = "game"
+                        await asyncio.sleep(0.4)
+                        popup.dismiss()
 
-                    self.manager.current = "game"
+                    else:
+                        # Move to the game screen when it is time
+                        if gameInfo["roundStartTime"]-now() > 0:
+                            print("Waiting for round start")
+                            await asyncio.sleep((gameInfo["roundStartTime"]-now())/1000)
+
+                        self.manager.current = "game"
                     return
 
         except Exception as e:
