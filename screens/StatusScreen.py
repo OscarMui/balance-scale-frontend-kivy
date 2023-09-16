@@ -1,8 +1,11 @@
 import asyncio
+import os
 
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.popup import Popup
 
 from common.now import now
 from common.visibility import show,hide
@@ -10,13 +13,17 @@ from widgets.NewRulesPopup import NewRulesPopup
 
 class ParticipantUI(BoxLayout):
 
-    def __init__(self,nickname):
+    def __init__(self,nickname,isBot):
         super().__init__()
         if len(nickname) > 10:
             self.ids["nickname"].font_size = "12sp"
         else:
             self.ids["nickname"].font_size = "14sp"
         self.ids["nickname"].text = nickname
+        if isBot:
+            self.ids["pfp"].source = os.path.join("assets","bot.png")
+        else:
+            self.ids["pfp"].source = os.path.join("assets","pfp.jpg")
 
     def declareWin(self):
         win = self.ids["win"]
@@ -53,6 +60,15 @@ class StatusScreen(Screen):
         self.isDeads = None
 
     def on_pre_enter(self):
+        # reset UIs
+        titleLabel = self.ids["titleLabel"]
+        titleLabel.color = (1,1,1,1)
+
+        infoLabel = self.ids["infoLabel"]
+        # hide quit button
+        hide(self.ids["exitButton"])
+        infoLabel.pos_hint= {'center_x': 0.5, 'y': 0.07}
+
         self.statusTask = asyncio.create_task(self.__status())
     
     async def __status(self):
@@ -77,7 +93,7 @@ class StatusScreen(Screen):
                 infoLabel.color=(1,1,1,1)
                 ps = gameInfo["participants"]
 
-                pus = list(map(lambda p: {**p, "ui": ParticipantUI(p["nickname"])},ps))
+                pus = list(map(lambda p: {**p, "ui": ParticipantUI(p["nickname"],p["isBot"])},ps))
                 
                 # prepare prevScore - clear it if round == 2 (first time visiting this screen in a game)
                 # for animation only, persists between rounds
@@ -183,7 +199,6 @@ class StatusScreen(Screen):
 
                     # show quit button
                     infoLabel.pos_hint= {'center_x': 0.45, 'y': 0.07}
-                    infoLabel.size_hint= (1, None)
                     show(self.ids["exitButton"],animation=True)
 
                 if gameInfo["gameEnded"]:
@@ -203,7 +218,6 @@ class StatusScreen(Screen):
                     # show quit button
                     show(self.ids["exitButton"],animation=True)
                     infoLabel.pos_hint= {'center_x': 0.45, 'y': 0.07}
-                    infoLabel.size_hint= (1, None)
 
                     # stop working
                     return
@@ -250,6 +264,12 @@ class StatusScreen(Screen):
 
         except Exception as e:
             # We need to print the exception or else it will fail silently
+            popup = Popup(
+                title='Sorry an error occured', 
+                content=Label(text=''),
+                size_hint=(0.8, 0.3), 
+            )
+            popup.open()
             print("ERROR __status",repr(e))
 
     def exitGame(self):

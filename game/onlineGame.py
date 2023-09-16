@@ -48,7 +48,6 @@ class OnlineGame:
                 })
                 return
             assert(res["result"]=="success")
-            pid = res["id"]
 
             print("Joined websocket")
 
@@ -69,6 +68,7 @@ class OnlineGame:
                 })
                 return
             assert(res["result"]=="success")
+            pid = res["id"]
 
             self.qApp.put_nowait({
                 "event": "serverConnected",

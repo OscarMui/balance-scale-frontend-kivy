@@ -1,5 +1,5 @@
 import asyncio
-import os # for os.join
+import os # for os.path.join
 from kivy.app import App
 from kivy.lang.builder import Builder
 from kivy.uix.screenmanager import ScreenManager, FadeTransition

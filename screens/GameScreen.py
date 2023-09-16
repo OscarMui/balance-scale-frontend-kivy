@@ -345,6 +345,12 @@ class GameScreen(Screen):
 
         except Exception as e:
             # We need to print the exception or else it will fail silently
+            popup = Popup(
+                title='Sorry an error occured', 
+                content=Label(text=''),
+                size_hint=(0.8, 0.3), 
+            )
+            popup.open()
             print("ERROR __handleGame",repr(e))
 
     def on_leave(self):

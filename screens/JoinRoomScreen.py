@@ -3,6 +3,10 @@ import asyncio
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.popup import Popup
+
+import os
 
 from common.now import now
 from common.visibility import show, hide
@@ -11,7 +15,11 @@ class JoinRoomParticipantUI(BoxLayout):
     def __init__(self):
         super().__init__()
 
-    def showPfp(self):
+    def showPfp(self,isBot=False):
+        if isBot:
+            self.ids["pfp"].source = os.path.join("assets","bot.png")
+        else:
+            self.ids["pfp"].source = os.path.join("assets","pfp.jpg")
         show(self)
 
     def hidePfp(self):
@@ -60,6 +68,7 @@ class JoinRoomScreen(Screen):
                 participantCount = event["participantsCount"]
                 participantsPerGame = event["participantsPerGame"]
                 titleLabel.text = f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
+                bodyLabel.text = "The game will be filled with computer players if no one joins in 15 seconds. Please wait..."
                 # Create that many participants
                 for i in range(participantsPerGame):
                     pu = JoinRoomParticipantUI()
@@ -92,7 +101,7 @@ class JoinRoomScreen(Screen):
             print("gameStart event received by app")
             self.gameStarted = True
             gameInfo = event
-            titleLabel.text = f'Game is starting ({participantCount}/{participantsPerGame})'
+            titleLabel.text = f'Game is starting ({len(gameInfo["participants"])}/{len(gameInfo["participants"])})'
             bodyLabel.text = "The game will start shortly"
             # print(self.ids["exitButton"].background_color)
             self.ids["exitButton"].background_color = [0.5,0.5,0.5, 1]
@@ -100,6 +109,7 @@ class JoinRoomScreen(Screen):
             for i in range(len(gameInfo["participants"])):
                 p = gameInfo["participants"][i]
                 pus[i].showNickname(p["nickname"])
+                pus[i].showPfp(isBot=p["isBot"])
 
             if gameInfo["roundStartTime"]-now() > 0:
                 print("Waiting for round start")
@@ -110,6 +120,12 @@ class JoinRoomScreen(Screen):
 
         except Exception as e:
             # We need to print the exception or else it will fail silently
+            popup = Popup(
+                title='Sorry an error occured', 
+                content=Label(text=''),
+                size_hint=(0.8, 0.3), 
+            )
+            popup.open()
             print("ERROR __joinRoom",repr(e))
     
     def exitGame(self):
