@@ -75,7 +75,7 @@ class OnlineGame:
                 "participantsCount": res["participantsCount"],
                 "participantsPerGame": res["participantsPerGame"],
             }
-            
+
             self.qApp.put_nowait(msg)
 
             print("finished sending serverConnected event",msg)
@@ -160,7 +160,8 @@ class OnlineGame:
 
     async def __obtainToken(self):
         async with httpx.AsyncClient() as client:
-            resp = await client.get(SERVER_URL + "/api/version", timeout=10.0)
+            timeout = httpx.Timeout(5.0, read=15.0)
+            resp = await client.get(SERVER_URL + "/api/version", timeout=timeout)
             response = resp.json()
             assert(response["result"]=="success")
             acceptedClientVersions = response["acceptedClientVersions"]
