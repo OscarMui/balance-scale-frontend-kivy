@@ -61,9 +61,9 @@ class JoinRoomScreen(Screen):
             pus = [] # list of joinRoomParticipantUIs
 
             print("In join room")
-
+            
             event = await self.qApp.get()
-            print(event)
+            print("joinRoom receives",event)
             if event["event"] == "serverConnected":
                 participantCount = event["participantsCount"]
                 participantsPerGame = event["participantsPerGame"]
@@ -136,6 +136,7 @@ class JoinRoomScreen(Screen):
             self.qGame.put_nowait({
                 "event": "quitGame"
             })
+            self.joinRoomTask.cancel()
             self.manager.current = "home"
             return
         

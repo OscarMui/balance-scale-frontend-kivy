@@ -70,13 +70,15 @@ class OnlineGame:
             assert(res["result"]=="success")
             pid = res["id"]
 
-            self.qApp.put_nowait({
+            msg = {
                 "event": "serverConnected",
                 "participantsCount": res["participantsCount"],
                 "participantsPerGame": res["participantsPerGame"],
-            })
+            }
+            
+            self.qApp.put_nowait(msg)
 
-            print("finished sending serverConnected event")
+            print("finished sending serverConnected event",msg)
 
         except Exception as e:
             print("Exception in onlineGame",e)
