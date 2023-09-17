@@ -2,23 +2,24 @@
 
 <ParticipantUI>:
     orientation: "vertical"
+    spacing: 10
     Label:
         id: win
         opacity: 0 # hide
         font_size: "20sp"
-        size_hint: (1,.15)
+        size_hint: (1,.19)
     Image:
         id: pfp
-        size_hint: (1,.6)
+        size_hint: (1,.5)
         source: "assets/pfp.jpg"
         fit_mode: "scale-down"
     Label:
         id: nickname
-        size_hint: (1,.1)
+        size_hint: (1,.12)
     Label:
         id: info
         font_size: "20sp"
-        size_hint: (1,.15)
+        size_hint: (1,.19)
 <StatusScreen>:
     # canvas:
     #     Rectangle:
@@ -36,8 +37,8 @@
         BoxLayout:
             id: participantUIs
             spacing: 35 # space between children
-            pos_hint: {'center_x': 0.5, 'y': 0.35}
-            size_hint: 0.8, 0.48
+            pos_hint: {'center_x': 0.5, 'y': 0.4}
+            size_hint: 0.8, 0.43
             
         Label:
             id: calculationLabel

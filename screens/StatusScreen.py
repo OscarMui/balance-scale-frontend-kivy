@@ -35,7 +35,7 @@ class ParticipantUI(BoxLayout):
     def declareGameOver(self,animation=True):
         win = self.ids["win"]
         win.text = "GAME OVER"
-        win.font_size = "18sp"
+        win.font_size = "16sp"
         win.color = (1,0,0,1)
         show(win,animation=animation)    
 
