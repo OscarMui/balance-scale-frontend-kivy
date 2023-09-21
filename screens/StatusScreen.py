@@ -204,13 +204,18 @@ class StatusScreen(Screen):
                 if gameInfo["gameEnded"]:
                     infoLabel.text = "Game ended"
                     ps = gameInfo["participants"]
-                    filteredP = list(filter(lambda p: not p["isDead"],ps))
-                    if(len(filteredP)>0):
+                    filteredP = list(filter(lambda p: not p["isDead"] and not p["isBot"],ps))
+                    filteredBots = list(filter(lambda p: not p["isDead"] and p["isBot"],ps))
+                    if(len(filteredP)==1):
                         p = filteredP[0]
-                        titleLabel.color=(0,1,1,1)
+                        titleLabel.color= (0,1,1,1)
                         titleLabel.text = f'The winner is {p["nickname"]}'
+                    elif(len(filteredBots)>0):
+                        # there are bots left
+                        titleLabel.color= (0,1,1,1)
+                        titleLabel.text = f'The winner are bots'
                     else:
-                        titleLabel.color=(1,0,0,1)
+                        titleLabel.color= (1,0,0,1)
                         infoLabel.text = f'GAME OVER for everyone'
                        
                     
