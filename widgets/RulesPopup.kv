@@ -1,0 +1,66 @@
+#:kivy 2.2.0
+
+<LeftWrapLabel>:
+    halign: "left"
+
+<ShowAnswerButton>:
+    text: "Show Answer"
+    color: 0,1,1,1
+    background_color: 0,0,0,0
+    size_hint: 1, None
+    size_y: 100
+    on_press: self.showAns()
+
+<RulesPopup>:
+    title: 'Rules'
+    size_hint: 0.8,1
+    ScrollView:
+        do_scroll_x: False
+        BoxLayout:
+            id: rulesLayout
+            orientation: "vertical"
+            size_hint: 1, None
+            size: 0,0
+            spacing: 15
+            
+            # WrapLabel:
+            #     id: ruleTitle
+            #     text: "New rules upon elimination"
+            #     bold: True
+            # WrapLabel:
+            #     id: rule4
+            #     opacity: 0
+            #     text: "1. If two or more players choose the same number, the number is invalid and all players who selected the number will lose a point."
+            # WrapLabel:
+            #     id: rule3
+            #     opacity: 0
+            #     text: "2. If a player chooses the exact correct number, they win the round and all other players lose two points."
+            # WrapLabel:
+            #     id: rule2
+            #     opacity: 0
+            #     text: "3. If someone chooses 0, a player who chooses 100 automatically wins the round."
+            # WrapLabel:
+            #     text: "General Rules"
+            #     bold: True
+            # WrapLabel:
+            #     text: "Every player chooses a number between 0 and 100 in each round. The player closest to the target wins the round. The target would be the average of the numbers multiplied by 0.8."
+            # WrapLabel:
+            #     text: "All players start with 0 points. If a player reaches -5 points, it is a GAME OVER for that player. The last person standing wins."
+            # WrapLabel:
+            #     text: "A new rule will be introduced for every player eliminated."
+            # BoxLayout:
+            #     id: detailLayout
+            #     orientation: "vertical"
+            #     size_hint: 1, None
+            #     spacing: 10
+            #     WrapLabel:
+            #         text: "FAQs"
+            #         bold: True
+            #     WrapLabel:
+            #         text: "Q: I am confused after reading the rules."
+            #     WrapLabel:
+            #         text: "A: You are not alone! The key to the game is that 0.8 multiplier. With that, it means that the target will never be above 80, as the average is at most 100. Then people should never choose a number above 80 to win. But if everyone thinks the same, they should not choose a number above 64, as the average will not go beyond 80. This creates a dilemma that leads to people choosing smaller and smaller numbers."
+            #     WrapLabel:
+            #         text: "Q: I watched Alice in Borderland, are there any differences between your game and the game in the TV show?"
+            #     WrapLabel:
+            #         text: "A: Not much except for a few technicalities, and the fact that you don't die if you lose. This game is designed to recreate the game in Alice in Borderland, so that viewers can try it out for themselves. \nHere are the differences:\n1. The round time is shortened to 2 minutes. \n2. The GAME OVER score is changed to -5.\n3. Players can disconnect anytime, it counts as a GAME OVER for that player.\n4. Players need to type in the number digit by digit.\nThe changes are mainly to address the fast lifestyle of people outside of the Borderland, and the fact that your screen is smaller than the one the TV show uses."

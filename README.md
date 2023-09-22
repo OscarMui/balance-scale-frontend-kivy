@@ -142,7 +142,7 @@ A new rule will be introduced for every player eliminated.
 
 2 players remaining: If someone chooses 0, a player who chooses 100 wins the round.
 
-### FAQ
+### FAQs
 
 Q: I am confused after reading the rules.
 

@@ -50,6 +50,9 @@
                 background_color: 0.7, 0, 0, 1
                 halign: 'center'
                 on_press: root.modeSelection("solo")
-            # Button:
-            #     text: "Goto settings"
-            #     on_press: root.manager.current = "settings"
+        ImageButton:
+            background_normal: "assets/question-mark.png"
+            background_down: "assets/question-mark.png"
+            pos_hint: {'x': 0.87, 'y': 0.93}
+            size_hint_y: 0.05
+            on_press: root.showRules()

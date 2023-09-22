@@ -13,9 +13,11 @@ from screens.JoinRoomScreen import JoinRoomScreen
 from screens.SettingsScreen import SettingsScreen
 from screens.StatusScreen import StatusScreen
 
-from common.now import now
-from common.visibility import show, hide
 from logic import logic
+
+# We need these imports in order for the .kv files to parse correctly
+from widgets.ImageButton import ImageButton
+from widgets.WrapLabel import WrapLabel
 
 # Load static templates
 Builder.load_file("main.kv")
@@ -25,6 +27,8 @@ Builder.load_file(os.path.join("views","JoinRoomScreen.kv"))
 Builder.load_file(os.path.join("views","SettingsScreen.kv"))
 Builder.load_file(os.path.join("views","StatusScreen.kv"))
 Builder.load_file(os.path.join("widgets","NewRulesPopup.kv"))
+Builder.load_file(os.path.join("widgets","RulesPopup.kv"))
+Builder.load_file(os.path.join("widgets","ImageButton.kv"))
 Builder.load_file(os.path.join("widgets","WrapLabel.kv"))
 
 # Set default screen size to a landscape phone
@@ -72,8 +76,11 @@ class TenbinApp(App):
 
 if __name__ == '__main__':
     # register our google font
-    LabelBase.register(name='Noto Sans',
-                      fn_regular='fonts/Noto_Sans_TC/NotoSansTC-Regular.ttf')
+    LabelBase.register(
+        name='Noto Sans',
+        fn_regular='fonts/Noto_Sans_TC/NotoSansTC-Regular.ttf',
+        fn_bold='fonts/Noto_Sans_TC/NotoSansTC-Bold.ttf',
+    )
     
     loop = asyncio.get_event_loop()
     loop.run_until_complete(TenbinApp().app_func())

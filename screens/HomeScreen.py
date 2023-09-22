@@ -4,7 +4,9 @@ from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 
 import re # regex
+import asyncio
 
+from widgets.RulesPopup import RulesPopup
 
 class HomeScreen(Screen):
     def __init__(self, qGame, qApp, name):
@@ -71,3 +73,7 @@ class HomeScreen(Screen):
         })
 
         self.manager.current = "joinRoom"
+    
+    def showRules(self):
+        popup = RulesPopup(detail=True)
+        popup.open()
