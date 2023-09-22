@@ -7,11 +7,11 @@ from kivy.core.window import Window
 from kivy.core.text import LabelBase
 from kivy.utils import platform
 
-from screens.GameScreen import GameScreen
-from screens.HomeScreen import HomeScreen
-from screens.JoinRoomScreen import JoinRoomScreen
-from screens.SettingsScreen import SettingsScreen
-from screens.StatusScreen import StatusScreen
+from views.GameScreen import GameScreen
+from views.HomeScreen import HomeScreen
+from views.JoinRoomScreen import JoinRoomScreen
+from views.SettingsScreen import SettingsScreen
+from views.StatusScreen import StatusScreen
 
 from logic import logic
 
