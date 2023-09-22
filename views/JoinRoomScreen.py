@@ -10,6 +10,7 @@ import os
 
 from common.now import now
 from common.visibility import show, hide
+from widgets.RulesPopup import RulesPopup
 
 class JoinRoomParticipantUI(BoxLayout):
     def __init__(self):
@@ -139,4 +140,13 @@ class JoinRoomScreen(Screen):
             self.joinRoomTask.cancel()
             self.manager.current = "home"
             return
-        
+    
+    def on_pre_leave(self):
+        if hasattr(self,"popup"):
+            self.popup.dismiss()
+        if hasattr(self,"joinRoomTask"):
+            self.joinRoomTask.cancel()
+    
+    def showRules(self):
+        self.popup = RulesPopup(detail=True)
+        self.popup.open()

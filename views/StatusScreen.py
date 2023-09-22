@@ -10,6 +10,7 @@ from kivy.uix.popup import Popup
 from common.now import now
 from common.visibility import show,hide
 from widgets.NewRulesPopup import NewRulesPopup
+from widgets.RulesPopup import RulesPopup
 
 class ParticipantUI(BoxLayout):
 
@@ -235,6 +236,8 @@ class StatusScreen(Screen):
                     dpLen = len(list(filter(lambda dp : dp["reason"]!="disconnectedMidgame",gameInfo["justDiedParticipants"])))
                     if dpLen > 0:
                         await asyncio.sleep(3)
+                        if hasattr(self,"popup"):
+                            self.popup.dismiss()
                         popup = NewRulesPopup(dpLen + gameInfo["aliveCount"],gameInfo["aliveCount"],titleText="Someone died")
                         popup.open()
                         await asyncio.sleep(5)
@@ -249,6 +252,8 @@ class StatusScreen(Screen):
                     if dpLen > 0:
                         # Display the someone died popup until it is time
                         await asyncio.sleep(3)
+                        if hasattr(self,"popup"):
+                            self.popup.dismiss()
                         popup = NewRulesPopup(dpLen + gameInfo["aliveCount"],gameInfo["aliveCount"],titleText="Someone died")
                         popup.open()
                         if gameInfo["roundStartTime"]-now() > 0:
@@ -278,5 +283,19 @@ class StatusScreen(Screen):
             print("ERROR __status",repr(e))
 
     def exitGame(self):
+        if hasattr(self,"statusTask"):
+            self.statusTask.cancel()
         self.app.globalGameInfo = None
         self.manager.current = "home"
+        
+    
+    def on_pre_leave(self):
+        if hasattr(self,"popup"):
+            self.popup.dismiss()
+        if hasattr(self,"statusTask"):
+            self.statusTask.cancel()
+    
+    def showRules(self):
+        gameInfo = self.app.globalGameInfo
+        self.popup = RulesPopup(detail=True,aliveCount=gameInfo["aliveCount"])
+        self.popup.open()

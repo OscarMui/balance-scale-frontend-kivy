@@ -18,6 +18,7 @@ from logic import logic
 # We need these imports in order for the .kv files to parse correctly
 from widgets.ImageButton import ImageButton
 from widgets.WrapLabel import WrapLabel
+from widgets.RulesPopup import RulesPopup
 
 # Load static templates
 Builder.load_file("main.kv")

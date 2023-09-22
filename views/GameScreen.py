@@ -9,6 +9,7 @@ from kivy.graphics import Color, Rectangle
 from kivy.uix.popup import Popup
 
 from widgets.NewRulesPopup import NewRulesPopup
+from widgets.RulesPopup import RulesPopup
 from widgets.WrapLabel import WrapLabel
 from common.now import now
 
@@ -278,7 +279,7 @@ class GameScreen(Screen):
         try:
             # get gameInfo back from a previous screen
             gameInfo = self.app.globalGameInfo
-            aliveCount = gameInfo["aliveCount"]
+            self.aliveCount = gameInfo["aliveCount"]
 
             guessLabel = self.ids["guessLabel"]
             infoLayout = self.ids["infoLayout"]
@@ -313,8 +314,10 @@ class GameScreen(Screen):
                     ps = gameInfo["participants"]
                     p = list(filter(lambda p: p["id"]==event["id"],ps))[0]
 
-                    popup = NewRulesPopup(aliveCount,aliveCount-1,titleText=f'{p["nickname"]} disconnected midgame')
-                    aliveCount -= 1
+                    if hasattr(self,"popup"):
+                        self.popup.dismiss()
+                    popup = NewRulesPopup(self.aliveCount,self.aliveCount-1,titleText=f'{p["nickname"]} disconnected midgame')
+                    self.aliveCount -= 1
                     popup.open()
                     await asyncio.sleep(5)
                     popup.dismiss()
@@ -353,6 +356,14 @@ class GameScreen(Screen):
             popup.open()
             print("ERROR __handleGame",repr(e))
 
-    def on_leave(self):
+    def on_pre_leave(self):
+        if hasattr(self,"popup"):
+            self.popup.dismiss()
         if hasattr(self,"handleTimerTask"):
             self.handleTimerTask.cancel()
+        if hasattr(self,"handleGameTask"):
+            self.handleGameTask.cancel()
+    
+    def showRules(self):
+        self.popup = RulesPopup(detail=True,aliveCount=self.aliveCount)
+        self.popup.open()

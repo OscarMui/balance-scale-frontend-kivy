@@ -74,6 +74,10 @@ class HomeScreen(Screen):
 
         self.manager.current = "joinRoom"
     
+    def on_pre_leave(self):
+        if hasattr(self,"popup"):
+            self.popup.dismiss()
+    
     def showRules(self):
-        popup = RulesPopup(detail=True)
-        popup.open()
+        self.popup = RulesPopup(detail=True)
+        self.popup.open()

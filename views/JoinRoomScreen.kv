@@ -43,3 +43,9 @@
             background_color: 1, 0, 0, 1
             halign: 'center'
             on_press: root.exitGame()
+        ImageButton:
+            background_normal: "assets/question-mark.png"
+            background_down: "assets/question-mark.png"
+            pos_hint: {'x': 0.93, 'y': 0.93}
+            size_hint: 0.05/16*9,0.05
+            on_press: root.showRules()
