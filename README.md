@@ -166,7 +166,7 @@ The changes are mainly to address the fast lifestyle of people outside of the Bo
 
 Q: Am I allowed to communicate?
 
-A: Absolutely. You are encouraged to communicate with your opponents during the game. That's what makes the game interesting It is a shame that I do not have time to add communication features in-game. 
+A: Absolutely. That's what makes the game interesting. It is a shame that I do not have time to add communication features in-game. You are encouraged to communicate with your opponents during the game using other means.
 
 Q: How do computer players behave?
 
