@@ -88,15 +88,24 @@ class JoinRoomScreen(Screen):
             event = await self.qApp.get()
 
             while event["event"] != "gameStart":
-                assert(event["event"]=="updateParticipantsCount",'condition event["event"]=="updateParticipantsCount" not met')
-                participantCount = event["participantsCount"]
-                participantsPerGame = event["participantsPerGame"]
-                titleLabel.text = f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
-                for i in range(participantCount):
-                    pus[i].showPfp()
-                for i in range(participantCount,participantsPerGame):
-                    pus[i].hidePfp()
-                event = await self.qApp.get()
+                if(event["event"] == "gameError"):
+                    popup = Popup(
+                        title='Sorry an error occured', 
+                        content=Label(text=f'{event.get("errorMsg","")}\nWe brought you back to the home screen.'),
+                        size_hint=(0.8, 0.3), 
+                    )
+                    popup.open()
+                    self.manager.current = "home"
+                else:    
+                    assert(event["event"]=="updateParticipantsCount",'condition event["event"]=="updateParticipantsCount" not met')
+                    participantCount = event["participantsCount"]
+                    participantsPerGame = event["participantsPerGame"]
+                    titleLabel.text = f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
+                    for i in range(participantCount):
+                        pus[i].showPfp()
+                    for i in range(participantCount,participantsPerGame):
+                        pus[i].hidePfp()
+                    event = await self.qApp.get()
 
             assert(event["event"]=="gameStart",'condition event["event"]=="gameStart" not met')
             print("gameStart event received by app")
@@ -120,13 +129,20 @@ class JoinRoomScreen(Screen):
             self.manager.current = "game"
 
         except Exception as e:
-            # We need to print the exception or else it will fail silently
+            # 1. inform the onlineGame to stop
+            self.qGame.put_nowait({
+                "event": "appError"
+            })
+            # 2. inform the user by displaying the popup
             popup = Popup(
                 title='Sorry an error occured', 
-                content=Label(text=''),
+                content=Label(text='We brought you back to the home screen.'),
                 size_hint=(0.8, 0.3), 
             )
             popup.open()
+            # 3. go back to the home screen
+            self.manager.current = "home"
+            # 4. print the error We need to print the exception or else it will fail silently
             print("ERROR __joinRoom",repr(e))
     
     def exitGame(self):

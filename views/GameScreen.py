@@ -251,28 +251,41 @@ class GameScreen(Screen):
                     else:
                         # Reset problem triggered once there are no more problems 
                         problemTriggered = False
-                elif now() >= self.endTime+5000: # -5s
-                    # go back to home screen with a popup
-                    if self.confirmedGuess == None:
-                        popup = Popup(
-                            title='GAME OVER', 
-                            content=Label(text='You did not submit a guess in time. We brought you back to the home screen.'),
-                            size_hint=(0.8, 0.3), 
-                        )
-                        popup.open()
+                # elif now() >= self.endTime+5000: # -5s
+                #     # go back to home screen with a popup
+                #     if self.confirmedGuess == None:
+                #         popup = Popup(
+                #             title='GAME OVER', 
+                #             content=Label(text='You did not submit a guess in time. We brought you back to the home screen.'),
+                #             size_hint=(0.8, 0.3), 
+                #         )
+                #         popup.open()
                         
-                    else:
-                        popup = Popup(
-                            title='Sorry an error occured', 
-                            content=Label(text='We brought you back to the home screen.'),
-                            size_hint=(0.8, 0.3), 
-                        )
-                        popup.open()
-                        self.manager.current = "home"
+                #     else:
+                #         popup = Popup(
+                #             title='Sorry an error occured', 
+                #             content=Label(text='We brought you back to the home screen.'),
+                #             size_hint=(0.8, 0.3), 
+                #         )
+                #         popup.open()
+                #         self.manager.current = "home"
                 # Rember to await!
                 await asyncio.sleep(1)
         except Exception as e:
-            # We need to print the exception or else it will fail silently
+            # 1. inform the onlineGame to stop
+            self.qGame.put_nowait({
+                "event": "appError"
+            })
+            # 2. inform the user by displaying the popup
+            popup = Popup(
+                title='Sorry an error occured', 
+                content=Label(text='We brought you back to the home screen.'),
+                size_hint=(0.8, 0.3), 
+            )
+            popup.open()
+            # 3. go back to the home screen
+            self.manager.current = "home"
+            # 4. print the error We need to print the exception or else it will fail silently
             print("ERROR __handleTimer",repr(e))
 
     async def __handleGame(self):
@@ -293,7 +306,22 @@ class GameScreen(Screen):
             event = await self.qApp.get()
             print(event)
             while event["event"] != "gameInfo":
-                if event["event"] == "digitPressed":
+                if(event["event"] == "gameError"):
+                    if now() > self.endTime:
+                        popup = Popup(
+                            title='GAME OVER', 
+                            content=Label(text='You did not submit a guess in time. We brought you back to the home screen.'),
+                            size_hint=(0.8, 0.3), 
+                        )
+                    else:
+                        popup = Popup(
+                            title='Sorry an error occured', 
+                            content=Label(text=f'{event.get("errorMsg","")}\nWe brought you back to the home screen.'),
+                            size_hint=(0.8, 0.3), 
+                        )
+                    popup.open()
+                    self.manager.current = "home"
+                elif event["event"] == "digitPressed":
                     if int(self.proposedGuess + event["digit"]) <= 100 and int(self.proposedGuess + event["digit"]) >= 0:
                         self.__changeProposedGuess(str(int(self.proposedGuess + event["digit"])))# the str(int) is there to let us change from 0 to 4, lets say
                     else:
@@ -347,13 +375,20 @@ class GameScreen(Screen):
             self.manager.current = "status"
 
         except Exception as e:
-            # We need to print the exception or else it will fail silently
+            # 1. inform the onlineGame to stop
+            self.qGame.put_nowait({
+                "event": "appError"
+            })
+            # 2. inform the user by displaying the popup
             popup = Popup(
                 title='Sorry an error occured', 
-                content=Label(text=''),
+                content=Label(text='We brought you back to the home screen.'),
                 size_hint=(0.8, 0.3), 
             )
             popup.open()
+            # 3. go back to the home screen
+            self.manager.current = "home"
+            # 4. print the error We need to print the exception or else it will fail silently
             print("ERROR __handleGame",repr(e))
 
     def on_pre_leave(self):

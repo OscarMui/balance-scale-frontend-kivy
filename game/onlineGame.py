@@ -81,69 +81,32 @@ class OnlineGame:
             print("finished sending serverConnected event",msg)
 
         except Exception as e:
-            print("Exception in onlineGame",e)
+            print("Exception in onlineGame (before serverConnected)",repr(e))
             self.qApp.put_nowait({
                 "event": "serverConnectionFailed",
                 "errorMsg": repr(e)
             })
             return
 
-        # repeatedly get event from our own queue
-        event = await self.qGame.get()
+        try:
+            # repeatedly get event from our own queue
+            event = await self.qGame.get()
 
-        while event["event"] != "gameStart":
-            if(event["event"] == "quitGame"):
-                return
-            else:
-                assert(event["event"] == "updateParticipantsCount")
-                # forward this event to app
-                self.qApp.put_nowait(event)
-                event = await self.qGame.get()
-        
-        assert(event["event"]=="gameStart")
-
-        # Find our own info
-        ps = event["participants"]
-        p = list(filter(lambda p: p["id"]==pid,ps))[0]
-        p["nickname"] = p["nickname"] + " (YOU)"
-        event["us"] = p
-        event["roundStartTime"] += now()
-        event["roundEndTime"] += now()
-
-        gameInfo = event
-
-        # forward gameStart event to app
-        self.qApp.put_nowait(gameInfo)
-
-        while not gameInfo["gameEnded"]:
-            # acts as a middleman between the server and the UI
-            event = await self.qGame.get() 
-            while event["event"]!="gameInfo":
-                if event["event"] == "submitGuess":
-                    # this event is from the app, pass it on to the server
-                    req = {
-                        "method": "submitGuess",
-                        "id": pid,
-                        "guess": event["guess"],
-                    }
-                    self.socket.sendMsg(req)
-                    res = await self.qGame.get()
-                    while not "result" in res:
-                        # print(res)
-                        # in case other events get in the way, enqueue the event again
-                        self.qGame.put_nowait(res)
-                        res = await self.qGame.get()
-                        await asyncio.sleep(0.1) # necessary or else it will enter an infinite loop when waiting for the response, so the response cannot get through
-                    assert(res["result"]=="success")
-                elif event["event"] == "participantDisconnectedMidgame":
-                    # this event is from server, pass it on to app
+            while event["event"] != "gameStart":
+                if(event["event"] == "quitGame" or event["event"] == "appError"):
+                    return
+                elif(event["event"] == "gameError"):
+                    # forward this event to app
                     self.qApp.put_nowait(event)
+                    # then stop
+                    return
                 else:
-                    assert(event["event"] == "changeCountdown")
-                    # this event is from server, pass it on to app
+                    assert(event["event"] == "updateParticipantsCount")
+                    # forward this event to app
                     self.qApp.put_nowait(event)
-
-                event = await self.qGame.get() 
+                    event = await self.qGame.get()
+            
+            assert(event["event"]=="gameStart")
 
             # Find our own info
             ps = event["participants"]
@@ -154,9 +117,63 @@ class OnlineGame:
             event["roundEndTime"] += now()
 
             gameInfo = event
-            # inform the UI
+
+            # forward gameStart event to app
             self.qApp.put_nowait(gameInfo)
 
+            while not gameInfo["gameEnded"]:
+                # acts as a middleman between the server and the UI
+                event = await self.qGame.get() 
+                while event["event"]!="gameInfo":
+                    if event["event"] == "submitGuess":
+                        # this event is from the app, pass it on to the server
+                        req = {
+                            "method": "submitGuess",
+                            "id": pid,
+                            "guess": event["guess"],
+                        }
+                        self.socket.sendMsg(req)
+                        res = await self.qGame.get()
+                        while not "result" in res:
+                            # print(res)
+                            # in case other events get in the way, enqueue the event again
+                            self.qGame.put_nowait(res)
+                            res = await self.qGame.get()
+                            await asyncio.sleep(0.1) # necessary or else it will enter an infinite loop when waiting for the response, so the response cannot get through
+                        assert(res["result"]=="success")
+                    elif(event["event"] == "gameError"):
+                        # forward this event to app
+                        self.qApp.put_nowait(event)
+                        # then stop
+                        return
+                    elif(event["event"] == "appError"):
+                        return
+                    else:
+                        assert(event["event"] == "participantDisconnectedMidgame" or 
+                               event["event"] == "changeCountdown")
+                        # this event is from server, pass it on to app
+                        self.qApp.put_nowait(event)
+
+                    event = await self.qGame.get() 
+
+                # Find our own info
+                ps = event["participants"]
+                p = list(filter(lambda p: p["id"]==pid,ps))[0]
+                p["nickname"] = p["nickname"] + " (YOU)"
+                event["us"] = p
+                event["roundStartTime"] += now()
+                event["roundEndTime"] += now()
+
+                gameInfo = event
+                # inform the UI
+                self.qApp.put_nowait(gameInfo)
+        except Exception as e:
+            print("Exception in onlineGame (after serverConnected)",repr(e))
+            self.qApp.put_nowait({
+                "event": "gameError",
+                "errorMsg": repr(e)
+            })
+            return
 
     async def __obtainToken(self):
         async with httpx.AsyncClient() as client:
@@ -171,12 +188,12 @@ class OnlineGame:
                 print("Version compatible")
             networkDelay = now()-response["currentTime"]
             print("Network delay (ms): ",networkDelay)
-            if networkDelay > response["allowedNetworkDelay"] or networkDelay < 0:
-                # raise Exception("SYSTEM TIME ERROR: Your network connection is unstable, or your system time is wrong.")
-                # Disable clock check for now, probably has to figure out another method
-                print("SYSTEM TIME ERROR: Your network connection is unstable, or your system time is wrong.")
-            else:
-                print("Time in sync")
+            # if networkDelay > response["allowedNetworkDelay"] or networkDelay < 0:
+            #     # raise Exception("SYSTEM TIME ERROR: Your network connection is unstable, or your system time is wrong.")
+            #     # Disable clock check for now, probably has to figure out another method
+            #     print("SYSTEM TIME ERROR: Your network connection is unstable, or your system time is wrong.")
+            # else:
+            #     print("Time in sync")
 
     def __del__(self):
         if(hasattr(self,"socket")):
