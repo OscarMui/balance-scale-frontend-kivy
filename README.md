@@ -90,16 +90,22 @@ def _cmp(self, other):
 p4a aab --private . --arch arm64-v8a --arch armeabi-v7a --permission android.permission.INTERNET --permission android.permission.ACCESS_NETWORK_STATE --package=com.kidprof.tenbin --name "Tenbin"  --bootstrap=sdl2 --requirements=python3,kivy,httpx,websocket_client,certifi,httpcore,idna,sniffio,anyio,exceptiongroup,h11 --orientation landscape --orientation landscape-reverse --icon assets/icon.png --presplash assets/background.jpg --blacklist-requirements=sqlite3,libffi,openssl --release --version 0.4.2
 ```
 
-APK for debug:
-
-Remove `--release` flag and replace `aab` with `apk`.
-
 Signing app bundle:
 
 ```bash
 jarsigner -keystore <key_location> <bundle_location> <key_alias>
 ```
 
+APK for debug:
+
+Remove `--release` flag and replace `aab` with `apk`.
+
+Signing APKs:
+
+```bash
+$ANDROIDSDK/build-tools/34.0.0/zipalign -v -p 4 orig.apk aligned.apk
+$ANDROIDSDK/build-tools/34.0.0/apksigner sign --ks ~/kidprof.jks --out signed.apk aligned.apk
+```
 
 Clean:
 

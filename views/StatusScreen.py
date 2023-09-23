@@ -145,7 +145,7 @@ class StatusScreen(Screen):
                 # Either 2 or 4 will be in justAppliedRules
                 if 2 in gameInfo["justAppliedRules"]:
                     infoLabel.color = (0,1,1,1)
-                    infoLabel.text = "Rule applied: If someone chooses 0, a player who chooses 100 automatically wins the round."
+                    infoLabel.text = "Rule applied: If someone chooses 0, a player who chooses 100 wins the round."
                 elif 4 in gameInfo["justAppliedRules"]:
                     infoLabel.color = (0,1,1,1)
                     infoLabel.text = "Rule applied: If two or more players choose the same number, the number is invalid and all players who selected the number will lose a point."

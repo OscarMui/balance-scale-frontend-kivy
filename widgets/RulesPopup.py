@@ -78,7 +78,7 @@ class RulesPopup(Popup):
                 ))
             if aliveCount <= 2:
                 rulesLayout.add_widget(LeftWrapLabel(
-                    text = "3. If someone chooses 0, a player who chooses 100 automatically wins the round.",
+                    text = "3. If someone chooses 0, a player who chooses 100 wins the round.",
                 ))
         
         # General rules
