@@ -1,6 +1,6 @@
 import os
 
-from kivy.uix.label import Label
+from widgets.WrapLabel import WrapLabel
 from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 from common.visibility import show
@@ -20,9 +20,9 @@ class StatusPopupParticipantUI(BoxLayout):
         score = p["score"]
 
         if len(nickname) > 10:
-            self.ids["nickname"].font_size = "12sp"
+            self.ids["nickname"].font_size = "10sp"
         else:
-            self.ids["nickname"].font_size = "14sp"
+            self.ids["nickname"].font_size = "12sp"
         self.ids["nickname"].text = nickname
         if isBot:
             self.ids["pfp"].source = os.path.join("assets","bot.png")
@@ -76,7 +76,7 @@ class StatusPopup(Popup):
         target = round(gameInfo["target"],2)
         calculationLabel.text = calculationLabel.text + f')/{numGuesses} = {average}\n{average} * 0.8 = {target}'
 
-        justAppliedRulesLabel = Label(text="",color=(0,1,1,1))
+        justAppliedRulesLabel = WrapLabel(text="",color=(0,1,1,1),font_size="12sp")
         for r in gameInfo["justAppliedRules"]:
             if r == 2:
                 justAppliedRulesLabel.text += "Rule applied: If someone chooses 0, a player who chooses 100 wins the round.\n"
@@ -86,10 +86,10 @@ class StatusPopup(Popup):
                 justAppliedRulesLabel.text += "Rule applied: If two or more players choose the same number, the number is invalid and all players who selected the number will lose a point.\n"
         if len(gameInfo["justAppliedRules"])>0:
             statusLayout.add_widget(justAppliedRulesLabel)
-            participantUIs.size_hint_y -= 0.1
-            statusLayout.size_hint_y += 0.1
+            participantUIs.size_hint_y -= 0.15
+            statusLayout.size_hint_y += 0.15
 
-        justDiedParticipantsLabel = Label(text="",color=(1,0,0,1))
+        justDiedParticipantsLabel = WrapLabel(text="",color=(1,0,0,1),font_size="12sp")
         for d in gameInfo["justDiedParticipants"]:
             p = list(filter(lambda p: p["id"]==d["id"],ps))[0]
             if d["reason"]=="deadLimit":
@@ -100,5 +100,5 @@ class StatusPopup(Popup):
                 justDiedParticipantsLabel.text += f'{p["nickname"]} disconnected midgame, GAME OVER.\n'
         if len(gameInfo["justDiedParticipants"])>0:
             statusLayout.add_widget(justDiedParticipantsLabel)
-            participantUIs.size_hint_y -= 0.1
-            statusLayout.size_hint_y += 0.1
+            participantUIs.size_hint_y -= 0.2
+            statusLayout.size_hint_y += 0.2

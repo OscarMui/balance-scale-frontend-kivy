@@ -69,6 +69,7 @@ class StatusScreen(Screen):
         # hide quit button
         hide(self.ids["exitButton"])
         infoLabel.pos_hint= {'center_x': 0.5, 'y': 0.07}
+        infoLabel.size_hint= (1,None)
 
         self.statusTask = asyncio.create_task(self.__status())
     
@@ -200,7 +201,8 @@ class StatusScreen(Screen):
                     titleLabel.text = "You are dead :("
 
                     # show quit button
-                    infoLabel.pos_hint= {'center_x': 0.45, 'y': 0.07}
+                    infoLabel.pos_hint= {'center_x': 0.4, 'y': 0.07}
+                    infoLabel.size_hint= (0.8,None)
                     show(self.ids["exitButton"],animation=True)
 
                 if gameInfo["gameEnded"]:
@@ -224,7 +226,8 @@ class StatusScreen(Screen):
 
                     # show quit button
                     show(self.ids["exitButton"],animation=True)
-                    infoLabel.pos_hint= {'center_x': 0.45, 'y': 0.07}
+                    infoLabel.pos_hint= {'center_x': 0.4, 'y': 0.07}
+                    infoLabel.size_hint= (0.8,None)
 
                     # stop working
                     return
