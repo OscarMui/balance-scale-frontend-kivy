@@ -24,7 +24,7 @@ class ParticipantUI(BoxLayout):
         if isBot:
             self.ids["pfp"].source = os.path.join("assets","bot.png")
         else:
-            self.ids["pfp"].source = os.path.join("assets","pfp.jpg")
+            self.ids["pfp"].source = os.path.join("assets","pfp.png")
 
     def declareWin(self):
         win = self.ids["win"]

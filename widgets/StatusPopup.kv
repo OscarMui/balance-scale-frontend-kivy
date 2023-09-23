@@ -11,7 +11,7 @@
     Image:
         id: pfp
         size_hint: (1,.4)
-        source: "assets/pfp.jpg"
+        source: "assets/pfp.png"
         fit_mode: "scale-down"
     Label:
         id: nickname
@@ -27,31 +27,18 @@
 
 <StatusPopup>:
     title: 'Previous Round'
-    size_hint: 0.8,1
+    size_hint: 0.7,1
     BoxLayout:
-        id: statusLayout
         orientation: "vertical"
         BoxLayout:
             id: participantUIs
             spacing: 35 # space between children
-            pos_hint_x: {'center_x': 0.5}
-            size_hint: 1,1
-        Label:
-            id: calculationLabel
-            font_size:"14sp"
-            text: ""
-            size_hint: 1, None
-        # Label:
-        #     id: justDiedParticipantsLabel
-        #     font_size:"14sp"
-        #     text: ""
-        #     color: 1,0,0,1
-        #     pos_hint: {'center_x': 0.5, 'y': 0.23}
-        #     size_hint: 1, None
-        # Label:
-        #     id: justAppliedRulesLabel
-        #     font_size:"14sp"
-        #     text: ""
-        #     color: 0,1,1,1
-        #     pos_hint: {'center_x': 0.5, 'y': 0.1}
-        #     size_hint: 1, None
+            size_hint: 1,0.7
+        BoxLayout:
+            id: statusLayout
+            orientation: "vertical"
+            size_hint: 1,0.3
+            Label:
+                id: calculationLabel
+                font_size:"14sp"
+                text: ""

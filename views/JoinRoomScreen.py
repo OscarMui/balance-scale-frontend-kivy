@@ -20,7 +20,7 @@ class JoinRoomParticipantUI(BoxLayout):
         if isBot:
             self.ids["pfp"].source = os.path.join("assets","bot.png")
         else:
-            self.ids["pfp"].source = os.path.join("assets","pfp.jpg")
+            self.ids["pfp"].source = os.path.join("assets","pfp.png")
         show(self)
 
     def hidePfp(self):
