@@ -19,6 +19,8 @@ from logic import logic
 from widgets.ImageButton import ImageButton
 from widgets.WrapLabel import WrapLabel
 from widgets.RulesPopup import RulesPopup
+from widgets.NewRulesPopup import NewRulesPopup
+from widgets.StatusPopup import StatusPopup
 
 # Load static templates
 Builder.load_file("main.kv")
@@ -29,6 +31,7 @@ Builder.load_file(os.path.join("views","SettingsScreen.kv"))
 Builder.load_file(os.path.join("views","StatusScreen.kv"))
 Builder.load_file(os.path.join("widgets","NewRulesPopup.kv"))
 Builder.load_file(os.path.join("widgets","RulesPopup.kv"))
+Builder.load_file(os.path.join("widgets","StatusPopup.kv"))
 Builder.load_file(os.path.join("widgets","ImageButton.kv"))
 Builder.load_file(os.path.join("widgets","WrapLabel.kv"))
 

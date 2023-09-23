@@ -11,7 +11,9 @@ from kivy.uix.popup import Popup
 from widgets.NewRulesPopup import NewRulesPopup
 from widgets.RulesPopup import RulesPopup
 from widgets.WrapLabel import WrapLabel
+from widgets.StatusPopup import StatusPopup
 from common.now import now
+from common.visibility import hide, show
 
 class GuessLabel(Label):
     border_color = ColorProperty((1, 1, 1, 1)) # Default border color (white)
@@ -182,6 +184,11 @@ class GameScreen(Screen):
         # setup end time first, so that handleTimer works correctly
         self.endTime = gameInfo["roundEndTime"]
 
+        rewindButton = self.ids["rewindButton"]
+        if gameInfo["round"] == 1:
+            hide(rewindButton)
+        else:
+            show(rewindButton)
         # handle events
         self.handleGameTask = asyncio.create_task(self.__handleGame())
 
@@ -401,4 +408,10 @@ class GameScreen(Screen):
     
     def showRules(self):
         self.popup = RulesPopup(detail=True,aliveCount=self.aliveCount)
+        self.popup.open()
+
+    def showRewind(self):
+        gameInfo = self.app.globalGameInfo
+        assert(gameInfo["round"]>1)
+        self.popup = StatusPopup(gameInfo)
         self.popup.open()

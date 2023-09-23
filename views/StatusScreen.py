@@ -111,6 +111,7 @@ class StatusScreen(Screen):
                                 print("found justDiedParticipantMidgame")
 
                 guessSum = 0
+                numGuesses = 0
                 for i in range(len(pus)):
                     pu = pus[i]
                     guess = pu["guess"]
@@ -118,6 +119,7 @@ class StatusScreen(Screen):
                     if self.isDeads[i]:
                         pu["ui"].declareGameOver(animation=False)
                     if guess != None:
+                        numGuesses += 1
                         # Calculate sum
                         guessSum += guess
 
@@ -130,10 +132,9 @@ class StatusScreen(Screen):
                     participantUIs.add_widget(pu["ui"])
 
                 # finish preparing calculationLabel
-                numAlive = len(list(filter(lambda x: not x,self.isDeads)))
-                average = round(guessSum/numAlive,2)
+                average = round(guessSum/numGuesses,2)
                 target = round(gameInfo["target"],2)
-                calculationLabel.text = calculationLabel.text + f')/{numAlive} = {average}\n{average} * 0.8 = {target}'
+                calculationLabel.text = calculationLabel.text + f')/{numGuesses} = {average}\n{average} * 0.8 = {target}'
             
                 await asyncio.sleep(1)
 
@@ -259,10 +260,8 @@ class StatusScreen(Screen):
                         if gameInfo["roundStartTime"]-now() > 0:
                             print("Waiting for round start while displaying the popup")
                             await asyncio.sleep((gameInfo["roundStartTime"]-now())/1000)
-                        self.manager.current = "game"
-                        await asyncio.sleep(0.4)
                         popup.dismiss()
-
+                        self.manager.current = "game"
                     else:
                         # Move to the game screen when it is time
                         if gameInfo["roundStartTime"]-now() > 0:

@@ -79,8 +79,9 @@
             pos_hint: {'x': 0.87, 'y': 0.58}
             size_hint: 0.13/16*9,0.13
             on_press: root.backspacePressed()
-        Image:
-            source: "assets/clock.png"
+        ImageButton: # Fake button
+            background_normal: "assets/clock.png"
+            background_down: "assets/clock.png"
             pos_hint: {'x': 0.87, 'y': 0.37}
             size_hint: 0.13/16*9,0.13
         Label:
@@ -96,6 +97,13 @@
             pos_hint: {'x': 0.87, 'y': 0.12}
             size_hint: 0.13/16*9,0.13
             on_press: root.confirmPressed()
+        ImageButton:
+            id: rewindButton
+            background_normal: "assets/rewind.png"
+            background_down: "assets/rewind.png"
+            pos_hint: {'x': 0.85, 'y': 0.93}
+            size_hint: 0.05/16*9,0.05
+            on_press: root.showRewind()
         ImageButton:
             background_normal: "assets/question-mark.png"
             background_down: "assets/question-mark.png"
