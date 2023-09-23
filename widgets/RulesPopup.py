@@ -1,4 +1,4 @@
-import asyncio
+import webbrowser
 
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
@@ -6,6 +6,7 @@ from kivy.uix.button import Button
 
 from widgets.WrapLabel import WrapLabel
 from widgets.ImageButton import ImageButton
+from common.constants import DISCORD_URL
 from common.visibility import hide
 
 class LeftWrapLabel(WrapLabel):
@@ -95,16 +96,32 @@ class RulesPopup(Popup):
         rulesLayout.add_widget(LeftWrapLabel(
             text = "A new rule will be introduced for every player eliminated.",
         ))
-        if detail:
-            rulesLayout.add_widget(WrapLabel(
-                text = "FAQs",
-                bold = True,
-            ))
-            for i in range(len(self.qs)):
-                q = self.qs[i]
-                rulesLayout.add_widget(LeftWrapLabel(
-                    text = q["question"],
-                ))
-                rulesLayout.add_widget(ShowAnswerButton(rulesLayout,q["answer"]))
 
-       
+        rulesLayout.add_widget(WrapLabel(
+            text = "FAQs",
+            bold = True,
+        ))
+        for i in range(len(self.qs)):
+            q = self.qs[i]
+            rulesLayout.add_widget(LeftWrapLabel(
+                text = q["question"],
+            ))
+            rulesLayout.add_widget(ShowAnswerButton(rulesLayout,q["answer"]))
+
+        rulesLayout.add_widget(LeftWrapLabel(
+            text = "Created by KidProf\nFrontend: Python, Kivy, Async IO\nBackend: ExpressJS, Websockets"
+        ))
+
+        if detail:
+            rulesLayout.add_widget(ImageButton(
+                text = "Join Discord",
+                color = (114.0/255,137.0/255,218.0/255,1),
+                size_hint = (1, None),
+                height = 100,
+                background_color = (0,0,0,0),
+                on_press = self.openDiscord,  
+            ))
+
+    def openDiscord(self,arg):
+        webbrowser.open(DISCORD_URL)
+        

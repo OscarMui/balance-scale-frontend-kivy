@@ -7,3 +7,5 @@ SERVER_URL = f'http{"s" if SSL else ""}://{SERVER_IP}'
 WSS_URL = f'ws{"s" if SSL else ""}://{SERVER_IP}/game'
 
 CLIENT_VERSION = "20230912.3.app"
+
+DISCORD_URL = "https://discord.gg/H6bsxqZyuu"

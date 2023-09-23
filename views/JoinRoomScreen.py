@@ -164,5 +164,5 @@ class JoinRoomScreen(Screen):
             self.joinRoomTask.cancel()
     
     def showRules(self):
-        self.popup = RulesPopup(detail=True)
+        self.popup = RulesPopup(detail=False)
         self.popup.open()

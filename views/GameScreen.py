@@ -407,7 +407,7 @@ class GameScreen(Screen):
             self.handleGameTask.cancel()
     
     def showRules(self):
-        self.popup = RulesPopup(detail=True,aliveCount=self.aliveCount)
+        self.popup = RulesPopup(detail=False,aliveCount=self.aliveCount)
         self.popup.open()
 
     def showRewind(self):

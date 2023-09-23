@@ -303,5 +303,5 @@ class StatusScreen(Screen):
     
     def showRules(self):
         gameInfo = self.app.globalGameInfo
-        self.popup = RulesPopup(detail=True,aliveCount=gameInfo["aliveCount"])
+        self.popup = RulesPopup(detail=False,aliveCount=gameInfo["aliveCount"])
         self.popup.open()
