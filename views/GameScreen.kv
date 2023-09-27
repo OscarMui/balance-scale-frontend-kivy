@@ -17,8 +17,8 @@
 <GameScreen>:
     RelativeLayout:
         BoxLayout:
-            pos_hint: {'x': 0.07, 'y': 0.73}
-            size_hint: 0.35,0.2
+            pos_hint: {'x': 0.05, 'y': 0.73}
+            size_hint: 0.33,0.2
             # wrapper for guess label for it to position correctly initially
             GuessLabel:
                 # background_color set in code for consistency
@@ -26,8 +26,8 @@
                 id: guessLabel
                 text: ""
         ScrollView:
-            pos_hint: {'x': 0.07, 'y': 0.1}
-            size_hint: 0.35,0.5
+            pos_hint: {'x': 0.05, 'y': 0.1}
+            size_hint: 0.33,0.5
             do_scroll_x: False
             BoxLayout:
                 id: infoLayout
@@ -38,7 +38,7 @@
         GridLayout:
             id: numpad
             cols: 3
-            pos_hint: {'x': 0.45, 'y': 0.1}
+            pos_hint: {'x': 0.40, 'y': 0.1}
             size_hint: 0.32,0.8
             Button:
                 id: cancelButton
@@ -96,67 +96,35 @@
         ImageButton:
             background_normal: "assets/question-mark-big.png"
             background_down: "assets/question-mark-big.png"
-            pos_hint: {'x': 0.82, 'y': 0.74}
-            size_hint: 0.13/16*9*2,0.13
+            pos_hint: {'center_x': 0.86, 'y': 0.75}
+            size_hint: 0.15/16*9*2,0.15
             ratio: 2
             on_press: root.showRules()
         ImageButton:
             id: rewindButton
             background_normal: "assets/rewind-big.png"
             background_down: "assets/rewind-big.png"
-            pos_hint: {'x': 0.82, 'y': 0.58}
-            size_hint: 0.13/16*9*2,0.13
+            pos_hint: {'center_x': 0.86, 'y': 0.55}
+            size_hint: 0.15/16*9*2,0.15
             ratio: 2
             on_press: root.showRewind()
-        # ImageButton:
-        #     background_normal: "assets/cancel.png"
-        #     background_down: "assets/cancel_down.png"
-        #     border: 0,0,0,0 # Or else the image would look weird
-        #     pos_hint: {'x': 0.87, 'y': 0.74}
-        #     size_hint: 0.13/16*9,0.13
-        #     ratio: 1
-        #     on_press: root.cancelPressed()
-        # ImageButton:
-        #     background_normal: "assets/backspace.png"
-        #     background_down: "assets/backspace_down.png"
-        #     border: 0,0,0,0
-        #     pos_hint: {'x': 0.87, 'y': 0.58}
-        #     size_hint: 0.13/16*9,0.13
-        #     ratio: 1
-        #     on_press: root.backspacePressed()
         ImageButton: # Fake button
             background_normal: "assets/clock.png"
             background_down: "assets/clock.png"
-            pos_hint: {'x': 0.87, 'y': 0.37}
+            pos_hint: {'center_x': 0.86, 'y': 0.37}
             size_hint: 0.13/16*9,0.13
             ratio: 1
         Label:
             id: timer
             text: "1m30s"
             font_size:"20sp"
-            pos_hint: {'x': 0.87, 'y': 0.27}
-            size_hint: None,0.13
+            pos_hint: {'center_x': 0.86, 'y': 0.27}
+            size_hint: 0.28,0.13
         ImageButton:
             background_normal: "assets/confirm-big.png"
             background_down: "assets/confirm-big-down.png"
             border: 0,0,0,0
-            pos_hint: {'x': 0.82, 'y': 0.12}
-            size_hint: 0.13/16*9*2,0.13
+            pos_hint: {'center_x': 0.86, 'y': 0.12}
+            size_hint: 0.15/16*9*2,0.15
             ratio: 2
             on_press: root.confirmPressed()
-        # ImageButton:
-        #     id: rewindButton
-        #     background_normal: "assets/rewind.png"
-        #     background_down: "assets/rewind.png"
-        #     pos_hint: {'x': 0.85, 'y': 0.93}
-        #     size_hint: 0.05/16*9,0.05
-        #     ratio: 1
-        #     on_press: root.showRewind()
-        # ImageButton:
-        #     background_normal: "assets/question-mark.png"
-        #     background_down: "assets/question-mark.png"
-        #     pos_hint: {'x': 0.93, 'y': 0.93}
-        #     size_hint: 0.05/16*9,0.05
-        #     ratio: 1
-        #     on_press: root.showRules()
-
