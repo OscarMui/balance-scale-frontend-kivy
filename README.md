@@ -34,8 +34,8 @@ source venv/bin/activate
 python main.py
 ```
 
-### Android build
-## Installation
+## Android build
+### Installation
 
 First finish the normal installation.
 
@@ -138,7 +138,7 @@ View logs:
 $ANDROIDSDK/platform-tools/adb logcat | grep python
 ```
 
-## Build for Windows/MacOS
+## Build for MacOS
 
 ### Installation
 
@@ -154,7 +154,32 @@ python -m pip install pyinstaller==5.13.2
 
 ```bash
 python -m PyInstaller -y --clean main.spec
+
+pushd dist
+hdiutil create ./Tenbin.dmg -srcfolder tenbin.app -ov
+popd
 ```
+
+## Build for Windows
+
+Python 3.11.3 is required. Newer versions of python and pyinstaller would result in errors at the moment.
+### Installation
+
+```bash
+# Create a venv specifically for android build, outside of the project folder, the bundle and apk size will increase significantly with extra packages in the venv
+python -m venv ../venv
+source ../venv/Scripts/activate
+
+python -m pip install pyinstaller==5.6.2
+```
+
+### Build
+
+```bash
+python -m PyInstaller -y --clean win.spec
+```
+
+But for now the `datas` functionality seems to be not working for windows. We need to put the `.kv` files and all the assets in the same folder as the executable for it to work.
 
 ## Game Rules
 
