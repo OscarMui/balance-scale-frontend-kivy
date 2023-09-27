@@ -7,6 +7,7 @@ from kivy.uix.button import Button
 from kivy.properties import (NumericProperty, ColorProperty, ListProperty)
 from kivy.graphics import Color, Rectangle
 from kivy.uix.popup import Popup
+from kivy.core.window import Window
 
 from widgets.NewRulesPopup import NewRulesPopup
 from widgets.RulesPopup import RulesPopup
@@ -86,6 +87,23 @@ class GameScreen(Screen):
         for i in range(0,10): # [0..9]
             numpad.add_widget(DigitButton(self.qApp,i))
     
+    def key_action(self, *args):
+        # print("got a key event: %s" % list(args))
+        key = args[1]
+        if key >= 48 and key <= 57: # '0' and '9'
+            self.qApp.put_nowait({
+                "event": "digitPressed",
+                "digit": str(key-48)
+            })
+        elif key == 8: # backspace
+            self.qApp.put_nowait({
+                "event": "backspacePressed"
+            })
+        elif key == 13: # enter
+            self.qApp.put_nowait({
+                "event": "confirmPressed"
+            })
+
     def confirmPressed(self):
         self.qApp.put_nowait({
             "event": "confirmPressed"
@@ -197,6 +215,9 @@ class GameScreen(Screen):
             hide(rewindButton)
         else:
             show(rewindButton)
+
+        Window.bind(on_key_down=self.key_action)
+
         # handle events
         self.handleGameTask = asyncio.create_task(self.__handleGame())
 
@@ -407,6 +428,7 @@ class GameScreen(Screen):
             print("ERROR __handleGame",repr(e))
 
     def on_pre_leave(self):
+        Window.unbind(on_key_down=self.key_action)
         if hasattr(self,"popup"):
             self.popup.dismiss()
         if hasattr(self,"handleTimerTask"):
