@@ -51,8 +51,16 @@
                 halign: 'center'
                 on_press: root.modeSelection("solo")
         ImageButton:
-            background_normal: "assets/question-mark.png"
-            background_down: "assets/question-mark.png"
-            pos_hint: {'x': 0.93, 'y': 0.93}
-            size_hint: 0.05/16*9,0.05
+            background_normal: "assets/question-mark-big.png"
+            background_down: "assets/question-mark-big.png"
+            pos_hint: {'x': 0.83, 'y': 0.88}
+            size_hint: 0.1/16*9*2,0.1
+            ratio: 2
             on_press: root.showRules()
+        ImageButton:
+            background_normal: "assets/discord.png"
+            background_down: "assets/discord.png"
+            pos_hint: {'x': 0.7, 'y': 0.88}
+            size_hint: 0.1/16*9*2,0.1
+            ratio: 2
+            on_press: root.openDiscord()

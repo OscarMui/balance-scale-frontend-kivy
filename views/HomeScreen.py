@@ -1,11 +1,12 @@
+import webbrowser
+import re # regex
+
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 
-import re # regex
-import asyncio
-
+from common.constants import DISCORD_URL
 from widgets.RulesPopup import RulesPopup
 
 class HomeScreen(Screen):
@@ -80,3 +81,6 @@ class HomeScreen(Screen):
     def showRules(self):
         self.popup = RulesPopup(detail=True)
         self.popup.open()
+
+    def openDiscord(self):
+        webbrowser.open(DISCORD_URL)

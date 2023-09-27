@@ -1,7 +1,6 @@
 from kivy.uix.label import Label
 
 class WrapLabel(Label):
-    pass
     def __init__(self, **kwargs):
         super(WrapLabel, self).__init__(**kwargs)
 

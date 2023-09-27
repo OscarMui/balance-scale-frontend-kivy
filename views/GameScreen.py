@@ -92,14 +92,22 @@ class GameScreen(Screen):
         })
 
     def backspacePressed(self):
+        self.ids["backspaceButton"].background_color = 59.0/255,0,0,1
         self.qApp.put_nowait({
             "event": "backspacePressed"
         })
 
+    def backspaceReleased(self):
+        self.ids["backspaceButton"].background_color = 89.0/255,0,0,1
+
     def cancelPressed(self):
+        self.ids["cancelButton"].background_color = 59.0/255,0,0,1
         self.qApp.put_nowait({
             "event": "cancelPressed"
         })
+
+    def cancelReleased(self):
+        self.ids["cancelButton"].background_color = 89.0/255,0,0,1
 
     def __addInfo(self,text,color=(1,1,1,1)):
         infoLayout = self.ids["infoLayout"]

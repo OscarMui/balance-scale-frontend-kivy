@@ -39,11 +39,39 @@
             id: numpad
             cols: 3
             pos_hint: {'x': 0.45, 'y': 0.1}
-            size_hint: 0.35,0.8
-            Label:
-                text: ""
-            Label:
-                text: ""
+            size_hint: 0.32,0.8
+            Button:
+                id: cancelButton
+                text: "AC"
+                font_size:"26sp"
+                # border: 0,0,0,0
+                background_color: 89.0/255,0,0,1
+                background_normal: "" # The default texture is grey, so just setting the background color will give a darker result. To set a plain color, set the background_normal to ''.
+                background_down: ""
+                canvas.before:
+                    Color:
+                        rgba: 1,1,1,1
+                    Line:
+                        width: 5
+                        rectangle: self.x, self.y, self.width, self.height
+                on_press: root.cancelPressed()
+                on_release: root.cancelReleased()
+            Button:
+                id: backspaceButton
+                text: "C"
+                font_size:"26sp"
+                # border: 0,0,0,0
+                background_color: 89.0/255,0,0,1
+                background_normal: "" # The default texture is grey, so just setting the background color will give a darker result. To set a plain color, set the background_normal to ''.
+                background_down: ""
+                canvas.before:
+                    Color:
+                        rgba: 1,1,1,1
+                    Line:
+                        width: 5
+                        rectangle: self.x, self.y, self.width, self.height
+                on_press: root.backspacePressed()
+                on_release: root.backspaceReleased()
             # DigitButtons will be rendered in code
             # DigitButton:
             #     digit: 0
@@ -66,24 +94,42 @@
             # DigitButton:
             #     digit: 9
         ImageButton:
-            background_normal: "assets/cancel.png"
-            background_down: "assets/cancel_down.png"
-            border: 0,0,0,0 # Or else the image would look weird
-            pos_hint: {'x': 0.87, 'y': 0.74}
-            size_hint: 0.13/16*9,0.13
-            on_press: root.cancelPressed()
+            background_normal: "assets/question-mark-big.png"
+            background_down: "assets/question-mark-big.png"
+            pos_hint: {'x': 0.82, 'y': 0.74}
+            size_hint: 0.13/16*9*2,0.13
+            ratio: 2
+            on_press: root.showRules()
         ImageButton:
-            background_normal: "assets/backspace.png"
-            background_down: "assets/backspace_down.png"
-            border: 0,0,0,0
-            pos_hint: {'x': 0.87, 'y': 0.58}
-            size_hint: 0.13/16*9,0.13
-            on_press: root.backspacePressed()
+            id: rewindButton
+            background_normal: "assets/rewind-big.png"
+            background_down: "assets/rewind-big.png"
+            pos_hint: {'x': 0.82, 'y': 0.58}
+            size_hint: 0.13/16*9*2,0.13
+            ratio: 2
+            on_press: root.showRewind()
+        # ImageButton:
+        #     background_normal: "assets/cancel.png"
+        #     background_down: "assets/cancel_down.png"
+        #     border: 0,0,0,0 # Or else the image would look weird
+        #     pos_hint: {'x': 0.87, 'y': 0.74}
+        #     size_hint: 0.13/16*9,0.13
+        #     ratio: 1
+        #     on_press: root.cancelPressed()
+        # ImageButton:
+        #     background_normal: "assets/backspace.png"
+        #     background_down: "assets/backspace_down.png"
+        #     border: 0,0,0,0
+        #     pos_hint: {'x': 0.87, 'y': 0.58}
+        #     size_hint: 0.13/16*9,0.13
+        #     ratio: 1
+        #     on_press: root.backspacePressed()
         ImageButton: # Fake button
             background_normal: "assets/clock.png"
             background_down: "assets/clock.png"
             pos_hint: {'x': 0.87, 'y': 0.37}
             size_hint: 0.13/16*9,0.13
+            ratio: 1
         Label:
             id: timer
             text: "1m30s"
@@ -91,23 +137,26 @@
             pos_hint: {'x': 0.87, 'y': 0.27}
             size_hint: None,0.13
         ImageButton:
-            background_normal: "assets/confirm.png"
-            background_down: "assets/confirm_down.png"
+            background_normal: "assets/confirm-big.png"
+            background_down: "assets/confirm-big-down.png"
             border: 0,0,0,0
-            pos_hint: {'x': 0.87, 'y': 0.12}
-            size_hint: 0.13/16*9,0.13
+            pos_hint: {'x': 0.82, 'y': 0.12}
+            size_hint: 0.13/16*9*2,0.13
+            ratio: 2
             on_press: root.confirmPressed()
-        ImageButton:
-            id: rewindButton
-            background_normal: "assets/rewind.png"
-            background_down: "assets/rewind.png"
-            pos_hint: {'x': 0.85, 'y': 0.93}
-            size_hint: 0.05/16*9,0.05
-            on_press: root.showRewind()
-        ImageButton:
-            background_normal: "assets/question-mark.png"
-            background_down: "assets/question-mark.png"
-            pos_hint: {'x': 0.93, 'y': 0.93}
-            size_hint: 0.05/16*9,0.05
-            on_press: root.showRules()
+        # ImageButton:
+        #     id: rewindButton
+        #     background_normal: "assets/rewind.png"
+        #     background_down: "assets/rewind.png"
+        #     pos_hint: {'x': 0.85, 'y': 0.93}
+        #     size_hint: 0.05/16*9,0.05
+        #     ratio: 1
+        #     on_press: root.showRewind()
+        # ImageButton:
+        #     background_normal: "assets/question-mark.png"
+        #     background_down: "assets/question-mark.png"
+        #     pos_hint: {'x': 0.93, 'y': 0.93}
+        #     size_hint: 0.05/16*9,0.05
+        #     ratio: 1
+        #     on_press: root.showRules()
 
