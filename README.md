@@ -6,7 +6,9 @@ The frontend of a game based on Alice in Borderland, a TV show on Netflix.
 
 Written in Python mainly using the asyncio library to handle communication with the server via websocket. I used the Kivy framework for GUI support and conversion to an Android app.
 
-## Installation (for running the game)
+## Running the game
+
+### Installation
 
 Requires Python 3.10 and pip
 
@@ -19,18 +21,22 @@ Here are the commands for MacOS.
 You need to create the venv outside of the project directory
 ```bash
 python3.10 -m virtualenv venv
-source venv/bin/activate
+cd balance-scale-frontend-kivy 
+# put the env outside of the project directory so that it is ignored by the android build
+source ../venv/bin/activate
 python -m pip install "kivy[base]" httpx websocket_client
 
 ```
 
-## Running the game
+### Running
 
 ```bash
 source venv/bin/activate
 python main.py
 ```
-## Installation (for Android build)
+
+### Android build
+## Installation
 
 First finish the normal installation.
 
@@ -84,7 +90,7 @@ def _cmp(self, other):
 ```
 
 
-## Build for Android
+### Build
 
 ```bash
 p4a aab --private . --arch arm64-v8a --arch armeabi-v7a --permission android.permission.INTERNET --permission android.permission.ACCESS_NETWORK_STATE --package=com.kidprof.tenbin --name "Tenbin"  --bootstrap=sdl2 --requirements=python3,kivy,httpx,websocket_client,certifi,httpcore,idna,sniffio,anyio,exceptiongroup,h11 --orientation landscape --orientation landscape-reverse --icon assets/icon.png --presplash assets/background.jpg --blacklist-requirements=sqlite3,libffi,openssl --release --version 1.0.0
@@ -111,7 +117,7 @@ Clean:
 
 ```bash
 rm **/*.pyc
-mv *.apk bin
+mv *.apk *.aab 
 ```
 
 View logs:
@@ -123,13 +129,13 @@ $ANDROIDSDK/platform-tools/adb logcat | grep python
 ## Installation for Windows/MacOS build
 
 ```bash
-pip install pyinstaller
+python -m pip install pyinstaller==5.13.2
 ```
 
 ## Build for Windows/MacOS
 
 ```bash
-pyinstaller main.spec
+python -m PyInstaller -y --clean main.spec
 ```
 
 ## Game Rules
