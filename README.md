@@ -20,8 +20,7 @@ Here are the commands for MacOS.
 
 You need to create the venv outside of the project directory
 ```bash
-python3.10 -m virtualenv venv
-cd balance-scale-frontend-kivy 
+(cd ..; python3.10 -m virtualenv venv)
 # put the env outside of the project directory so that it is ignored by the android build
 source ../venv/bin/activate
 python -m pip install "kivy[base]" httpx websocket_client
@@ -47,6 +46,11 @@ Documentation for p4a:
 https://python-for-android.readthedocs.io/en/latest/quickstart/?highlight=archs
 
 ```bash
+# Create a venv specifically for android build, outside of the project folder, the bundle and apk size will increase significantly with extra packages in the venv
+(cd ..; python3.10 -m virtualenv venv_android)
+source ../venv_android/bin/activate
+
+# install stuff
 pip install python-for-android
 
 brew install autoconf automake libtool openssl pkg-config
@@ -92,8 +96,16 @@ def _cmp(self, other):
 
 ### Build
 
+First remove `dist` and `build` folder if you have built for MacOS or Windows. Or else the size of the apk and bundle will be very large.
+
 ```bash
-p4a aab --private . --arch arm64-v8a --arch armeabi-v7a --permission android.permission.INTERNET --permission android.permission.ACCESS_NETWORK_STATE --package=com.kidprof.tenbin --name "Tenbin"  --bootstrap=sdl2 --requirements=python3,kivy,httpx,websocket_client,certifi,httpcore,idna,sniffio,anyio,exceptiongroup,h11 --orientation landscape --orientation landscape-reverse --icon assets/icon.png --presplash assets/background.jpg --blacklist-requirements=sqlite3,libffi,openssl --release --version 1.0.0
+rm -rf build dist
+```
+
+The actual magical command:
+
+```bash
+p4a aab --private . --arch arm64-v8a --arch armeabi-v7a --permission android.permission.INTERNET --permission android.permission.ACCESS_NETWORK_STATE --package=com.kidprof.tenbin --name "Tenbin"  --bootstrap=sdl2 --requirements=python3,kivy,httpx,websocket_client,certifi,httpcore,idna,sniffio,anyio,exceptiongroup,h11 --orientation landscape --orientation landscape-reverse --icon assets/icon.png --presplash assets/background.jpg --blacklist-requirements=sqlite3,libffi,openssl --release --version 1.0.1
 ```
 
 Signing app bundle:
@@ -126,13 +138,19 @@ View logs:
 $ANDROIDSDK/platform-tools/adb logcat | grep python
 ```
 
-## Installation for Windows/MacOS build
+## Build for Windows/MacOS
+
+### Installation
 
 ```bash
+# Create a venv specifically for android build, outside of the project folder, the bundle and apk size will increase significantly with extra packages in the venv
+(cd ..; python3.10 -m virtualenv venv_macos)
+source ../venv_macos/bin/activate
+
 python -m pip install pyinstaller==5.13.2
 ```
 
-## Build for Windows/MacOS
+### Build
 
 ```bash
 python -m PyInstaller -y --clean main.spec

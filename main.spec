@@ -57,6 +57,6 @@ coll = COLLECT(
 app = BUNDLE(
     coll,
     name='tenbin.app',
-    icon=None,
+    icon='assets/icon.png',
     bundle_identifier=None,
 )
