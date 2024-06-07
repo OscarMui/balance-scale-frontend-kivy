@@ -89,18 +89,23 @@ class GameScreen(Screen):
             numpad.add_widget(DigitButton(self.qApp,i))
     
     def key_action(self, *args):
-        # print("got a key event: %s" % list(args))
+        print("got a key event: %s" % list(args))
         key = args[1]
         if key >= 48 and key <= 57: # '0' and '9'
             self.qApp.put_nowait({
                 "event": "digitPressed",
                 "digit": str(key-48)
             })
+        elif key >= 256 and key <= 265: # numpad '0' and '9' (at least for my keyboard)
+            self.qApp.put_nowait({
+                "event": "digitPressed",
+                "digit": str(key-256)
+            })
         elif key == 8: # backspace
             self.qApp.put_nowait({
                 "event": "backspacePressed"
             })
-        elif key == 13: # enter
+        elif key == 13 or key == 271: # enter, and enter for numpad
             self.qApp.put_nowait({
                 "event": "confirmPressed"
             })
