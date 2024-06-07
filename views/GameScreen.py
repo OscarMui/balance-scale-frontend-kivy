@@ -89,7 +89,7 @@ class GameScreen(Screen):
             numpad.add_widget(DigitButton(self.qApp,i))
     
     def key_action(self, *args):
-        print("got a key event: %s" % list(args))
+        # print("got a key event: %s" % list(args))
         key = args[1]
         if key >= 48 and key <= 57: # '0' and '9'
             self.qApp.put_nowait({
@@ -215,12 +215,19 @@ class GameScreen(Screen):
         
         # setup end time first, so that handleTimer works correctly
         self.endTime = gameInfo["roundEndTime"]
+        self.aliveCount = gameInfo["aliveCount"]
 
         rewindButton = self.ids["rewindButton"]
         if gameInfo["round"] == 1:
             hide(rewindButton)
         else:
             show(rewindButton)
+            if len(gameInfo["justDiedParticipants"])>0:
+                # Someone died, show the rules page
+                self.showRules()
+            else:
+                # No one died, show the prev results
+                self.showRewind()
 
         Window.bind(on_key_down=self.key_action)
 
@@ -334,7 +341,6 @@ class GameScreen(Screen):
         try:
             # get gameInfo back from a previous screen
             gameInfo = self.app.globalGameInfo
-            self.aliveCount = gameInfo["aliveCount"]
 
             guessLabel = self.ids["guessLabel"]
             infoLayout = self.ids["infoLayout"]
@@ -389,11 +395,9 @@ class GameScreen(Screen):
 
                     if hasattr(self,"popup"):
                         self.popup.dismiss()
-                    popup = NewRulesPopup(self.aliveCount,self.aliveCount-1,titleText=f'{p["nickname"]} disconnected midgame')
+                    popup = NewRulesPopup(self.aliveCount,self.aliveCount-1,titleText=f'{p["nickname"]} disconnected midgame',allowClose=True)
                     self.aliveCount -= 1
                     popup.open()
-                    await asyncio.sleep(5)
-                    popup.allowClose()
                 else:
                     assert(event["event"] == "changeCountdown")
                     #! start time delay of the changeCountdown if participantDisconnectedMidgame is enforced by the 5-second popup window on the participantDisconnectedMidgame event. Will change that behaviour when we handle reconnection.
