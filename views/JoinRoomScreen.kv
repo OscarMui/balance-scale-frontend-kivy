@@ -30,11 +30,25 @@
             text: "Please wait..."
             pos_hint: {'center_x': 0.5, 'y': 0.7}
             size_hint: 1, None
+        ImageButton: # Fake button
+            id: timerImage
+            background_normal: "assets/clock.png"
+            background_down: "assets/clock.png"
+            pos_hint: {'center_x': 0.07, 'y': 0.15}
+            size_hint: 0.13/16*9,0.13
+            ratio: 1
+        Label:
+            id: timer
+            text: ""
+            font_size:"20sp"
+            pos_hint: {'center_x': 0.07, 'y': 0.05}
+            size_hint: 0.28,0.13
         BoxLayout:
             id: joinRoomParticipantUIs
             spacing: 35 # space between children
             pos_hint: {'center_x': 0.5, 'y': 0.2}
             size_hint: 0.8, 0.3
+        
         Button:
             pos_hint: {'x': 0.87, 'y': 0.05}
             size_hint: 0.1, None

@@ -39,6 +39,7 @@ class JoinRoomScreen(Screen):
         super().__init__(name=name)
         self.qGame = qGame  
         self.qApp = qApp 
+        self.endTime = 0
         self.app = App.get_running_app()
 
     def on_pre_enter(self):
@@ -53,6 +54,51 @@ class JoinRoomScreen(Screen):
 
         self.ids["exitButton"].background_color = [1,0,0,1]
         self.joinRoomTask = asyncio.create_task(self.__joinRoom())
+        self.handleTimerTask = asyncio.create_task(self.__handleTimer())
+
+    async def __handleTimer(self):
+        try:
+            timer = self.ids["timer"]
+            timerImage = self.ids["timerImage"]
+
+            timer.color = (1,1,1,1)
+
+            while True: 
+                if now() < self.endTime:
+                    show(timer)
+                    show(timerImage)
+                    seconds = (self.endTime-now())//1000
+
+                    # modify timer
+                    if seconds < 60:
+                        timer.text = f'{seconds}s'
+                    else:
+                        timer.text = f'{seconds//60}m{seconds%60}s'
+                else:
+                    # A time in the past/ not initialised yet (it was initialised to 0, which is definitely smaller than now())
+                    timer.text = ""
+                    hide(timer)
+                    hide(timerImage)
+                    
+                # Rember to await!
+                await asyncio.sleep(1)
+        except Exception as e:
+            # 1. inform the onlineGame to stop
+            self.qGame.put_nowait({
+                "event": "appError"
+            })
+            # 2. inform the user by displaying the popup
+            popup = Popup(
+                title='Sorry an error occured', 
+                content=Label(text='We brought you back to the home screen.'),
+                size_hint=(0.8, 0.3), 
+            )
+            popup.open()
+            # 3. go back to the home screen
+            self.manager.current = "home"
+            # 4. print the error We need to print the exception or else it will fail silently
+            print("ERROR __handleTimer",repr(e))
+
     
     async def __joinRoom(self):
         try:
@@ -70,6 +116,7 @@ class JoinRoomScreen(Screen):
                 participantsPerGame = event["participantsPerGame"]
                 titleLabel.text = f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
                 bodyLabel.text = "The game will be filled with computer players if no one joins in 15 seconds. Please wait..."
+                
                 # Create that many participants
                 for i in range(participantsPerGame):
                     pu = JoinRoomParticipantUI()
@@ -79,6 +126,7 @@ class JoinRoomScreen(Screen):
                     pus[i].showPfp()
                 for i in range(participantCount,participantsPerGame):
                     pus[i].hidePfp()
+                self.endTime = now() + 15*1000
             else:
                 assert(event["event"] == "serverConnectionFailed",'condition event["event"] == "serverConnectionFailed" not met')
                 titleLabel.text = "An error occured"
@@ -105,9 +153,11 @@ class JoinRoomScreen(Screen):
                         pus[i].showPfp()
                     for i in range(participantCount,participantsPerGame):
                         pus[i].hidePfp()
+                    self.endTime = now() + 15*1000
                     event = await self.qApp.get()
 
             assert(event["event"]=="gameStart",'condition event["event"]=="gameStart" not met')
+            self.endTime = 0 # the timer task will then hide the timer
             print("gameStart event received by app")
             self.gameStarted = True
             gameInfo = event
@@ -162,6 +212,8 @@ class JoinRoomScreen(Screen):
             self.popup.dismiss()
         if hasattr(self,"joinRoomTask"):
             self.joinRoomTask.cancel()
+        if hasattr(self,"handleTimerTask"):
+            self.handleTimerTask.cancel()
     
     def showRules(self):
         self.popup = RulesPopup(detail=False)
