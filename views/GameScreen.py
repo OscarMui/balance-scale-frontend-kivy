@@ -1,4 +1,5 @@
 import asyncio
+from math import floor
 
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
@@ -337,7 +338,10 @@ class GameScreen(Screen):
             if gameInfo["round"] == 1:
                 infoLayout.clear_widgets()
 
-            self.__addInfo(f'Round {gameInfo["round"]}, you can make a guess between 0 and 100.')
+            includeBots = len(list(filter(lambda p: p["isBot"],gameInfo["participants"]))) != 0
+            botsUpperLimit = floor(100*0.8**(gameInfo["round"]-1))
+
+            self.__addInfo(f'Round {gameInfo["round"]}, you can make a guess between 0 and 100 of the target.{f" Note that bots will choose a number between 0 and {botsUpperLimit} randomly."if includeBots else ""}')
 
             event = await self.qApp.get()
             print(event)
@@ -384,20 +388,20 @@ class GameScreen(Screen):
                     self.aliveCount -= 1
                     popup.open()
                     await asyncio.sleep(5)
-                    popup.dismiss()
+                    popup.allowClose()
                 else:
                     assert(event["event"] == "changeCountdown")
                     #! start time delay of the changeCountdown if participantDisconnectedMidgame is enforced by the 5-second popup window on the participantDisconnectedMidgame event. Will change that behaviour when we handle reconnection.
                     self.endTime = event["endTime"]+now()
                     if event["reason"] == "participantDisconnectedMidgame":
                         self.__addInfo(
-                            "Based on the new rules, you now have 15 seconds to amend your guess.",
+                            "Based on the new rules, you now have 30 seconds to amend your guess.",
                             color=(1,1,0,1)
                         )
                     else:
                         assert(event["reason"] == "allDecided")
                         self.__addInfo(
-                            "Every player has submitted their guess, the timer is changed to 15 seconds.",
+                            "Every player has submitted their guess, the timer is changed to 5 seconds.",
                             color=(1,1,0,1)
                         )
 

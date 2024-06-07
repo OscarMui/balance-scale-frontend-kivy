@@ -15,6 +15,9 @@ class NewRulesPopup(Popup):
             show(self.ids[f"rule{i}"])
         self.handlePopupTask = asyncio.create_task(self.__handlePopup(origPNum,newPNum))
     
+    def allowClose(self):
+        show(self.ids["closeButton"])
+        
     async def __handlePopup(self,origPNum,newPNum):
         try:
             # show the rest of the rules after 1 sec

@@ -129,7 +129,7 @@ Clean:
 
 ```bash
 rm **/*.pyc
-mv *.apk *.aab 
+rm *.apk *.aab 
 ```
 
 View logs:

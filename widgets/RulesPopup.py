@@ -109,7 +109,7 @@ class RulesPopup(Popup):
             rulesLayout.add_widget(ShowAnswerButton(rulesLayout,q["answer"]))
 
         rulesLayout.add_widget(LeftWrapLabel(
-            text = "Created by KidProf\nFrontend: Python, Kivy, Async IO\nBackend: ExpressJS, Websockets"
+            text = "Created by KidProf\nFrontend: Python, Kivy, asyncio\nBackend: ExpressJS, Websockets"
         ))
 
         if detail:

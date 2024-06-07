@@ -4,6 +4,7 @@
     auto_dismiss: False
     title: 'Someone died!'
     title_color: 1,0,0,1
+    size_hint: 0.7,1
     BoxLayout:
         size_hint: 1, 1
         orientation: 'vertical'
@@ -27,3 +28,14 @@
             size_hint: 1,0.25
         WrapLabel:
             text: "You can always review these rules by clicking the (?) button on the top-right corner."
+        BoxLayout:
+            size_hint: 1, 0.15
+            Button:
+                id: closeButton
+                opacity: 0
+                text: "Close"
+                font_size:"20sp"
+                background_color: 0, 0.7, 0, 1
+                halign: 'center'
+                size_hint: 0.4, 0.15
+                on_press: root.dismiss()
