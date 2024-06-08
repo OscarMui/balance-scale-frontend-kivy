@@ -96,16 +96,20 @@ def _cmp(self, other):
 
 ### Build
 
-First remove `dist` and `build` folder if you have built for MacOS or Windows. Or else the size of the apk and bundle will be very large.
+First remove `dist` and `build` folder if you have built for MacOS or Windows, and also the existing apks in this directory. Or else the size of the apk and bundle will be very large.
 
 ```bash
 rm -rf build dist
+rm **/*.pyc
+rm *.apk
+rm *.aab 
+rm *.idsig
 ```
 
 The actual magical command:
 
 ```bash
-p4a aab --private . --arch arm64-v8a --arch armeabi-v7a --permission android.permission.INTERNET --permission android.permission.ACCESS_NETWORK_STATE --package=com.kidprof.tenbin --name "Tenbin"  --bootstrap=sdl2 --requirements=python3,kivy,httpx,websocket_client,certifi,httpcore,idna,sniffio,anyio,exceptiongroup,h11 --orientation landscape --orientation landscape-reverse --icon assets/icon.png --presplash assets/background.jpg --blacklist-requirements=sqlite3,libffi,openssl --release --version 1.1.1
+p4a aab --private . --arch arm64-v8a --arch armeabi-v7a --permission android.permission.INTERNET --permission android.permission.ACCESS_NETWORK_STATE --package=com.kidprof.tenbin --name "Tenbin"  --bootstrap=sdl2 --requirements=python3,kivy,httpx,websocket_client,certifi,httpcore,idna,sniffio,anyio,exceptiongroup,h11 --orientation landscape --orientation landscape-reverse --icon assets/icon.png --presplash assets/background.jpg --blacklist-requirements=sqlite3,libffi,openssl --release --version 1.1.3
 ```
 
 Signing app bundle:
@@ -154,6 +158,18 @@ python -m pip install pyinstaller==5.13.2
 
 ### Build
 
+Clean up:
+
+```bash
+rm -rf build dist
+rm **/*.pyc
+rm *.apk
+rm *.aab 
+rm *.idsig
+```
+
+Actual code: 
+
 ```bash
 python -m PyInstaller -y --clean main.spec
 
@@ -161,6 +177,8 @@ pushd dist
 hdiutil create ./Tenbin.dmg -srcfolder tenbin.app -ov
 popd
 ```
+
+The `.dmg` file alone is the output file.
 
 ## Build for Windows
 
