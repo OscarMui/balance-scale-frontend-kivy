@@ -1,4 +1,4 @@
-PRODUCTION = False
+PRODUCTION = True
 
 #* constants
 SERVER_IP = "tenbin-b735da2f640d.herokuapp.com" if PRODUCTION else "localhost:8999"
