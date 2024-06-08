@@ -2,6 +2,7 @@ import asyncio
 
 # import from other project files
 from game.onlineGame import OnlineGame
+from game.soloGame import SoloGame
 
 async def logic(qGame, qApp):
     '''This method is also run by the asyncio loop. A simple skeleton for hosting the game.
@@ -29,7 +30,7 @@ async def logic(qGame, qApp):
             else:
                 assert(event["mode"] == "solo")
                 print("Solo mode selected")
-                raise("solo mode not yet available")
+                game = SoloGame(qGame, qApp, event["nickname"])
             
             await game.play()
             

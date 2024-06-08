@@ -7,7 +7,7 @@ from common.socket import Socket
 
 class OnlineGame:
     # an event for receiving the success message after submitGuess
-    guessSuccessEvent = asyncio.Event()
+    # guessSuccessEvent = asyncio.Event()
 
     # endTime and a lock for mutex
     # endTime = 0

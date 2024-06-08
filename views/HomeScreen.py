@@ -52,14 +52,14 @@ class HomeScreen(Screen):
             popup.open()
             return 
             
-        if(mode=="solo"):
-            popup = Popup(
-                title='Coming soon', 
-                content=None,
-                size_hint=(0.8, 0.3), 
-            )
-            popup.open()
-            return
+        # if(mode=="solo"):
+        #     popup = Popup(
+        #         title='Coming soon', 
+        #         content=None,
+        #         size_hint=(0.8, 0.3), 
+        #     )
+        #     popup.open()
+        #     return
 
         print(f'HomeScreen.playGame text: {NICKNAME}, mode {mode}')
         # put_nowait can be used because our queue does not have an upper limit
