@@ -2,7 +2,7 @@ import asyncio
 import random
 import uuid
 
-from common.constants import BOT_NICKNAMES, DEAD_LIMIT, PARTICIPANTS_PER_GAME, ROUND_INFO_DIGEST_TIME_MS, ROUND_LIMIT, ROUND_TIME_MS, ROUND_ZERO_DIGEST_TIME_MS, SERVER_URL, WSS_URL, CLIENT_VERSION
+from common.constants import BOT_NICKNAMES, DEAD_LIMIT, DIGEST_TIME_MS, PARTICIPANTS_PER_GAME, ROUND_INFO_DIGEST_TIME_MS, ROUND_LIMIT, ROUND_TIME_MS, ROUND_ZERO_DIGEST_TIME_MS, SERVER_URL, WSS_URL, CLIENT_VERSION
 from common.now import now
 from common.socket import Socket
 
@@ -179,13 +179,13 @@ class SoloGame:
                     },self.participants))
                     
                     self.roundNumber+=1
-
+                    
                     msg = {
                         "event": "gameInfo",
                         "participants": participantsGuess,
                         "round": self.roundNumber,
-                        "roundStartTime": ROUND_INFO_DIGEST_TIME_MS + now(),
-                        "roundEndTime": ROUND_INFO_DIGEST_TIME_MS + ROUND_TIME_MS + now(),
+                        "roundStartTime": ROUND_INFO_DIGEST_TIME_MS + (0 if len(justDiedParticipants)==0 else DIGEST_TIME_MS) + now(),
+                        "roundEndTime": ROUND_INFO_DIGEST_TIME_MS + ROUND_TIME_MS + (0 if len(justDiedParticipants)==0 else DIGEST_TIME_MS) + now(),
                         "gameEnded": self.__isEnded(),
                         "aliveCount": self.__getAliveCount(),
                         "target": target,
