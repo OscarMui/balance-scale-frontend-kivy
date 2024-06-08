@@ -245,6 +245,9 @@ class GameScreen(Screen):
             problemTriggered = False
             fifteenSecondsTriggered = False
 
+            gameInfo = self.app.globalGameInfo
+            mode = gameInfo["mode"]
+
             timer.color = (1,1,1,1)
 
             while True: 
@@ -257,49 +260,50 @@ class GameScreen(Screen):
                     else:
                         timer.text = f'{seconds//60}m{seconds%60}s'
                     
-                    # modify color of guessLabel and give relevant infos
-                    if seconds < 15 and self.confirmedGuess == None and self.proposedGuess == "":
-                        guessLabel.changeColor("red")
-                        timer.color = (1,0,0,1)
-                        if not fifteenSecondsTriggered:
-                            self.__addInfo(
-                                "You have not make a guess. It will be a game over if you do not submit a guess before time is up.",
-                                color=(1,0,0,1)
-                            )
-                        fifteenSecondsTriggered = True
-                    elif seconds < 15 and self.confirmedGuess == None and self.proposedGuess != "":
-                        if not fifteenSecondsTriggered:
-                            self.__addInfo(
-                                "Confirm button not pressed, we auto-submitted your guess as there is not much time left.",
-                                color=(1,1,0,1)
-                            )
+                    # modify color of guessLabel and give relevant infos, these are only relevant in multiplayer modes
+                    if not mode == "solo":
+                        if seconds < 15 and self.confirmedGuess == None and self.proposedGuess == "":
+                            guessLabel.changeColor("red")
+                            timer.color = (1,0,0,1)
+                            if not fifteenSecondsTriggered:
+                                self.__addInfo(
+                                    "You have not make a guess. It will be a game over if you do not submit a guess before time is up.",
+                                    color=(1,0,0,1)
+                                )
+                            fifteenSecondsTriggered = True
+                        elif seconds < 15 and self.confirmedGuess == None and self.proposedGuess != "":
+                            if not fifteenSecondsTriggered:
+                                self.__addInfo(
+                                    "Confirm button not pressed, we auto-submitted your guess as there is not much time left.",
+                                    color=(1,1,0,1)
+                                )
 
-                        self.__submitGuess()
+                            self.__submitGuess()
 
-                        fifteenSecondsTriggered = True
-                    elif self.lastPressTime == None:
-                        guessLabel.changeColor("red")
-                    elif self.lastPressTime + 10*1000 < now() and self.confirmedGuess == None:
-                        guessLabel.changeColor("red")
-                        if not problemTriggered:
-                            self.__addInfo(
-                                "You need to press the tick button on the bottom right to register the guess.",
-                                color=(1,0,0,1)
-                            )
-                        problemTriggered = True
-                    elif self.lastPressTime + 10*1000 < now() and self.proposedGuess == "":
-                        self.__changeProposedGuess("",isClear=True)
-                    elif self.lastPressTime + 10*1000 < now() and self.confirmedGuess != int(self.proposedGuess):
-                        self.__changeProposedGuess("",isClear=True)
-                        if not problemTriggered:
-                            self.__addInfo(
-                                "Confirm button not pressed, we reverted your guess back to your last confirmed guess.",
-                                color=(1,0,0,1)
-                            )
-                        problemTriggered = True
-                    else:
-                        # Reset problem triggered once there are no more problems 
-                        problemTriggered = False
+                            fifteenSecondsTriggered = True
+                        elif self.lastPressTime == None:
+                            guessLabel.changeColor("red")
+                        elif self.lastPressTime + 10*1000 < now() and self.confirmedGuess == None:
+                            guessLabel.changeColor("red")
+                            if not problemTriggered:
+                                self.__addInfo(
+                                    "You need to press the tick button on the bottom right to register the guess.",
+                                    color=(1,0,0,1)
+                                )
+                            problemTriggered = True
+                        elif self.lastPressTime + 10*1000 < now() and self.proposedGuess == "":
+                            self.__changeProposedGuess("",isClear=True)
+                        elif self.lastPressTime + 10*1000 < now() and self.confirmedGuess != int(self.proposedGuess):
+                            self.__changeProposedGuess("",isClear=True)
+                            if not problemTriggered:
+                                self.__addInfo(
+                                    "Confirm button not pressed, we reverted your guess back to your last confirmed guess.",
+                                    color=(1,0,0,1)
+                                )
+                            problemTriggered = True
+                        else:
+                            # Reset problem triggered once there are no more problems 
+                            problemTriggered = False
                 # elif now() >= self.endTime+5000: # -5s
                 #     # go back to home screen with a popup
                 #     if self.confirmedGuess == None:
@@ -342,12 +346,36 @@ class GameScreen(Screen):
             # get gameInfo back from a previous screen
             gameInfo = self.app.globalGameInfo
 
+            # Note the structure of a typical game info
+            # msg = {
+            #     "event": "gameInfo",
+            #     "participants": participantsGuess,
+            #     "round": self.roundNumber,
+            #     "roundStartTime": ROUND_INFO_DIGEST_TIME_MS + now(),
+            #     "roundEndTime": ROUND_INFO_DIGEST_TIME_MS + ROUND_TIME_MS + now(),
+            #     "gameEnded": self.__isEnded(),
+            #     "aliveCount": self.__getAliveCount(),
+            #     "target": target,
+            #     "winners": winners,
+            #     "justDiedParticipants": justDiedParticipants,
+            #     "justAppliedRules": list(justAppliedRules),
+            #     "us": participantsGuess[0],
+            #     "mode": "solo",
+            # }
+
             guessLabel = self.ids["guessLabel"]
             infoLayout = self.ids["infoLayout"]
 
             # only clear when it is the first round
             if gameInfo["round"] == 1:
                 infoLayout.clear_widgets()
+
+            # only show the quit game button if it is in solo mode
+            assert(gameInfo["mode"] == "solo" or gameInfo["mode"] == "online")
+            if gameInfo["mode"] == "solo":
+                show(self.ids["quitGameButton"])
+            else:
+                hide(self.ids["quitGameButton"])
 
             includeBots = len(list(filter(lambda p: p["isBot"] and not p["isDead"],gameInfo["participants"]))) != 0
             botsUpperLimit = floor(100*0.8**(gameInfo["round"]-1))
@@ -464,3 +492,11 @@ class GameScreen(Screen):
         assert(gameInfo["round"]>1)
         self.popup = StatusPopup(gameInfo)
         self.popup.open()
+
+    def quitGame(self):
+        print("quit game")
+        self.qGame.put_nowait({
+            "event": "quitGame"
+        })
+        self.manager.current = "home"
+        return

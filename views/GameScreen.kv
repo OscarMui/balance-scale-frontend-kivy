@@ -35,6 +35,15 @@
                 size_hint: 1, None
                 size: 0,0
                 spacing: 10
+        ImageButton:
+            opacity: 0
+            id: quitGameButton
+            background_normal: "assets/cross.png"
+            background_down: "assets/cross.png"
+            pos_hint: {'x': 0.03, 'y': 0.93}
+            size_hint: 0.05/16*9,0.05
+            ratio: 1
+            on_press: root.quitGame()
         GridLayout:
             id: numpad
             cols: 3

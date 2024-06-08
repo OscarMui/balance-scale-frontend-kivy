@@ -86,7 +86,8 @@ class SoloGame:
                 "roundEndTime": ROUND_ZERO_DIGEST_TIME_MS + ROUND_TIME_MS + now(),
                 "gameEnded": False,
                 "aliveCount": self.__getAliveCount(),
-                "us": self.participants[0]
+                "us": self.participants[0],
+                "mode": "solo",
             }
 
             # send gameStart event to app
@@ -191,7 +192,8 @@ class SoloGame:
                         "winners": winners,
                         "justDiedParticipants": justDiedParticipants,
                         "justAppliedRules": list(justAppliedRules),
-                        "us": participantsGuess[0]
+                        "us": participantsGuess[0],
+                        "mode": "solo",
                     }
 
                     # send gameStart event to app

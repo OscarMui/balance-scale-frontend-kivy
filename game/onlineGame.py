@@ -115,6 +115,7 @@ class OnlineGame:
             event["us"] = p
             event["roundStartTime"] += now()
             event["roundEndTime"] += now()
+            event["mode"] = "online"
 
             gameInfo = event
 
@@ -163,6 +164,7 @@ class OnlineGame:
                 event["us"] = p
                 event["roundStartTime"] += now()
                 event["roundEndTime"] += now()
+                event["mode"] = "online"
 
                 gameInfo = event
                 # inform the UI
