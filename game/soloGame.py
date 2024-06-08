@@ -141,6 +141,7 @@ class SoloGame:
                         if len(reqs) <= 4:
                             if len(list(filter(lambda x: x["guess"] == req["guess"],reqs)))>1:
                                 justAppliedRules.add(4)
+                            continue
                         
                         diff = calDiff(req["guess"])
                         if(winnersDiff==None or diff < winnersDiff):
