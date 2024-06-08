@@ -349,10 +349,16 @@ class GameScreen(Screen):
             if gameInfo["round"] == 1:
                 infoLayout.clear_widgets()
 
-            includeBots = len(list(filter(lambda p: p["isBot"],gameInfo["participants"]))) != 0
+            includeBots = len(list(filter(lambda p: p["isBot"] and not p["isDead"],gameInfo["participants"]))) != 0
             botsUpperLimit = floor(100*0.8**(gameInfo["round"]-1))
 
-            self.__addInfo(f'Round {gameInfo["round"]}, you can make a guess between 0 and 100 of the target.{f" Note that bots will choose a number between 0 and {botsUpperLimit} randomly."if includeBots else ""}')
+            botsInfo = ""
+            if includeBots:
+                if gameInfo["aliveCount"] == 2:
+                    botsInfo = "Note the bot would choose a number among 0, 1, and 100."
+                else:
+                    botsInfo = f"Note that bots will choose a number between 0 and {botsUpperLimit} randomly."
+            self.__addInfo(f'Round {gameInfo["round"]}, you can make a guess between 0 and 100 of the target. {botsInfo}')
 
             event = await self.qApp.get()
             print(event)
