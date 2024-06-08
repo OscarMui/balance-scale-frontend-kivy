@@ -100,9 +100,13 @@ class SoloGame:
             while not self.__isEnded() and self.roundNumber < ROUND_LIMIT:
                 # get events from the UI (if any)
                 event = await self.qGame.get() 
+                # print("solo",event) 
                 while(event["event"] != "submitGuess"):
-                        if(event["event"] == "quitGame"): # players can quit the offline game at anypoint
-                            return
+                    if(event["event"] == "quitGame"): # players can quit the offline game at anypoint
+                        return
+                    else:
+                        assert(False)
+                    # event = await self.qGame.get() 
                 assert(event["event"] == "submitGuess")
                 
                 # generate guesses (reqs)
@@ -141,7 +145,7 @@ class SoloGame:
                         if len(reqs) <= 4:
                             if len(list(filter(lambda x: x["guess"] == req["guess"],reqs)))>1:
                                 justAppliedRules.add(4)
-                            continue
+                                continue
                         
                         diff = calDiff(req["guess"])
                         if(winnersDiff==None or diff < winnersDiff):
@@ -151,54 +155,54 @@ class SoloGame:
                             winners.append(req["id"])
                 
                 
-                    for i in range(len(reqs)):
-                        req = reqs[i]
+                for i in range(len(reqs)):
+                    req = reqs[i]
 
-                        # get corresponding participant
-                        p = list(filter(lambda x: x["id"] == req["id"],self.participants))[0]
+                    # get corresponding participant
+                    p = list(filter(lambda x: x["id"] == req["id"],self.participants))[0]
 
-                        # if alive and not win: -1 score
-                        if(p["id"] not in winners):
-                            if len(reqs) <= 3 and winnersDiff and winnersDiff <= 0.5:
-                                # rule 3
-                                if self.__changeScore(p,-2):
-                                    justDiedParticipants.append({
-                                        "id": p["id"],
-                                        "reason": "deadLimit",
-                                    })
-                                justAppliedRules.add(3)
-                            else:
-                                if self.__changeScore(p,-1):
-                                    justDiedParticipants.append({
-                                        "id": p["id"],
-                                        "reason": "deadLimit",
-                                    })
-                        
-                    participantsGuess = list(map(lambda p: {
-                        "guess": list(filter(lambda r: r["id"] == p["id"],reqs))[0]["guess"] if len(list(filter(lambda r: r["id"] == p["id"],reqs))) > 0 else None,
-                        **p
-                    },self.participants))
+                    # if alive and not win: -1 score
+                    if(p["id"] not in winners):
+                        if len(reqs) <= 3 and winnersDiff and winnersDiff <= 0.5:
+                            # rule 3
+                            if self.__changeScore(p,-2):
+                                justDiedParticipants.append({
+                                    "id": p["id"],
+                                    "reason": "deadLimit",
+                                })
+                            justAppliedRules.add(3)
+                        else:
+                            if self.__changeScore(p,-1):
+                                justDiedParticipants.append({
+                                    "id": p["id"],
+                                    "reason": "deadLimit",
+                                })
                     
-                    self.roundNumber+=1
-                    
-                    msg = {
-                        "event": "gameInfo",
-                        "participants": participantsGuess,
-                        "round": self.roundNumber,
-                        "roundStartTime": ROUND_INFO_DIGEST_TIME_MS + (0 if len(justDiedParticipants)==0 else DIGEST_TIME_MS) + now(),
-                        "roundEndTime": ROUND_INFO_DIGEST_TIME_MS + ROUND_TIME_MS + (0 if len(justDiedParticipants)==0 else DIGEST_TIME_MS) + now(),
-                        "gameEnded": self.__isEnded(),
-                        "aliveCount": self.__getAliveCount(),
-                        "target": target,
-                        "winners": winners,
-                        "justDiedParticipants": justDiedParticipants,
-                        "justAppliedRules": list(justAppliedRules),
-                        "us": participantsGuess[0],
-                        "mode": "solo",
-                    }
+                participantsGuess = list(map(lambda p: {
+                    "guess": list(filter(lambda r: r["id"] == p["id"],reqs))[0]["guess"] if len(list(filter(lambda r: r["id"] == p["id"],reqs))) > 0 else None,
+                    **p
+                },self.participants))
+                
+                self.roundNumber+=1
+                
+                msg = {
+                    "event": "gameInfo",
+                    "participants": participantsGuess,
+                    "round": self.roundNumber,
+                    "roundStartTime": ROUND_INFO_DIGEST_TIME_MS + (0 if len(justDiedParticipants)==0 else DIGEST_TIME_MS) + now(),
+                    "roundEndTime": ROUND_INFO_DIGEST_TIME_MS + ROUND_TIME_MS + (0 if len(justDiedParticipants)==0 else DIGEST_TIME_MS) + now(),
+                    "gameEnded": self.__isEnded(),
+                    "aliveCount": self.__getAliveCount(),
+                    "target": target,
+                    "winners": winners,
+                    "justDiedParticipants": justDiedParticipants,
+                    "justAppliedRules": list(justAppliedRules),
+                    "us": participantsGuess[0],
+                    "mode": "solo",
+                }
 
-                    # send gameStart event to app
-                    self.qApp.put_nowait(msg)
+                # send gameStart event to app
+                self.qApp.put_nowait(msg)
         except Exception as e:
             print("Exception in soloGame",repr(e))
             self.qApp.put_nowait({
