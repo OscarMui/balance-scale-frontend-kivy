@@ -100,6 +100,7 @@ First remove `dist` and `build` folder if you have built for MacOS or Windows, a
 
 ```bash
 rm -rf build dist
+rm -rf .cache
 rm **/*.pyc
 rm *.apk
 rm *.aab 
@@ -132,6 +133,8 @@ $ANDROIDSDK/build-tools/34.0.0/apksigner sign --ks ~/kidprof.jks --out signed.ap
 Clean:
 
 ```bash
+rm -rf build dist
+rm -rf .cache
 rm **/*.pyc
 rm *.apk
 rm *.aab 
@@ -143,6 +146,65 @@ View logs:
 ```bash
 $ANDROIDSDK/platform-tools/adb logcat | grep python
 ```
+
+## iOS build
+
+### Installation
+
+Python 3.11.5 is used.
+
+Clean: 
+
+```bash
+rm -rf build dist
+rm -rf .cache
+rm **/*.pyc
+rm *.apk
+rm *.aab 
+rm *.idsig
+```
+
+Main instructions:
+https://kivy.org/doc/stable/guide/packaging-ios.html
+
+Problems encountered and how to solve them:
+
+1. Please do everything outside of the development directory
+
+https://kivy.org/doc/stable/guide/packaging-ios.html
+
+2. Install pip packages 
+
+```bash
+toolchain pip install httpx websocket_client certifi httpcore idna sniffio anyio exceptiongroup h11
+toolchain update tenbin-ios
+```
+
+3. https://github.com/kivy/kivy-ios/issues/901
+
+Solved by: `brew uninstall -—ignore-dependencies libb2`
+
+4. https://stackoverflow.com/questions/72409563/unsupported-hash-type-ripemd160-with-hashlib-in-python/72508879#72508879
+
+On any updates, run:
+
+```bash
+toolchain update tenbin-ios
+```
+
+Modify these information in "Target > Build settings" in xcode:
+
+Product bundle identifier: com.kidprof.tenbin
+
+iOS deployment target: 12.0
+
+Modify these information in "Target > General" in xcode:
+
+UISupportedInterfaceOrientations: Remove the portrait ones
+
+UISupportedInterfaceOrientations~ipad: Remove the portrait ones
+
+CFBundleIdentifier: com.kidprof.tenbin
 
 ## Build for MacOS
 
@@ -162,6 +224,7 @@ Clean up:
 
 ```bash
 rm -rf build dist
+rm -rf .cache
 rm **/*.pyc
 rm *.apk
 rm *.aab 

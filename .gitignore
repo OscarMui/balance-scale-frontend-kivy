@@ -17,3 +17,4 @@ dist
 *.apk
 *.aab
 *.idsig
+.cache

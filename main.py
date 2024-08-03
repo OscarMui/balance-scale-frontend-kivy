@@ -36,7 +36,7 @@ Builder.load_file(os.path.join("widgets","ImageButton.kv"))
 Builder.load_file(os.path.join("widgets","WrapLabel.kv"))
 
 # Set default screen size to a landscape phone
-if platform == 'android' :
+if platform == 'android' or platform == "ios":
     Window.fullscreen = 'auto'
 else:
     Window.size = (667, 375)
