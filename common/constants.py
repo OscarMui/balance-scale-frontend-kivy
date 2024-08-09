@@ -1,5 +1,6 @@
 PRODUCTION = True
-
+SCREEN_SIZE = "IPAD_PORTRAIT"
+# "" / "IPAD_LANDSCAPE" / "IPAD_PROTRAIT"
 #* constants
 SERVER_IP = "tenbin-b735da2f640d.herokuapp.com" if PRODUCTION else "localhost:8999"
 SSL = PRODUCTION

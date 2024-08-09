@@ -15,6 +15,8 @@ from views.StatusScreen import StatusScreen
 
 from logic import logic
 
+from common.constants import SCREEN_SIZE
+
 # We need these imports in order for the .kv files to parse correctly
 from widgets.ImageButton import ImageButton
 from widgets.WrapLabel import WrapLabel
@@ -38,6 +40,10 @@ Builder.load_file(os.path.join("widgets","WrapLabel.kv"))
 # Set default screen size to a landscape phone
 if platform == 'android' or platform == "ios":
     Window.fullscreen = 'auto'
+elif SCREEN_SIZE == "IPAD_LANDSCAPE":
+    Window.size = (667, 512)
+elif SCREEN_SIZE == "IPAD_PORTRAIT":
+    Window.size = (512, 667)
 else:
     Window.size = (667, 375)
 

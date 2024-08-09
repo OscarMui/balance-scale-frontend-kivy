@@ -35,7 +35,7 @@
             background_normal: "assets/clock.png"
             background_down: "assets/clock.png"
             pos_hint: {'center_x': 0.07, 'y': 0.15}
-            size_hint: 0.13/16*9,0.13
+            size_hint: None,0.13
             ratio: 1
         Label:
             id: timer
@@ -61,6 +61,6 @@
             background_normal: "assets/question-mark.png"
             background_down: "assets/question-mark.png"
             pos_hint: {'x': 0.93, 'y': 0.93}
-            size_hint: 0.05/16*9,0.05
+            size_hint: None,0.05
             ratio: 1
             on_press: root.showRules()
