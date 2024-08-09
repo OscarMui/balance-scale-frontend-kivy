@@ -5,9 +5,9 @@
         Rectangle:
             id: background
             source: 'assets/background-blur.jpg'
-            pos: self.pos
-            size: self.size
-            
+            pos: (self.width-self.height*16/9)/2,0 # self.center
+            size: self.height*16/9, self.height
+
     RelativeLayout:
         Label:
             text: "[ GAME ]"
@@ -43,24 +43,26 @@
                 font_size:"20sp"
                 background_color: 0, 0.7, 0, 1
                 halign: 'center'
+                text_size: self.width, None
                 on_press: root.modeSelection("online")
             Button:
                 text: "Play Solo"
                 font_size:"20sp"
                 background_color: 0.7, 0, 0, 1
                 halign: 'center'
+                text_size: self.width, None
                 on_press: root.modeSelection("solo")
         ImageButton:
             background_normal: "assets/question-mark-big.png"
             background_down: "assets/question-mark-big.png"
-            pos_hint: {'center_x': 0.86, 'y': 0.83}
+            pos_hint: {'right': 0.96, 'y': 0.83}
             size_hint: None,0.13
             ratio: 2
             on_press: root.showRules()
         ImageButton:
             background_normal: "assets/discord.png"
             background_down: "assets/discord.png"
-            pos_hint: {'center_x': 0.86, 'y': 0.68}
+            pos_hint: {'right': 0.96, 'y': 0.68}
             size_hint: None,0.13
             ratio: 2
             on_press: root.openDiscord()

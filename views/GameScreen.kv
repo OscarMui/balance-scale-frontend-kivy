@@ -105,7 +105,7 @@
         ImageButton:
             background_normal: "assets/question-mark-big.png"
             background_down: "assets/question-mark-big.png"
-            pos_hint: {'center_x': 0.86, 'y': 0.75}
+            pos_hint: {'right': 0.96, 'y': 0.75}
             size_hint: None,0.15
             ratio: 2
             on_press: root.showRules()
@@ -113,27 +113,28 @@
             id: rewindButton
             background_normal: "assets/rewind-big.png"
             background_down: "assets/rewind-big.png"
-            pos_hint: {'center_x': 0.86, 'y': 0.55}
+            pos_hint: {'right': 0.96,'y': 0.55}
             size_hint: None,0.15
             ratio: 2
             on_press: root.showRewind()
-        ImageButton: # Fake button
-            background_normal: "assets/clock.png"
-            background_down: "assets/clock.png"
-            pos_hint: {'center_x': 0.86, 'y': 0.37}
-            size_hint: None,0.13
-            ratio: 1
-        Label:
-            id: timer
-            text: "1m30s"
-            font_size:"20sp"
-            pos_hint: {'center_x': 0.86, 'y': 0.27}
-            size_hint: 0.28,0.13
+        BoxLayout:
+            pos_hint: {'center_x': 0.86,'y': 0.27}
+            size_hint: None,0.17
+            orientation: "vertical"
+            halign: "center"
+            Image: # Fake button
+                source: "assets/clock.png"
+                fit_mode: "scale-down"
+                ratio: 1
+            Label:
+                id: timer
+                text: "2m00s"
+                font_size:"20sp"
         ImageButton:
             background_normal: "assets/confirm-big.png"
             background_down: "assets/confirm-big-down.png"
             border: 0,0,0,0
-            pos_hint: {'center_x': 0.86, 'y': 0.12}
+            pos_hint: {'right': 0.96, 'y': 0.12}
             size_hint: None,0.15
             ratio: 2
             on_press: root.confirmPressed()

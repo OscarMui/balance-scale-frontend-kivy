@@ -30,19 +30,20 @@
             text: "Please wait..."
             pos_hint: {'center_x': 0.5, 'y': 0.7}
             size_hint: 1, None
-        ImageButton: # Fake button
-            id: timerImage
-            background_normal: "assets/clock.png"
-            background_down: "assets/clock.png"
-            pos_hint: {'center_x': 0.07, 'y': 0.15}
-            size_hint: None,0.13
-            ratio: 1
-        Label:
-            id: timer
-            text: ""
-            font_size:"20sp"
-            pos_hint: {'center_x': 0.07, 'y': 0.05}
-            size_hint: 0.28,0.13
+        BoxLayout:
+            pos_hint: {'x': 0.07, 'y': 0.07}
+            size_hint: None,0.17
+            orientation: "vertical"
+            halign: "center"
+            Image: # Fake button
+                id: timerImage
+                source: "assets/clock.png"
+                fit_mode: "scale-down"
+                ratio: 1
+            Label:
+                id: timer
+                text: ""
+                font_size:"20sp"
         BoxLayout:
             id: joinRoomParticipantUIs
             spacing: 35 # space between children
@@ -60,7 +61,7 @@
         ImageButton:
             background_normal: "assets/question-mark.png"
             background_down: "assets/question-mark.png"
-            pos_hint: {'x': 0.93, 'y': 0.93}
+            pos_hint: {'right': 0.96, 'top': 0.93}
             size_hint: None,0.05
             ratio: 1
             on_press: root.showRules()
