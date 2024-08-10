@@ -520,9 +520,11 @@ class GameScreen(Screen):
 
     def showRewind(self):
         gameInfo = self.app.globalGameInfo
-        assert(gameInfo["round"]>1)
-        self.popup = StatusPopup(gameInfo)
-        self.popup.open()
+        if(gameInfo["round"]>1):
+            # need this if statement, as unfortunately the button is still clickable when opacity = 0!!!
+            # assert(gameInfo["round"]>1)
+            self.popup = StatusPopup(gameInfo)
+            self.popup.open()
 
     def quitGame(self):
         print("quit game")
