@@ -13,7 +13,7 @@ class ImageButton(Button):
         # if((not hasattr(self,"primary_dimension")) or self.primary_dimension == "y"):
         # print("set_button_width")
         ratio = self.ratio if hasattr(self,"ratio") else 1
-        self.width = height*ratio  # Set button width equal to its height*ratio
+        self.width = min(225,height)*ratio  # Set button width equal to its height*ratio
 
     # def set_button_height(self, instance, width):
     #     if(hasattr(self,"primary_dimension") and self.primary_dimension == "x"):

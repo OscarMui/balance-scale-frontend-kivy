@@ -189,7 +189,7 @@ Solved by: `brew uninstall -—ignore-dependencies libb2`
 On any updates, run:
 
 ```bash
-toolchain update tenbin-ios
+toolchain update ../app_ios/tenbin-ios
 ```
 
 Modify these information in "Target > Build settings" in xcode:
