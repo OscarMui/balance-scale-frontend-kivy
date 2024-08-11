@@ -104,6 +104,7 @@ class JoinRoomScreen(Screen):
         try:
             titleLabel = self.ids["titleLabel"]
             bodyLabel = self.ids["bodyLabel"]
+            tipLabel = self.ids["tipLabel"]
             joinRoomParticipantUIs = self.ids["joinRoomParticipantUIs"]
             pus = [] # list of joinRoomParticipantUIs
 
@@ -117,6 +118,12 @@ class JoinRoomScreen(Screen):
                 titleLabel.text = f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
                 bodyLabel.text = "The game will be filled with computer players if no one joins in 15 seconds. Please wait..."
                 
+                if event["tip"] != "":
+                    show(tipLabel)
+                    tipLabel.text = "Tip:\n" + event["tip"]
+                else:
+                    hide(tipLabel)
+
                 # Create that many participants
                 for i in range(participantsPerGame):
                     pu = JoinRoomParticipantUI()

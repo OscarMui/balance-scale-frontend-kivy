@@ -24,6 +24,7 @@ class SoloGame:
                 "event": "serverConnected",
                 "participantsCount": PARTICIPANTS_PER_GAME,
                 "participantsPerGame": PARTICIPANTS_PER_GAME,
+                "tip": "",
             }
 
             self.qApp.put_nowait(msg)

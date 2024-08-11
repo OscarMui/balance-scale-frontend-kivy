@@ -30,7 +30,7 @@ class OnlineGame:
 
         try:
 
-            TOKEN = await self.__obtainToken()
+            (TOKEN,TIP) = await self.__obtainToken()
 
             print("finished obtainToken")
 
@@ -74,6 +74,7 @@ class OnlineGame:
                 "event": "serverConnected",
                 "participantsCount": res["participantsCount"],
                 "participantsPerGame": res["participantsPerGame"],
+                "tip": TIP,
             }
 
             self.qApp.put_nowait(msg)
@@ -196,6 +197,8 @@ class OnlineGame:
             #     print("SYSTEM TIME ERROR: Your network connection is unstable, or your system time is wrong.")
             # else:
             #     print("Time in sync")
+
+            return (None, response["tip"])
 
     def __del__(self):
         if(hasattr(self,"socket")):
