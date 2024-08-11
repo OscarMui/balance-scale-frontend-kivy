@@ -140,6 +140,7 @@ class GameScreen(Screen):
         infoLayout.bind(minimum_height=infoLayout.setter('height'))
 
         label = WrapLabel(
+            markup=True,
             text=text,
             color=color
         )
@@ -302,16 +303,13 @@ class GameScreen(Screen):
                                 color=(1,0,0,1)
                             )
                         fifteenSecondsTriggered = True
-                    elif seconds < 15 and self.confirmedGuess == None and self.proposedGuess != "":
-                        if not fifteenSecondsTriggered:
-                            self.__addInfo(
-                                "Confirm button not pressed, we auto-submitted your guess as there is not much time left.",
-                                color=(1,1,0,1)
-                            )
+                    elif seconds < 3 and self.confirmedGuess == None and self.proposedGuess != "":
+                        self.__addInfo(
+                            "Confirm button not pressed, we auto-submitted your guess as there is not much time left.",
+                            color=(1,1,0,1)
+                        )
 
                         self.__submitGuess()
-
-                        fifteenSecondsTriggered = True
                     elif self.lastPressTime == None:
                         guessLabel.changeColor("red")
                     elif self.lastPressTime + 10*1000 < now() and self.confirmedGuess == None:
@@ -398,8 +396,11 @@ class GameScreen(Screen):
             infoLayout = self.ids["infoLayout"]
 
             # only clear when it is the first round
-            if gameInfo["round"] == 1:
-                infoLayout.clear_widgets()
+            # if gameInfo["round"] == 1:
+            #     infoLayout.clear_widgets()
+
+            # we now clear before every round instead
+            infoLayout.clear_widgets()
 
             # only show the quit game button if it is in solo mode
             assert(gameInfo["mode"] == "solo" or gameInfo["mode"] == "online")
@@ -414,9 +415,9 @@ class GameScreen(Screen):
             botsInfo = ""
             if includeBots:
                 if gameInfo["aliveCount"] == 2:
-                    botsInfo = "Note the bot would choose a number among 0, 1, and 100."
+                    botsInfo = "Note the bot would choose a number among [b]0, 1, and 100[/b]."
                 else:
-                    botsInfo = f"Note that bots will choose a number between 0 and {botsUpperLimit} randomly."
+                    botsInfo = f"Note that bots will choose a number between 0 and [b]{botsUpperLimit}[/b] randomly."
             self.__addInfo(f'Round {gameInfo["round"]}, you can make a guess between 0 and 100 of the target. {botsInfo}')
 
             event = await self.qApp.get()
