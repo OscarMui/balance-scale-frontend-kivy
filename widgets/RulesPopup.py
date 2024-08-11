@@ -88,7 +88,7 @@ class RulesPopup(Popup):
             bold = True,
         ))
         rulesLayout.add_widget(LeftWrapLabel(
-            text = "Every player chooses a number between 0 and 100 in each round. The player closest to the target wins the round. The target would be the average of the numbers multiplied by 0.8.",
+            text = "Every player chooses a number between 0 and 100 in each round. The player closest to the target, that is the average of the numbers multiplied by 0.8, wins the round.",
         ))
         rulesLayout.add_widget(LeftWrapLabel(
             text = "All players start with 0 points. If a player reaches -5 points, it is a GAME OVER for that player. The last person standing wins.",
