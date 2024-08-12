@@ -2,12 +2,22 @@
 
 <HomeScreen>:
     canvas:
+        Color:
+            rgba: 1, 1, 1, 1 
         Rectangle:
             id: background
             source: 'assets/background-blur.jpg'
-            pos: (self.width-self.height*16/9)/2,0 # self.center
+            pos: (self.width-self.height*16/9)/2,0 # bottom left corner 
             size: self.height*16/9, self.height
-
+    canvas.before:
+        Color:
+            rgba: 0.21875, 0.1875, 0.15625, 1  # Set the desired background color (RGB)
+        Rectangle:
+            pos: 0, 0
+            size: (self.width-self.height*16/9)/2, self.height
+        Rectangle:
+            pos: (self.width+self.height*16/9)/2, 0
+            size: (self.width-self.height*16/9)/2, self.height
     RelativeLayout:
         Label:
             text: "[ GAME ]"
@@ -66,3 +76,18 @@
             size_hint: None,0.13
             ratio: 2
             on_press: root.openDiscord()
+        ImageButton:
+            background_normal: "assets/google-play.png"
+            background_down: "assets/google-play.png"
+            pos_hint: {'x': 0.02, 'y': 0.86}
+            size_hint: None,0.10
+            ratio: 3
+            on_press: root.openGooglePlay()
+        ImageButton:
+            background_normal: "assets/app-store.png"
+            background_down: "assets/app-store.png"
+            pos_hint: {'x': 0.02, 'y': 0.74}
+            size_hint: None,0.10
+            ratio: 3
+            on_press: root.openAppStore()
+

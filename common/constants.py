@@ -10,6 +10,8 @@ WSS_URL = f'ws{"s" if SSL else ""}://{SERVER_IP}/game'
 CLIENT_VERSION = "20240811.0.app"
 
 DISCORD_URL = "https://discord.gg/H6bsxqZyuu"
+GOOGLE_PLAY_URL = "https://play.google.com/store/apps/details?id=com.kidprof.tenbin"
+APP_STORE_URL = "https://play.google.com/store/apps/details?id=com.kidprof.tenbin"
 
 #* Constants for the offline game, copied from backend
 PARTICIPANTS_PER_GAME = 5

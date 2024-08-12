@@ -6,7 +6,7 @@ from kivy.uix.screenmanager import Screen
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 
-from common.constants import DISCORD_URL
+from common.constants import APP_STORE_URL, DISCORD_URL, GOOGLE_PLAY_URL
 from widgets.RulesPopup import RulesPopup
 from widgets.WrapLabel import WrapLabel
 
@@ -74,3 +74,9 @@ class HomeScreen(Screen):
 
     def openDiscord(self):
         webbrowser.open(DISCORD_URL)
+
+    def openGooglePlay(self):
+        webbrowser.open(GOOGLE_PLAY_URL)
+
+    def openAppStore(self):
+        webbrowser.open(APP_STORE_URL)
