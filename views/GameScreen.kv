@@ -121,8 +121,8 @@
             ratio: 2
             on_press: root.showRewind()
         BoxLayout:
-            pos_hint: {'center_x': 0.87,'y': 0.27}
-            size_hint: None,0.17
+            pos_hint: {'right': 0.93,'y': 0.3}
+            size_hint: None,0.19
             orientation: "vertical"
             halign: "center"
             Image: # Fake button
@@ -133,6 +133,19 @@
                 id: timer
                 text: "2m00s"
                 font_size:"20sp"
+
+        # ImageButton: # Fake button
+        #     background_normal: "assets/clock-2.png"
+        #     background_down: "assets/clock-2.png"
+        #     pos_hint: {'right': 0.96, 'y': 0.37}
+        #     size_hint: None,0.13
+        #     ratio: 2
+        # Label:
+        #     pos_hint: {'right': 0.96, 'y': 0.27}
+        #     size_hint: 0.28,0.13
+        #     id: timer
+        #     text: "2m00s"
+        #     font_size:"20sp"
         ImageButton:
             background_normal: "assets/confirm-big.png"
             background_down: "assets/confirm-big-down.png"
