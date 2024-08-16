@@ -66,7 +66,7 @@ class JoinRoomScreen(Screen):
             timer.color = (1,1,1,1)
 
             TIPS = self.app.globalNews["tips"] if self.app.globalNews != None else []
-            print(TIPS)
+            # print(TIPS)
             if len(TIPS) > 0:
                 show(tipLabel)
                 tipLabel.text = "Tip:\n" + TIPS[random.randrange(0,len(TIPS))]

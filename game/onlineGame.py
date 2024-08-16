@@ -30,9 +30,9 @@ class OnlineGame:
 
         try:
 
-            TOKEN = await self.__obtainToken()
+            TOKEN = await self.__getToken()
 
-            print("finished obtainToken")
+            print("finished __getToken")
 
             # establish ws connection
             self.socket = Socket(WSS_URL,self.qGame)
@@ -178,17 +178,19 @@ class OnlineGame:
             })
             return
 
-    async def __obtainToken(self):
+    async def __getToken(self):
         async with httpx.AsyncClient() as client:
             timeout = httpx.Timeout(5.0, read=15.0)
-            resp = await client.get(SERVER_URL + "/api/version", timeout=timeout)
+            resp = await client.post(SERVER_URL + "/api/getToken", 
+                timeout=timeout, 
+                data={
+                    "version": CLIENT_VERSION
+                },
+            )
             response = resp.json()
+            if(response["result"]=="error"):
+                raise Exception(response["errorMsg"])
             assert(response["result"]=="success")
-            acceptedClientVersions = response["acceptedClientVersions"]
-            if CLIENT_VERSION not in acceptedClientVersions:
-                raise Exception("VERSION ERROR: Incompatible version with server. You need to update the app in order to play online.")
-            else:
-                print("Version compatible")
             return None
 
     def __del__(self):
