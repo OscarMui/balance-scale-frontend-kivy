@@ -7,7 +7,7 @@ SSL = PRODUCTION
 SERVER_URL = f'http{"s" if SSL else ""}://{SERVER_IP}'
 WSS_URL = f'ws{"s" if SSL else ""}://{SERVER_IP}/game'
 
-CLIENT_VERSION = "20240811.0.app"
+CLIENT_VERSION = "20240815.0.app"
 
 DISCORD_URL = "https://discord.gg/H6bsxqZyuu"
 GOOGLE_PLAY_URL = "https://play.google.com/store/apps/details?id=com.kidprof.tenbin"

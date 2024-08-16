@@ -49,12 +49,14 @@
             size_hint: 0.4, 0.15
             spacing: 10
             Button:
-                text: "Play Online"
+                id: onlineButton
+                text: "Connecting..."
                 font_size:"20sp"
                 background_color: 0, 0.7, 0, 1
                 halign: 'center'
                 text_size: self.width, None
                 on_press: root.modeSelection("online")
+                disabled: True
             Button:
                 text: "Play Solo"
                 font_size:"20sp"

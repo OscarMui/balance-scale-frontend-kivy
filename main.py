@@ -54,6 +54,7 @@ class TenbinApp(App):
     globalNickname = None
     globalId = None
     globalGameInfo = None
+    globalNews = None
 
     def build(self):
         # Create the manager

@@ -1,4 +1,5 @@
 import asyncio
+import random
 
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
@@ -118,9 +119,10 @@ class JoinRoomScreen(Screen):
                 titleLabel.text = f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
                 bodyLabel.text = "The game will be filled with computer players if no one joins in 15 seconds. Please wait..."
                 
-                if event["tip"] != "":
+                TIPS = self.app.globalNews["tips"] if self.app.globalNews != None else []
+                if len(TIPS) > 0:
                     show(tipLabel)
-                    tipLabel.text = "Tip:\n" + event["tip"]
+                    tipLabel.text = "Tip:\n" + TIPS[random.randint(0,len(TIPS))]
                 else:
                     hide(tipLabel)
 
@@ -164,6 +166,7 @@ class JoinRoomScreen(Screen):
                     event = await self.qApp.get()
 
             assert(event["event"]=="gameStart",'condition event["event"]=="gameStart" not met')
+            hide(tipLabel)
             self.endTime = 0 # the timer task will then hide the timer
             print("gameStart event received by app")
             self.gameStarted = True
