@@ -40,8 +40,8 @@ class OnlineGame:
             # consume the response of websocket connection feedback
             res = await self.qGame.get()
             print("onlineGame response",res)
-            if(res["result"]=="error"):
-                print("result: error")
+            if(res["result"]=="appError"):
+                print("result: appError")
                 self.qApp.put_nowait({
                     "event": "serverConnectionFailed",
                     "errorMsg": res["errorMsg"]
@@ -60,8 +60,8 @@ class OnlineGame:
             # wait for response
             res = await self.qGame.get()
             print("onlineGame response",res)
-            if(res["result"]=="error"):
-                print("result: error")
+            if(res["result"]=="appError"):
+                print("result: appError")
                 self.qApp.put_nowait({
                     "event": "serverConnectionFailed",
                     "errorMsg": res["errorMsg"]

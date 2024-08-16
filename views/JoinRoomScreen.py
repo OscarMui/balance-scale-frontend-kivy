@@ -61,13 +61,25 @@ class JoinRoomScreen(Screen):
         try:
             timer = self.ids["timer"]
             timerImage = self.ids["timerImage"]
+            tipLabel = self.ids["tipLabel"]
 
             timer.color = (1,1,1,1)
+
+            TIPS = self.app.globalNews["tips"] if self.app.globalNews != None else []
+            print(TIPS)
+            if len(TIPS) > 0:
+                show(tipLabel)
+                tipLabel.text = "Tip:\n" + TIPS[random.randrange(0,len(TIPS))]
+            else:
+                hide(tipLabel)
 
             while True: 
                 if now() < self.endTime:
                     show(timer)
                     show(timerImage)
+                    if len(TIPS) > 0:
+                        show(tipLabel)
+
                     seconds = (self.endTime-now())//1000
 
                     # modify timer
@@ -75,11 +87,16 @@ class JoinRoomScreen(Screen):
                         timer.text = f'{seconds}s'
                     else:
                         timer.text = f'{seconds//60}m{seconds%60}s'
+                    
+                    # precisely change the tip when there is 7s left, just a random point s.t. it ensures tip changes from time to time
+                    if seconds == 7 and len(TIPS) > 0:
+                        tipLabel.text = "Tip:\n" + TIPS[random.randrange(0,len(TIPS))]
                 else:
                     # A time in the past/ not initialised yet (it was initialised to 0, which is definitely smaller than now())
                     timer.text = ""
                     hide(timer)
                     hide(timerImage)
+                    hide(tipLabel)
                     
                 # Rember to await!
                 await asyncio.sleep(1)
@@ -105,7 +122,6 @@ class JoinRoomScreen(Screen):
         try:
             titleLabel = self.ids["titleLabel"]
             bodyLabel = self.ids["bodyLabel"]
-            tipLabel = self.ids["tipLabel"]
             joinRoomParticipantUIs = self.ids["joinRoomParticipantUIs"]
             pus = [] # list of joinRoomParticipantUIs
 
@@ -118,13 +134,6 @@ class JoinRoomScreen(Screen):
                 participantsPerGame = event["participantsPerGame"]
                 titleLabel.text = f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
                 bodyLabel.text = "The game will be filled with computer players if no one joins in 15 seconds. Please wait..."
-                
-                TIPS = self.app.globalNews["tips"] if self.app.globalNews != None else []
-                if len(TIPS) > 0:
-                    show(tipLabel)
-                    tipLabel.text = "Tip:\n" + TIPS[random.randint(0,len(TIPS))]
-                else:
-                    hide(tipLabel)
 
                 # Create that many participants
                 for i in range(participantsPerGame):
@@ -166,7 +175,6 @@ class JoinRoomScreen(Screen):
                     event = await self.qApp.get()
 
             assert(event["event"]=="gameStart",'condition event["event"]=="gameStart" not met')
-            hide(tipLabel)
             self.endTime = 0 # the timer task will then hide the timer
             print("gameStart event received by app")
             self.gameStarted = True
