@@ -154,6 +154,7 @@ class JoinRoomScreen(Screen):
             event = await self.qApp.get()
 
             while event["event"] != "gameStart":
+                print("joinRoom receives",event)
                 if(event["event"] == "gameError"):
                     popup = Popup(
                         title='Sorry an error occured', 
@@ -162,6 +163,7 @@ class JoinRoomScreen(Screen):
                     )
                     popup.open()
                     self.manager.current = "home"
+                    return
                 else:    
                     assert(event["event"]=="updateParticipantsCount",'condition event["event"]=="updateParticipantsCount" not met')
                     participantCount = event["participantsCount"]

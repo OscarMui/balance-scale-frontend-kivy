@@ -97,6 +97,7 @@ class OnlineGame:
                     return
                 elif(event["event"] == "gameError"):
                     # forward this event to app
+                    print("forwarded to qApp")
                     self.qApp.put_nowait(event)
                     # then stop
                     return
