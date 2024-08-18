@@ -28,7 +28,7 @@ class JoinRoomParticipantUI(BoxLayout):
         hide(self)
 
     def showNickname(self,nickname):
-        if len(nickname) > 10:
+        if len(nickname) > 11:
             self.ids["nickname"].font_size = "12sp"
         else:
             self.ids["nickname"].font_size = "14sp"

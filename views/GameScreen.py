@@ -220,9 +220,11 @@ class GameScreen(Screen):
 
         rewindButton = self.ids["rewindButton"]
         if gameInfo["round"] == 1:
-            hide(rewindButton)
+            rewindButton.background_normal = "assets/show-players-big.png"
+            rewindButton.background_down = "assets/show-players-big.png"
         else:
-            show(rewindButton)
+            rewindButton.background_normal = "assets/rewind-big.png"
+            rewindButton.background_down = "assets/rewind-big.png"
             if len(gameInfo["justDiedParticipants"])>0:
                 # Someone died, show the rules page
                 self.showRules()
@@ -521,11 +523,9 @@ class GameScreen(Screen):
 
     def showRewind(self):
         gameInfo = self.app.globalGameInfo
-        if(gameInfo["round"]>1):
-            # need this if statement, as unfortunately the button is still clickable when opacity = 0!!!
-            # assert(gameInfo["round"]>1)
-            self.popup = StatusPopup(gameInfo)
-            self.popup.open()
+        # assert(gameInfo["round"]>1)
+        self.popup = StatusPopup(gameInfo)
+        self.popup.open()
 
     def quitGame(self):
         print("quit game")
