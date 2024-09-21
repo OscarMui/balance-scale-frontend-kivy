@@ -7,6 +7,7 @@ from kivy.app import App
 from kivy.uix.screenmanager import Screen
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
+from kivy.storage.jsonstore import JsonStore
 
 from common.constants import APP_STORE_URL, CLIENT_VERSION, DISCORD_URL, GOOGLE_PLAY_URL, SERVER_URL
 from widgets.RulesPopup import RulesPopup
@@ -19,6 +20,11 @@ class HomeScreen(Screen):
         self.qApp = qApp
         self.app = App.get_running_app()
         self.allowOnline = False
+        self.store = JsonStore('v1.json')
+        if self.store.exists('nicknameV1'):
+            NICKNAME = self.store.get('nicknameV1')["value"]
+            print('nicknameV1 exists:', NICKNAME)
+            self.ids["nickname"].text = NICKNAME
 
     def on_pre_enter(self):
         # only run if it is the first time
@@ -103,6 +109,7 @@ class HomeScreen(Screen):
             return
         
         NICKNAME = self.ids["nickname"].text
+        self.store.put('nicknameV1', value=NICKNAME)
 
         if(NICKNAME==""):
             popup = Popup(

@@ -18,3 +18,5 @@ dist
 *.aab
 *.idsig
 .cache
+
+v1.json
