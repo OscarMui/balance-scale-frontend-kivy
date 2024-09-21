@@ -292,7 +292,7 @@ A: Not much except for a few technicalities, and the fact that you don't die if 
 
 Here are the differences:
 
-1. The round time is shortened to 2 minutes. 
+1. The round time is shortened to 1 minute. 
 
 2. The GAME OVER score is changed to -5.
 

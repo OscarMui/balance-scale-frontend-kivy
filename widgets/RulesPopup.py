@@ -40,7 +40,7 @@ class RulesPopup(Popup):
         },
         {
             "question": "Q: I watched Alice in Borderland, are there any differences between your game and the game in the TV show?",
-            "answer": "A: Not much except for a few technicalities, and the fact that you don't die if you lose. This game is designed to recreate the game in Alice in Borderland, so that viewers can try it out for themselves. \nHere are the differences:\n1. The round time is shortened to 2 minutes. \n2. The GAME OVER score is changed to -5.\n3. Players can disconnect anytime, it counts as a GAME OVER for that player.\n4. Players need to type in the number digit by digit.\nThe changes are mainly to address the fast lifestyle of people outside of the Borderland, and the fact that your screen is smaller than the one the TV show uses.",
+            "answer": "A: Not much except for a few technicalities, and the fact that you don't die if you lose. This game is designed to recreate the game in Alice in Borderland, so that viewers can try it out for themselves. \nHere are the differences:\n1. The round time is shortened to 1 minute. \n2. The GAME OVER score is changed to -5.\n3. Players can disconnect anytime, it counts as a GAME OVER for that player.\n4. Players need to type in the number digit by digit.\nThe changes are mainly to address the fast lifestyle of people outside of the Borderland, and the fact that your screen is smaller than the one the TV show uses.",
         },
         {
             "question": "Q: Am I allowed to communicate?",
