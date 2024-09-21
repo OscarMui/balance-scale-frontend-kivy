@@ -16,7 +16,7 @@ class ParticipantUI(BoxLayout):
 
     def __init__(self,nickname,isBot):
         super().__init__()
-        if len(nickname) > 10:
+        if len(nickname) > 11:
             self.ids["nickname"].font_size = "12sp"
         else:
             self.ids["nickname"].font_size = "14sp"

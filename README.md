@@ -177,7 +177,7 @@ https://kivy.org/doc/stable/guide/packaging-ios.html
 
 ```bash
 toolchain pip install httpx websocket_client certifi httpcore idna sniffio anyio exceptiongroup h11
-toolchain update tenbin-ios
+toolchain update ../app_ios/tenbin-io
 ```
 
 3. https://github.com/kivy/kivy-ios/issues/901
@@ -185,6 +185,8 @@ toolchain update tenbin-ios
 Solved by: `brew uninstall -—ignore-dependencies libb2`
 
 4. https://stackoverflow.com/questions/72409563/unsupported-hash-type-ripemd160-with-hashlib-in-python/72508879#72508879
+
+5. Prevent device from sleeping for iOS - https://forums.developer.apple.com/forums/thread/710045?answerId=720442022#720442022
 
 On any updates, run:
 
