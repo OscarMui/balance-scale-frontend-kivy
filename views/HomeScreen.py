@@ -1,3 +1,4 @@
+import random
 import webbrowser
 import asyncio
 import httpx
@@ -20,11 +21,18 @@ class HomeScreen(Screen):
         self.qApp = qApp
         self.app = App.get_running_app()
         self.allowOnline = False
+
+        # INIT STORAGE
         self.store = JsonStore('v1.json')
         if self.store.exists('nicknameV1'):
             NICKNAME = self.store.get('nicknameV1')["value"]
             print('nicknameV1 exists:', NICKNAME)
             self.ids["nickname"].text = NICKNAME
+        else:
+            NICKNAME = "Alice"+str(random.randint(1000,10000))
+            self.store.put('nicknameV1', value=NICKNAME)
+            self.ids["nickname"].text = NICKNAME
+
 
     def on_pre_enter(self):
         # only run if it is the first time
