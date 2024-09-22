@@ -12,10 +12,11 @@ class SoloGame:
     participants = None
     roundNumber = 1
 
-    def __init__(self, qGame, qApp, nickname):
+    def __init__(self, qGame, qApp, nickname, store):
         self.qGame = qGame
         self.qApp = qApp
         self.nickname = nickname
+        self.store = store
 
 
     async def play(self):
@@ -24,7 +25,7 @@ class SoloGame:
                 "event": "serverConnected",
                 "participantsCount": PARTICIPANTS_PER_GAME,
                 "participantsPerGame": PARTICIPANTS_PER_GAME,
-                "tip": "",
+                "isReconnect": False,
             }
 
             self.qApp.put_nowait(msg)

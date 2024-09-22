@@ -4,7 +4,7 @@ import asyncio
 from game.onlineGame import OnlineGame
 from game.soloGame import SoloGame
 
-async def logic(qGame, qApp):
+async def logic(qGame, qApp, store):
     '''This method is also run by the asyncio loop. A simple skeleton for hosting the game.
     '''
 
@@ -13,7 +13,7 @@ async def logic(qGame, qApp):
             event = await qGame.get()
 
             # There might be some events/ responses left over after an error
-            while(event["event"]!="modeSelection"):
+            while(event["event"]!="modeSelection" and event["event"]!="reconnectGame"):
                 print("discard", event)
                 event = await qGame.get()
             
@@ -21,17 +21,21 @@ async def logic(qGame, qApp):
             while(not qApp.empty()):
                 print("discard ",await qApp.get())
 
-            print(f'Mode selected: {event["mode"]}')
-
             game = None
-            if event["mode"] == "online":
-                print("Online mode selected")
-                game = OnlineGame(qGame, qApp, event["nickname"])
+
+            if(event["event"] == "modeSelection"):
+                print(f'Mode selected: {event["mode"]}')
+                if event["mode"] == "online":
+                    print("Online mode selected")
+                    game = OnlineGame(qGame, qApp, store, nickname=event["nickname"])
+                else:
+                    assert(event["mode"] == "solo")
+                    print("Solo mode selected")
+                    game = SoloGame(qGame, qApp, store, event["nickname"])
             else:
-                assert(event["mode"] == "solo")
-                print("Solo mode selected")
-                game = SoloGame(qGame, qApp, event["nickname"])
-            
+                assert(event["event"] == "reconnectGame")
+                print("reconnect game")
+                game = SoloGame(qGame, qApp, store, pid=event["pid"])
             await game.play()
             
             #destruction

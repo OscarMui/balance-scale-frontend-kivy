@@ -52,7 +52,7 @@ class ParticipantUI(BoxLayout):
             self.ids["info"].color = (1,1,1,1)
 
 class StatusScreen(Screen):
-    def __init__(self, qGame, qApp, name):
+    def __init__(self, qGame, qApp, store, name):
         super().__init__(name=name)
         self.qGame = qGame  
         self.qApp = qApp  

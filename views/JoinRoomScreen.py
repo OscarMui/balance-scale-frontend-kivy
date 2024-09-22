@@ -36,7 +36,7 @@ class JoinRoomParticipantUI(BoxLayout):
     
 
 class JoinRoomScreen(Screen):
-    def __init__(self, qGame, qApp, name):
+    def __init__(self, qGame, qApp, store, name):
         super().__init__(name=name)
         self.qGame = qGame  
         self.qApp = qApp 
@@ -132,7 +132,7 @@ class JoinRoomScreen(Screen):
             if event["event"] == "serverConnected":
                 participantCount = event["participantsCount"]
                 participantsPerGame = event["participantsPerGame"]
-                titleLabel.text = f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
+                titleLabel.text = 'Reconnecting to server' if event["isReconnect"] else f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
                 bodyLabel.text = "The game will be filled with computer players if no one joins in 15 seconds. Please wait..."
 
                 # Create that many participants

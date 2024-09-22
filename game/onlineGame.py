@@ -17,10 +17,13 @@ class OnlineGame:
     nickname = None
     gameInfo = None
 
-    def __init__(self, qGame, qApp, nickname):
+    def __init__(self, qGame, qApp, store, nickname=None, pid=None):
+        assert(not (nickname==None and pid == None))
         self.qGame = qGame
         self.qApp = qApp
         self.nickname = nickname
+        self.store = store
+        self.pid = pid
 
 
     async def play(self):
@@ -40,8 +43,8 @@ class OnlineGame:
             # consume the response of websocket connection feedback
             res = await self.qGame.get()
             print("onlineGame response",res)
-            if(res["result"]=="appError"):
-                print("result: appError")
+            if(res["result"]=="error"):
+                print("result: error")
                 self.qApp.put_nowait({
                     "event": "serverConnectionFailed",
                     "errorMsg": res["errorMsg"]
@@ -51,42 +54,89 @@ class OnlineGame:
 
             print("Joined websocket")
 
+        except Exception as e:
+            print("Exception in onlineGame (getToken and initial connection)",repr(e))
+            self.qApp.put_nowait({
+                "event": "serverConnectionFailed",
+                "errorMsg": repr(e)
+            })
+            return
+        
+
+
+        if self.nickname != None:
+            try:
+                # send joinGame request
+                self.socket.sendMsg({
+                    "method": "joinGame",
+                    "nickname": self.nickname,
+                })
+
+                # wait for response
+                res = await self.qGame.get()
+                print("onlineGame response",res)
+                if(res["result"]=="error"):
+                    print("result: error")
+                    self.qApp.put_nowait({
+                        "event": "serverConnectionFailed",
+                        "errorMsg": res["errorMsg"]
+                    })
+                    return
+                assert(res["result"]=="success")
+                self.pid = res["id"]
+
+                self.store.put('pidV1', value=self.pid)
+
+                msg = {
+                    "event": "serverConnected",
+                    "participantsCount": res["participantsCount"],
+                    "participantsPerGame": res["participantsPerGame"],
+                    "isReconnect": False,
+                }
+
+                self.qApp.put_nowait(msg)
+
+                print("finished sending serverConnected event",msg)
+
+            except Exception as e:
+                print("Exception in onlineGame (before serverConnected)",repr(e))
+                self.qApp.put_nowait({
+                    "event": "serverConnectionFailed",
+                    "errorMsg": repr(e)
+                })
+                return
+        else:
+            assert(self.pid != None)
+
             # send joinGame request
             self.socket.sendMsg({
-                "method": "joinGame",
-                "nickname": self.nickname,
+                "method": "reconnectGame",
+                "pid": self.pid,
             })
 
             # wait for response
             res = await self.qGame.get()
             print("onlineGame response",res)
-            if(res["result"]=="appError"):
-                print("result: appError")
+            if(res["result"]=="error"):
+                print("result: error")
                 self.qApp.put_nowait({
                     "event": "serverConnectionFailed",
                     "errorMsg": res["errorMsg"]
                 })
                 return
             assert(res["result"]=="success")
-            pid = res["id"]
+            
 
             msg = {
                 "event": "serverConnected",
                 "participantsCount": res["participantsCount"],
                 "participantsPerGame": res["participantsPerGame"],
+                "isReconnect": True,
             }
 
             self.qApp.put_nowait(msg)
 
             print("finished sending serverConnected event",msg)
-
-        except Exception as e:
-            print("Exception in onlineGame (before serverConnected)",repr(e))
-            self.qApp.put_nowait({
-                "event": "serverConnectionFailed",
-                "errorMsg": repr(e)
-            })
-            return
 
         try:
             # repeatedly get event from our own queue
@@ -111,7 +161,7 @@ class OnlineGame:
 
             # Find our own info
             ps = event["participants"]
-            p = list(filter(lambda p: p["id"]==pid,ps))[0]
+            p = list(filter(lambda p: p["id"]==self.pid,ps))[0]
             p["nickname"] = p["nickname"] + " (YOU)"
             event["us"] = p
             event["roundStartTime"] += now()
@@ -131,7 +181,7 @@ class OnlineGame:
                         # this event is from the app, pass it on to the server
                         req = {
                             "method": "submitGuess",
-                            "id": pid,
+                            "id": self.pid,
                             "guess": event["guess"],
                         }
                         self.socket.sendMsg(req)
@@ -160,7 +210,7 @@ class OnlineGame:
 
                 # Find our own info
                 ps = event["participants"]
-                p = list(filter(lambda p: p["id"]==pid,ps))[0]
+                p = list(filter(lambda p: p["id"]==self.pid,ps))[0]
                 p["nickname"] = p["nickname"] + " (YOU)"
                 event["us"] = p
                 event["roundStartTime"] += now()

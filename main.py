@@ -1,11 +1,13 @@
 import asyncio
 import os # for os.path.join
+import random 
 from kivy.app import App
 from kivy.lang.builder import Builder
 from kivy.uix.screenmanager import ScreenManager, FadeTransition
 from kivy.core.window import Window
 from kivy.core.text import LabelBase
 from kivy.utils import platform
+from kivy.storage.jsonstore import JsonStore
 
 from views.GameScreen import GameScreen
 from views.HomeScreen import HomeScreen
@@ -56,16 +58,23 @@ class TenbinApp(App):
     globalGameInfo = None
     globalNews = None
 
+    # INIT STORAGE
+    store = JsonStore('v1.json')
+
+    if not store.exists('nicknameV1'):
+        NICKNAME = "Alice"+str(random.randint(1000,10000))
+        store.put('nicknameV1', value=NICKNAME)
+
     def build(self):
         # Create the manager
         sm = ScreenManager(transition=FadeTransition())
         
         # add screens
-        sm.add_widget(HomeScreen(self.qGame,self.qApp,name='home'))
-        sm.add_widget(JoinRoomScreen(self.qGame,self.qApp,name='joinRoom'))
-        sm.add_widget(GameScreen(self.qGame,self.qApp,name='game'))
-        sm.add_widget(StatusScreen(self.qGame,self.qApp,name='status'))
-        sm.add_widget(SettingsScreen(self.qGame,self.qApp,name='settings'))
+        sm.add_widget(HomeScreen(self.qGame,self.qApp,self.store,name='home'))
+        sm.add_widget(JoinRoomScreen(self.qGame,self.qApp,self.store,name='joinRoom'))
+        sm.add_widget(GameScreen(self.qGame,self.qApp,self.store,name='game'))
+        sm.add_widget(StatusScreen(self.qGame,self.qApp,self.store,name='status'))
+        sm.add_widget(SettingsScreen(self.qGame,self.qApp,self.store,name='settings'))
 
         # remember to return the screen manager
         return sm
@@ -74,7 +83,7 @@ class TenbinApp(App):
         '''This will run both methods asynchronously and then block until they
         are finished
         '''
-        self.other_task = asyncio.ensure_future(logic(self.qGame,self.qApp))
+        self.other_task = asyncio.ensure_future(logic(self.qGame,self.qApp,self.store))
 
         async def run_wrapper():
             # we don't actually need to set asyncio as the lib because it is

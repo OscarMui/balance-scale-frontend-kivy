@@ -8,29 +8,23 @@ from kivy.app import App
 from kivy.uix.screenmanager import Screen
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
-from kivy.storage.jsonstore import JsonStore
 
 from common.constants import APP_STORE_URL, CLIENT_VERSION, DISCORD_URL, GOOGLE_PLAY_URL, SERVER_URL
 from widgets.RulesPopup import RulesPopup
 from widgets.WrapLabel import WrapLabel
 
 class HomeScreen(Screen):
-    def __init__(self, qGame, qApp, name):
+    def __init__(self, qGame, qApp, store, name):
         super().__init__(name=name)
         self.qGame = qGame  
         self.qApp = qApp
+        self.store = store
         self.app = App.get_running_app()
         self.allowOnline = False
 
-        # INIT STORAGE
-        self.store = JsonStore('v1.json')
         if self.store.exists('nicknameV1'):
             NICKNAME = self.store.get('nicknameV1')["value"]
             print('nicknameV1 exists:', NICKNAME)
-            self.ids["nickname"].text = NICKNAME
-        else:
-            NICKNAME = "Alice"+str(random.randint(1000,10000))
-            self.store.put('nicknameV1', value=NICKNAME)
             self.ids["nickname"].text = NICKNAME
 
 
@@ -38,6 +32,9 @@ class HomeScreen(Screen):
         # only run if it is the first time
         if self.app.globalNews == None:
             self.handleVersionTask = asyncio.create_task(self.__handleVersion())
+
+        if self.store.exists('pidV1') and not self.store.get('pidV1')["value"] == None:
+            self.handleGamesStatusTask = asyncio.create_task(self.__handleGamesStatus(self.store.get('pidV1')["value"]))
     
     async def __handleVersion(self):
         print("HTTP server:", SERVER_URL)
@@ -102,6 +99,32 @@ class HomeScreen(Screen):
             # when canceled, print that it finished
             print('Done version task')
 
+    async def __handleGamesStatus(self,pid):
+        try:
+            async with httpx.AsyncClient() as client:
+                timeout = httpx.Timeout(5.0, read=15.0)
+                resp = await client.post(SERVER_URL + "/api/gamesStatus", 
+                    timeout=timeout, 
+                    data={
+                        "pid": pid,
+                    },
+                )
+                response = resp.json()
+                if(response["result"]=="error"):
+                    raise Exception(response["errorMsg"])
+                assert(response["result"]=="success")
+                if(response["canReconnect"]):
+                    self.qGame.put_nowait({
+                        "event": "reconnectGame",
+                        "pid": pid,
+                    })
+                    self.manager.current = "joinRoom"
+                print('Games status task completed')
+        except asyncio.CancelledError as e:
+            print('Games status task is cancelled',e)
+        except Exception as e:
+            print('Games status task error',e)
+
     def modeSelection(self, mode):
         if(mode == "online" and self.app.globalNews == None):
             popup = Popup(
@@ -165,6 +188,8 @@ class HomeScreen(Screen):
             self.popup.dismiss()
         if hasattr(self,"handleVersionTask"):
             self.handleVersionTask.cancel()
+        if hasattr(self,"handleGamesStatusTask"):
+            self.handleGamesStatusTask.cancel()
     
     def showRules(self):
         self.popup = RulesPopup(detail=True)
