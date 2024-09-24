@@ -1,4 +1,7 @@
 import asyncio
+import httpx
+
+from common.constants import SERVER_URL
 
 # import from other project files
 from game.onlineGame import OnlineGame
@@ -13,7 +16,7 @@ async def logic(qGame, qApp, store):
             event = await qGame.get()
 
             # There might be some events/ responses left over after an error
-            while(event["event"]!="modeSelection" and event["event"]!="reconnectGame"):
+            while(event["event"]!="modeSelection"):
                 print("discard", event)
                 event = await qGame.get()
             
@@ -23,19 +26,34 @@ async def logic(qGame, qApp, store):
 
             game = None
 
-            if(event["event"] == "modeSelection"):
-                print(f'Mode selected: {event["mode"]}')
-                if event["mode"] == "online":
-                    print("Online mode selected")
-                    game = OnlineGame(qGame, qApp, store, nickname=event["nickname"])
+            print(f'Mode selected: {event["mode"]}')
+            if event["mode"] == "online":
+                print("Online mode selected")
+                if store.exists('pidV1') and not store.get('pidV1')["value"] == None:
+                    pid = store.get('pidV1')["value"]
+                    async with httpx.AsyncClient() as client:
+                        timeout = httpx.Timeout(5.0, read=15.0)
+                        resp = await client.post(SERVER_URL + "/api/gamesStatus", 
+                            timeout=timeout, 
+                            data={
+                                "pid": pid,
+                            },
+                        )
+                        response = resp.json()
+                        if(response["result"]=="error"):
+                            raise Exception(response["errorMsg"])
+                        assert(response["result"]=="success")
+                        if(response["canReconnect"]):
+                            game = OnlineGame(qGame, qApp, store, pid=pid)
+                        else:
+                            game = OnlineGame(qGame, qApp, store, nickname=event["nickname"])
+                        print('Game status check completed')
                 else:
-                    assert(event["mode"] == "solo")
-                    print("Solo mode selected")
-                    game = SoloGame(qGame, qApp, store, event["nickname"])
+                    game = OnlineGame(qGame, qApp, store, nickname=event["nickname"])
             else:
-                assert(event["event"] == "reconnectGame")
-                print("reconnect game")
-                game = SoloGame(qGame, qApp, store, pid=event["pid"])
+                assert(event["mode"] == "solo")
+                print("Solo mode selected")
+                game = SoloGame(qGame, qApp, store, event["nickname"])
             await game.play()
             
             #destruction

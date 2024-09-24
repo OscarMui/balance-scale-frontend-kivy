@@ -24,6 +24,7 @@ class OnlineGame:
         self.nickname = nickname
         self.store = store
         self.pid = pid
+        self.isReconnect = self.nickname == None
 
 
     async def play(self):
@@ -64,7 +65,7 @@ class OnlineGame:
         
 
 
-        if self.nickname != None:
+        if not self.isReconnect:
             try:
                 # send joinGame request
                 self.socket.sendMsg({
@@ -106,7 +107,7 @@ class OnlineGame:
                 })
                 return
         else:
-            assert(self.pid != None)
+            assert(self.isReconnect)
 
             # send joinGame request
             self.socket.sendMsg({
@@ -142,7 +143,7 @@ class OnlineGame:
             # repeatedly get event from our own queue
             event = await self.qGame.get()
 
-            while event["event"] != "gameStart":
+            while event["event"] != "gameStart" and event["event"] != "gameInfo":
                 if(event["event"] == "quitGame" or event["event"] == "appError"):
                     return
                 elif(event["event"] == "gameError"):
@@ -151,13 +152,14 @@ class OnlineGame:
                     self.qApp.put_nowait(event)
                     # then stop
                     return
-                else:
-                    assert(event["event"] == "updateParticipantsCount")
+                elif(event["event"] == "updateParticipantsCount"):
                     # forward this event to app
                     self.qApp.put_nowait(event)
                     event = await self.qGame.get()
+                
+                # do nothing otherwise, it could be events sent in the current round due to reconnection
             
-            assert(event["event"]=="gameStart")
+            assert((self.isReconnect and event["event"] == "gameInfo") or (not(self.isReconnect) and event["event"]=="gameStart"))
 
             # Find our own info
             ps = event["participants"]

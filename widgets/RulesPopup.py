@@ -53,7 +53,7 @@ class RulesPopup(Popup):
     ]
     answersShown = [False for i in range(len(qs))]
 
-    def __init__(self,detail=False,aliveCount=None, **kwargs):
+    def __init__(self,detail=False,activeCount=None, **kwargs):
         super(RulesPopup, self).__init__(**kwargs)
         
         rulesLayout = self.ids["rulesLayout"]
@@ -64,8 +64,8 @@ class RulesPopup(Popup):
             text = "",
         ))
         
-        if aliveCount != None:
-            if aliveCount <= 4:
+        if activeCount != None:
+            if activeCount <= 4:
                 rulesLayout.add_widget(WrapLabel(
                     text = "New rules upon elimination",
                     bold = True,
@@ -73,11 +73,11 @@ class RulesPopup(Popup):
                 rulesLayout.add_widget(LeftWrapLabel(
                     text = "1. If two or more players choose the same number, the number is invalid and all players who selected the number will lose a point.",
                 ))
-            if aliveCount <= 3:
+            if activeCount <= 3:
                 rulesLayout.add_widget(LeftWrapLabel(
                     text = "2. If a player chooses the exact correct number, they win the round and all other players lose two points.",
                 ))
-            if aliveCount <= 2:
+            if activeCount <= 2:
                 rulesLayout.add_widget(LeftWrapLabel(
                     text = "3. If someone chooses 0, a player who chooses 100 wins the round.",
                 ))

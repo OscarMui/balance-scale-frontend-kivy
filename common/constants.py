@@ -7,7 +7,7 @@ SSL = PRODUCTION
 SERVER_URL = f'http{"s" if SSL else ""}://{SERVER_IP}'
 WSS_URL = f'ws{"s" if SSL else ""}://{SERVER_IP}/game'
 
-CLIENT_VERSION = "20240815.0.app"
+CLIENT_VERSION = "20240922.0.app"
 
 DISCORD_URL = "https://discord.gg/H6bsxqZyuu"
 GOOGLE_PLAY_URL = "https://play.google.com/store/apps/details?id=com.kidprof.tenbin"
@@ -24,4 +24,4 @@ ROUND_ZERO_DIGEST_TIME_MS = 2 * 1000
 ROUND_INFO_DIGEST_TIME_MS = 10 * 1000
 DIGEST_TIME_MS = 5 * 1000
 POPULATE_BOTS_TIME_MS = 15 * 1000
-BOT_NICKNAMES = ["Alice","Clara","Ellen","Iris","Kate","Nora","Sarah"]
+BOT_NICKNAMES = ["Clara","Ellen","Iris","Kate","Nora","Sarah","Xandra"]

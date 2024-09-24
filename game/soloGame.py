@@ -12,7 +12,7 @@ class SoloGame:
     participants = None
     roundNumber = 1
 
-    def __init__(self, qGame, qApp, nickname, store):
+    def __init__(self, qGame, qApp, store, nickname):
         self.qGame = qGame
         self.qApp = qApp
         self.nickname = nickname
@@ -36,7 +36,7 @@ class SoloGame:
             #     id: string, 
             #     nickname: string,
             #     score: number,
-            #     isDead: boolean,
+            #     status: 'active'|'disconnected'|'dead',
             #     isBot: boolean,
             # }
 
@@ -48,14 +48,14 @@ class SoloGame:
                     "nickname": self.nickname + " (YOU)",
                     "isBot": False, 
                     "score": 0,
-                    "isDead": False,
+                    "status": 'active',
                 },
                 *[{
                     "id": uuid.uuid4(),
                     "nickname": BOT_NICKNAMES[(startingNickname+i)%len(BOT_NICKNAMES)],
                     "isBot": True,
                     "score": 0,
-                    "isDead": False,
+                    "status": 'active',
                 } for i in range(4)]
             ]
 
@@ -68,7 +68,7 @@ class SoloGame:
             #     roundStartTime: number,
             #     roundEndTime: number,
             #     gameEnded: boolean,
-            #     aliveCount: number,
+            #     activeCount: number,
             # }
 
             # To accomodate these changes made in onlineGame after receiving the gameEvent, we added (YOU) after the nickname of the actual human player
@@ -87,7 +87,7 @@ class SoloGame:
                 "roundStartTime": ROUND_ZERO_DIGEST_TIME_MS + now(),
                 "roundEndTime": ROUND_ZERO_DIGEST_TIME_MS + ROUND_TIME_MS + now(),
                 "gameEnded": False,
-                "aliveCount": self.__getAliveCount(),
+                "activeCount": self.__getActiveCount(),
                 "us": self.participants[0],
                 "mode": "solo",
             }
@@ -118,9 +118,9 @@ class SoloGame:
                 },*[{ #bots
                     "guess": self.__botGuess(),
                     "id": participant["id"]
-                } for participant in filter(lambda x: not x["isDead"],self.participants[1:])]]
+                } for participant in filter(lambda x: not x["status"] == 'dead',self.participants[1:])]]
 
-                assert(len(reqs)==self.__getAliveCount())
+                assert(len(reqs)==self.__getActiveCount())
                 
                 # basically copying code from backend at this point
                 # calculate targets
@@ -194,11 +194,13 @@ class SoloGame:
                     "roundStartTime": ROUND_INFO_DIGEST_TIME_MS + (0 if len(justDiedParticipants)==0 else DIGEST_TIME_MS) + now(),
                     "roundEndTime": ROUND_INFO_DIGEST_TIME_MS + ROUND_TIME_MS + (0 if len(justDiedParticipants)==0 else DIGEST_TIME_MS) + now(),
                     "gameEnded": self.__isEnded(),
-                    "aliveCount": self.__getAliveCount(),
+                    "activeCount": self.__getActiveCount(),
                     "target": target,
                     "winners": winners,
                     "justDiedParticipants": justDiedParticipants,
                     "justAppliedRules": list(justAppliedRules),
+                    "justDisconnectedParticipants": [],
+                    "justReconnectedParticipants": [],
                     "us": participantsGuess[0],
                     "mode": "solo",
                 }
@@ -213,15 +215,15 @@ class SoloGame:
             })
             return
 
-    # purely functional function to find aliveCount from self.gameInfo
-    def __getAliveCount(self):
-        return len(list(filter(lambda x: not x["isDead"],self.participants)))
+    # purely functional function to find activeCount from self.gameInfo
+    def __getActiveCount(self):
+        return len(list(filter(lambda x:  not x["status"] == 'dead',self.participants)))
 
     def __isEnded(self): # the game is over when the player is dead
-        return self.participants[0]["isDead"] or self.__getAliveCount() <= 1
+        return self.participants[0]["status"] == 'dead' or self.__getActiveCount() <= 1
     
     def __botGuess(self):
-        if self.__getAliveCount() == 2:
+        if self.__getActiveCount() == 2:
             r = random.randint(0, 2)
             if r == 2:
                 return 100
@@ -236,8 +238,8 @@ class SoloGame:
         p["score"] += delta
         if(p["score"] <= DEAD_LIMIT):
             p["score"] = DEAD_LIMIT; # display -10 instead of -11 or sth
-            if(not p["isDead"]):
-                p["isDead"] = True;
+            if(not p["status"] == 'dead'):
+                p["status"] = 'dead';
                 return True
         return False
     

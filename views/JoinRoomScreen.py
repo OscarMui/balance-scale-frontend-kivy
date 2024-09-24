@@ -41,10 +41,12 @@ class JoinRoomScreen(Screen):
         self.qGame = qGame  
         self.qApp = qApp 
         self.endTime = 0
+        self.store = store
         self.app = App.get_running_app()
 
     def on_pre_enter(self):
         self.gameStarted = False
+        self.isReconnect = False
         joinRoomParticipantUIs = self.ids["joinRoomParticipantUIs"]
         joinRoomParticipantUIs.clear_widgets()
 
@@ -130,10 +132,11 @@ class JoinRoomScreen(Screen):
             event = await self.qApp.get()
             print("joinRoom receives",event)
             if event["event"] == "serverConnected":
+                self.isReconnect =  event["isReconnect"]
                 participantCount = event["participantsCount"]
                 participantsPerGame = event["participantsPerGame"]
-                titleLabel.text = 'Reconnecting to server' if event["isReconnect"] else f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
-                bodyLabel.text = "The game will be filled with computer players if no one joins in 15 seconds. Please wait..."
+                titleLabel.text = 'Reconnection successful to server' if event["isReconnect"] else f'Waiting for participants to join ({participantCount}/{participantsPerGame})'
+                bodyLabel.text = 'You will be able to rejoin when the next round starts.' if event["isReconnect"] else "The game will be filled with computer players if no one joins in 15 seconds. Please wait..."
 
                 # Create that many participants
                 for i in range(participantsPerGame):
@@ -144,12 +147,20 @@ class JoinRoomScreen(Screen):
                     pus[i].showPfp()
                 for i in range(participantCount,participantsPerGame):
                     pus[i].hidePfp()
-                self.endTime = now() + 15*1000
+                self.endTime = now() + (60*1000 if event["isReconnect"] else 15*1000)
             else:
                 assert(event["event"] == "serverConnectionFailed",'condition event["event"] == "serverConnectionFailed" not met')
                 titleLabel.text = "An error occured"
                 bodyLabel.text = event["errorMsg"]
                 return
+            
+            if event["isReconnect"]:
+                event = await self.qApp.get()
+                print("joinRoom receives",event)
+                assert(event["event"]=="gameInfo",'condition event["event"]=="gameInfo" not met')
+                self.app.globalGameInfo = event
+                self.manager.current = "status"
+                return 
             
             event = await self.qApp.get()
 
@@ -220,6 +231,12 @@ class JoinRoomScreen(Screen):
             print("Game started cannot exit")
         else:
             print("quit game")
+
+            # TODO: Popup confirmation if it is a reconnection case
+            if self.isReconnect:
+                pass
+            self.store.remove('pidV1')
+
             self.qGame.put_nowait({
                 "event": "quitGame"
             })

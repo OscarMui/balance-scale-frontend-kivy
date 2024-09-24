@@ -15,7 +15,8 @@ class StatusPopupParticipantUI(BoxLayout):
 
         nickname = p["nickname"]
         isBot = p["isBot"]
-        isDead = p["isDead"]
+        isDead = p["status"] == 'dead'
+        isDisconnected = p['status'] == 'disconnected'
         guess = p.get("guess",None) # attr might not be provided if round number = 1
         score = p["score"]
 
@@ -28,11 +29,6 @@ class StatusPopupParticipantUI(BoxLayout):
             self.ids["pfp"].source = os.path.join("assets","bot.png")
         else:
             self.ids["pfp"].source = os.path.join("assets","pfp.png")
-        if isDead:
-            win.text = "GAME OVER"
-            win.font_size = "14sp"
-            win.color = (1,0,0,1)
-            show(win)
         if not isFirstRound:
             if hasWon:
                 win.text = "WIN"
@@ -44,6 +40,16 @@ class StatusPopupParticipantUI(BoxLayout):
             if guess != None:
                 guessLabel.text = str(guess)
             scoreLabel.text = str(score)
+        if isDead:
+            win.text = "GAME OVER"
+            win.font_size = "13sp"
+            win.color = (1,0,0,1)
+            show(win)
+        if isDisconnected:
+            win.text = "DISCONNECTED"
+            win.font_size = "13sp"
+            win.color = (1,0,0,1)
+            show(win)
 
 class StatusPopup(Popup):
     def __init__(self,gameInfo,**kwargs):

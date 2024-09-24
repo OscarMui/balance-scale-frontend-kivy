@@ -204,8 +204,7 @@ class GameScreen(Screen):
         print("Game in progress")
 
         # make sure we are not dead
-        isDead = gameInfo["us"]["isDead"] 
-        assert(isDead == False)
+        assert(gameInfo["us"]["status"] != 'dead')
         print("We are not dead")
 
         # assert round has started
@@ -216,7 +215,7 @@ class GameScreen(Screen):
         
         # setup end time first, so that handleTimer works correctly
         self.endTime = gameInfo["roundEndTime"]
-        self.aliveCount = gameInfo["aliveCount"]
+        self.activeCount = gameInfo["activeCount"]
 
         rewindButton = self.ids["rewindButton"]
         if gameInfo["round"] == 1:
@@ -385,7 +384,7 @@ class GameScreen(Screen):
             #     "roundStartTime": ROUND_INFO_DIGEST_TIME_MS + now(),
             #     "roundEndTime": ROUND_INFO_DIGEST_TIME_MS + ROUND_TIME_MS + now(),
             #     "gameEnded": self.__isEnded(),
-            #     "aliveCount": self.__getAliveCount(),
+            #     "activeCount": self.__getActiveCount(),
             #     "target": target,
             #     "winners": winners,
             #     "justDiedParticipants": justDiedParticipants,
@@ -411,12 +410,12 @@ class GameScreen(Screen):
             else:
                 hide(self.ids["quitGameButton"])
 
-            includeBots = len(list(filter(lambda p: p["isBot"] and not p["isDead"],gameInfo["participants"]))) != 0
+            includeBots = len(list(filter(lambda p: p["isBot"] and not p["status"] == 'dead',gameInfo["participants"]))) != 0
             botsUpperLimit = floor(100*0.8**(gameInfo["round"]-1))
 
             botsInfo = ""
             if includeBots:
-                if gameInfo["aliveCount"] == 2:
+                if gameInfo["activeCount"] == 2:
                     botsInfo = "Note the bot would choose a number among [b]0, 1, and 100[/b]."
                 else:
                     botsInfo = f"Note that bots will choose a number between 0 and [b]{botsUpperLimit}[/b] randomly."
@@ -463,16 +462,16 @@ class GameScreen(Screen):
 
                     if hasattr(self,"popup"):
                         self.popup.dismiss()
-                    popup = NewRulesPopup(self.aliveCount,self.aliveCount-1,titleText=f'{p["nickname"]} disconnected midgame',allowClose=True)
-                    self.aliveCount -= 1
+                    popup = NewRulesPopup(self.activeCount,self.activeCount-1,titleText=f'{p["nickname"]} disconnected midgame',allowClose=True)
+                    self.activeCount -= 1
                     popup.open()
                 else:
                     assert(event["event"] == "changeCountdown")
-                    #! start time delay of the changeCountdown if participantDisconnectedMidgame is enforced by the 5-second popup window on the participantDisconnectedMidgame event. Will change that behaviour when we handle reconnection.
+                    #! start time delay of the changeCountdown if participantDisconnectedMidgame is enforced by the 5-second popup window on the participantDisconnectedMidgame event.
                     self.endTime = event["endTime"]+now()
                     if event["reason"] == "participantDisconnectedMidgame":
                         self.__addInfo(
-                            "Based on the new rules, you now have 30 seconds to amend your guess.",
+                            "Based on the new rules, you now have 15 seconds to amend your guess.",
                             color=(1,1,0,1)
                         )
                     else:
@@ -518,7 +517,7 @@ class GameScreen(Screen):
             self.handleGameTask.cancel()
     
     def showRules(self):
-        self.popup = RulesPopup(detail=False,aliveCount=self.aliveCount)
+        self.popup = RulesPopup(detail=False,activeCount=self.activeCount)
         self.popup.open()
 
     def showRewind(self):
