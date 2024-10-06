@@ -18,8 +18,8 @@
 <GameScreen>:
     RelativeLayout:
         BoxLayout:
-            pos_hint: {'x': 0.05, 'y': 0.73}
-            size_hint: 0.33,0.2
+            pos_hint: {'x': 0.05, 'y': 0.71}
+            size_hint: 0.3,0.2
             # wrapper for guess label for it to position correctly initially
             GuessLabel:
                 # background_color set in code for consistency
@@ -28,7 +28,7 @@
                 text: ""
         ScrollView:
             pos_hint: {'x': 0.05, 'y': 0.1}
-            size_hint: 0.33,0.5
+            size_hint: 0.3,0.5
             do_scroll_x: False
             BoxLayout:
                 id: infoLayout
@@ -48,7 +48,7 @@
         GridLayout:
             id: numpad
             cols: 3
-            pos_hint: {'x': 0.40, 'y': 0.1}
+            pos_hint: {'x': 0.42, 'y': 0.1}
             size_hint: 0.32,0.8
             Button:
                 id: cancelButton
@@ -108,7 +108,7 @@
         ImageButton:
             background_normal: "assets/question-mark-big.png"
             background_down: "assets/question-mark-big.png"
-            pos_hint: {'right': 0.96, 'y': 0.75}
+            pos_hint: {'right': 0.96, 'y': 0.755}
             size_hint: None,0.15
             ratio: 2
             on_press: root.showRules()
@@ -150,7 +150,7 @@
             background_normal: "assets/confirm-big.png"
             background_down: "assets/confirm-big-down.png"
             border: 0,0,0,0
-            pos_hint: {'right': 0.96, 'y': 0.12}
+            pos_hint: {'right': 0.96, 'y': 0.095}
             size_hint: None,0.15
             ratio: 2
             on_press: root.confirmPressed()
