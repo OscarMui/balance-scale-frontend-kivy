@@ -110,7 +110,7 @@ rm *.idsig
 The actual magical command:
 
 ```bash
-p4a aab --private . --arch arm64-v8a --arch armeabi-v7a --permission android.permission.INTERNET --permission android.permission.ACCESS_NETWORK_STATE --package=com.kidprof.tenbin --name "Tenbin"  --bootstrap=sdl2 --requirements=python3,kivy,httpx,websocket_client,certifi,httpcore,idna,sniffio,anyio,exceptiongroup,h11 --orientation landscape --orientation landscape-reverse --icon assets/icon.png --presplash assets/background.jpg --blacklist-requirements=sqlite3,libffi,openssl --release --version 1.1.6
+p4a aab --private . --arch arm64-v8a --arch armeabi-v7a --permission android.permission.INTERNET --permission android.permission.ACCESS_NETWORK_STATE --package=com.kidprof.tenbin --name "Tenbin"  --bootstrap=sdl2 --requirements=python3,kivy,httpx,websocket_client,certifi,httpcore,idna,sniffio,anyio,exceptiongroup,h11 --orientation landscape --orientation landscape-reverse --icon assets/icon.png --presplash assets/background.jpg --blacklist-requirements=sqlite3,libffi,openssl --release --version 1.1.7
 ```
 
 Signing app bundle:
@@ -222,7 +222,7 @@ python -m pip install pyinstaller==5.13.2
 
 ### Build
 
-Clean up:
+Clean up: (MUST CLEAN v1.json, or else it is included in the app bundle)
 
 ```bash
 rm -rf build dist
@@ -231,6 +231,7 @@ rm **/*.pyc
 rm *.apk
 rm *.aab 
 rm *.idsig
+rm *.json
 ```
 
 Actual code: 
@@ -270,7 +271,7 @@ But for now the `datas` functionality seems to be not working for windows. We ne
 
 Every player chooses a number between 0 and 100 in each round. The player closest to the target wins the round. The target would be the average of the numbers multiplied by 0.8. 
 
-All players start with 0 points. If a player reaches -5 points, it is a GAME OVER for that player. The last person standing wins. 
+All players start with 0 points. If a player reaches -7 points, it is a GAME OVER for that player. The last person standing wins. 
 
 A new rule will be introduced for every player eliminated.
 
@@ -296,7 +297,7 @@ Here are the differences:
 
 1. The round time is shortened to 1 minute. 
 
-2. The GAME OVER score is changed to -5.
+2. The GAME OVER score is changed to -7.
 
 3. Players can disconnect anytime, it counts as a GAME OVER for that player.
 
