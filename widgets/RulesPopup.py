@@ -40,7 +40,7 @@ class RulesPopup(Popup):
         },
         {
             "question": "Q: I watched Alice in Borderland, are there any differences between your game and the game in the TV show?",
-            "answer": "A: Not much except for a few technicalities, and the fact that you don't die if you lose. This game is designed to recreate the game in Alice in Borderland, so that viewers can try it out for themselves. \nHere are the differences:\n1. The round time is shortened to 1 minute. \n2. The GAME OVER score is changed to -5.\n3. Players can disconnect anytime, it counts as a GAME OVER for that player.\n4. Players need to type in the number digit by digit.\nThe changes are mainly to address the fast lifestyle of people outside of the Borderland, and the fact that your screen is smaller than the one the TV show uses.",
+            "answer": "A: Not much except for a few technicalities, and the fact that you don't die if you lose. This game is designed to recreate the game in Alice in Borderland, so that viewers can try it out for themselves. \nHere are the differences:\n1. The round time is shortened to 1 minute. \n2. The GAME OVER score is changed to -7.\n3. Players can disconnect anytime, it counts as a GAME OVER for that player.\n4. Players need to type in the number digit by digit.\nThe changes are mainly to address the fast lifestyle of people outside of the Borderland, and the fact that your screen is smaller than the one the TV show uses.",
         },
         {
             "question": "Q: Am I allowed to communicate?",
@@ -91,7 +91,7 @@ class RulesPopup(Popup):
             text = "Every player chooses a number between 0 and 100 in each round. The player closest to the target, that is the average of the numbers multiplied by 0.8, wins the round.",
         ))
         rulesLayout.add_widget(LeftWrapLabel(
-            text = "All players start with 0 points. If a player reaches -5 points, it is a GAME OVER for that player. The last person standing wins.",
+            text = "All players start with 0 points. If a player reaches -7 points, it is a GAME OVER for that player. The last person standing wins.",
         ))
         rulesLayout.add_widget(LeftWrapLabel(
             text = "A new rule will be introduced for every player eliminated.",

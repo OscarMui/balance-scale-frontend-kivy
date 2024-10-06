@@ -16,7 +16,7 @@ APP_STORE_URL = "https://play.google.com/store/apps/details?id=com.kidprof.tenbi
 
 #* Constants for the offline game, copied from backend
 PARTICIPANTS_PER_GAME = 5
-DEAD_LIMIT = -5
+DEAD_LIMIT = -7
 ROUND_LIMIT = 200;
 ROUND_TIME_MS = 60 * 1000
 SHORTENED_TIME_MS = 5 * 1000

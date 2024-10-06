@@ -106,7 +106,7 @@ class StatusPopup(Popup):
             for d in gameInfo["justDiedParticipants"]:
                 p = list(filter(lambda p: p["id"]==d["id"],ps))[0]
                 if d["reason"]=="deadLimit":
-                    justDiedParticipantsLabel.text += f'{p["nickname"]} reached -5 score, GAME OVER.\n'
+                    justDiedParticipantsLabel.text += f'{p["nickname"]} reached -7 score, GAME OVER.\n'
                 elif d["reason"]=="disconnected":
                     justDiedParticipantsLabel.text += f'{p["nickname"]} disconnected, GAME OVER.\n'
                 elif d["reason"]=="disconnectedMidgame":

@@ -210,7 +210,7 @@ class StatusScreen(Screen):
                     pu = list(filter(lambda p: p["id"]==d["id"],pus))[0]
                     if d["reason"]=="deadLimit":
                         pu["ui"].declareGameOver()
-                        calculationLabel.text += f'[color=#FF0000]{pu["nickname"]} reached -5 score, GAME OVER.[/color]\n'
+                        calculationLabel.text += f'[color=#FF0000]{pu["nickname"]} reached -7 score, GAME OVER.[/color]\n'
                 for d in gameInfo["justDisconnectedParticipants"]:
                     pu = list(filter(lambda p: p["id"]==d["id"],pus))[0]
                     if d["reason"]=="disconnected":
