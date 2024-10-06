@@ -108,7 +108,7 @@ class HomeScreen(Screen):
             return 
         
         if(mode == "online" and not self.allowOnline):
-            self.handleVersionTask = asyncio.create_task(self.__handleVersion())
+            self.handleApiTask = asyncio.create_task(self.__handleApi())
             return
         
         NICKNAME = self.ids["nickname"].text

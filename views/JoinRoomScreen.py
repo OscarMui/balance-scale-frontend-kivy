@@ -235,7 +235,7 @@ class JoinRoomScreen(Screen):
             # TODO: Popup confirmation if it is a reconnection case
             if self.isReconnect:
                 pass
-            self.store.remove('pidV1')
+            self.store.delete('pidV1')
 
             self.qGame.put_nowait({
                 "event": "quitGame"

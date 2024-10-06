@@ -1,13 +1,14 @@
-PRODUCTION = True
+PRODUCTION = 'UAT' # PRD/UAT/DEV
+CLIENT_VERSION = "20240922.0.app"
+APP_VERSION = "1.1.7 (internal beta)"
+
 SCREEN_SIZE = ""
 # "" / "IPAD_LANDSCAPE" / "IPAD_PORTRAIT"
 #* constants
-SERVER_IP = "tenbin-b735da2f640d.herokuapp.com" if PRODUCTION else "localhost:8999"
-SSL = PRODUCTION
+SERVER_IP = "tenbin-b735da2f640d.herokuapp.com" if PRODUCTION=='PRD' else  "tenbin-2-b2fb376ee1a0.herokuapp.com" if PRODUCTION=='UAT' else "localhost:8999"
+SSL = PRODUCTION == 'PRD' or PRODUCTION == 'UAT'
 SERVER_URL = f'http{"s" if SSL else ""}://{SERVER_IP}'
 WSS_URL = f'ws{"s" if SSL else ""}://{SERVER_IP}/game'
-
-CLIENT_VERSION = "20240922.0.app"
 
 DISCORD_URL = "https://discord.gg/H6bsxqZyuu"
 GOOGLE_PLAY_URL = "https://play.google.com/store/apps/details?id=com.kidprof.tenbin"
