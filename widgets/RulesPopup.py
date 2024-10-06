@@ -6,7 +6,7 @@ from kivy.uix.button import Button
 
 from widgets.WrapLabel import WrapLabel
 from widgets.ImageButton import ImageButton
-from common.constants import DISCORD_URL
+from common.constants import APP_VERSION, CLIENT_VERSION, DISCORD_URL, PRODUCTION
 from common.visibility import hide
 
 class LeftWrapLabel(WrapLabel):
@@ -120,6 +120,12 @@ class RulesPopup(Popup):
                 height = 100,
                 background_color = (0,0,0,0),
                 on_press = self.openDiscord,  
+            ))
+
+            rulesLayout.add_widget(LeftWrapLabel(
+                text = f"For debug use:\nApp Version {APP_VERSION}\nCommunications Version {CLIENT_VERSION}\n{PRODUCTION} server",
+                font_size = "10sp",
+                color = (0.7,0.7,0.7,1),
             ))
 
     def openDiscord(self,arg):
