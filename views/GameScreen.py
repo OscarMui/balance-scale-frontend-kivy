@@ -462,9 +462,10 @@ class GameScreen(Screen):
 
                     if hasattr(self,"popup"):
                         self.popup.dismiss()
-                    popup = NewRulesPopup(self.activeCount,self.activeCount-1,titleText=f'{p["nickname"]} disconnected midgame',allowClose=True)
-                    self.activeCount -= 1
-                    popup.open()
+                    if self.activeCount-1 > 1: # If we are the only one here, we will receive a new game info shortly saying that we win
+                        popup = NewRulesPopup(self.activeCount,self.activeCount-1,titleText=f'{p["nickname"]} disconnected midgame',allowClose=True)
+                        self.activeCount -= 1
+                        popup.open()
                 else:
                     assert(event["event"] == "changeCountdown")
                     #! start time delay of the changeCountdown if participantDisconnectedMidgame is enforced by the 5-second popup window on the participantDisconnectedMidgame event.

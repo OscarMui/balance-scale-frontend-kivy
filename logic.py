@@ -31,6 +31,7 @@ async def logic(qGame, qApp, store):
                 print("Online mode selected")
                 if store.exists('pidV1') and not store.get('pidV1')["value"] == None:
                     pid = store.get('pidV1')["value"]
+                    
                     async with httpx.AsyncClient() as client:
                         timeout = httpx.Timeout(5.0, read=15.0)
                         resp = await client.post(SERVER_URL + "/api/gamesStatus", 
@@ -61,6 +62,13 @@ async def logic(qGame, qApp, store):
             
     except asyncio.CancelledError as e:
         print('Logic was canceled', e)
+    except Exception as e:
+        print("Exception in logic.py",repr(e))
+        qApp.put_nowait({
+                "event": "serverConnectionFailed",
+                "errorMsg": repr(e)
+            })
+        return
     finally:
         # when canceled, print that it finished
         print('Done logic')

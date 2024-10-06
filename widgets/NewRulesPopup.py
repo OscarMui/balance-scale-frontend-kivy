@@ -8,6 +8,8 @@ class NewRulesPopup(Popup):
 
     def __init__(self,origPNum,newPNum, titleText="Someone died!", hintText="You can always review these rules by clicking the (?) button on the top-right corner.", allowClose=False, **kwargs):
         super(NewRulesPopup, self).__init__(**kwargs)
+        assert(origPNum in [2,3,4],"origPNum in [2,3,4]")
+        assert(newPNum in [2,3,4],"newPNum in [2,3,4]")
 
         self.title = titleText
         self.ids["hintText"].text = hintText
