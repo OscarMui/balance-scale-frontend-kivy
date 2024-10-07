@@ -190,8 +190,8 @@ class StatusScreen(Screen):
                     for i in range(len(pus)):
                         pu = pus[i]
                         pu["ui"].changeInfoText(str(self.scores[i]))
-                        # if self.statuses[i] != 'active':
-                        #     pu["ui"].changeInfoColor("red")
+                        if self.statuses[i] == 'dead':
+                            pu["ui"].changeInfoColor("red")
 
                 await asyncio.sleep(1)
                 
