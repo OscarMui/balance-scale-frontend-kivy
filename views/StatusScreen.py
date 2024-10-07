@@ -61,10 +61,15 @@ class ParticipantUI(BoxLayout):
     def changeInfoColor(self,color):
         if color == "red":
             self.ids["info"].color = (1,0,0,1)
+            self.ids["info"].bold = False
             # print("label color changed to red")
+        elif color=="pinkBold":
+            self.ids["info"].color = (255/255,192/255,203/255,1)
+            self.ids["info"].bold = True
         else:
             # white
             self.ids["info"].color = (1,1,1,1)
+            self.ids["info"].bold = False
 
 class StatusScreen(Screen):
     def __init__(self, qGame, qApp, store, name):
@@ -185,8 +190,8 @@ class StatusScreen(Screen):
                     for i in range(len(pus)):
                         pu = pus[i]
                         pu["ui"].changeInfoText(str(self.scores[i]))
-                        if self.statuses[i] != 'active':
-                            pu["ui"].changeInfoColor("red")
+                        # if self.statuses[i] != 'active':
+                        #     pu["ui"].changeInfoColor("red")
 
                 await asyncio.sleep(1)
                 
@@ -194,12 +199,12 @@ class StatusScreen(Screen):
                     infoLabel.color = (0,1,1,1)
                     infoLabel.text = "Rule applied: If a player chooses the exact correct number, they win the round and all other players lose two points."
 
-                self.scores = [0 for p in ps]
-                self.statuses = ['active' for p in ps]
                 for i in range(len(pus)):
                     pu = pus[i]
                     if pu["id"] not in gameInfo["winners"]:
                         pu["ui"].changeInfoColor("red")
+                    if pu["score"] - self.scores[i] < -1:
+                        pu["ui"].changeInfoColor("pinkBold")
                     pu["ui"].changeInfoText(str(pu["score"]))
                     self.scores[i] = pu["score"]
                     self.statuses[i] = pu["status"]
