@@ -1,5 +1,6 @@
 import asyncio
 import os
+from kivmob import KivMob, TestIds
 
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
@@ -7,10 +8,12 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 
+from common.privateConstants import ADMOB_APP_ID, ADMOB_STATUS_AD_ID
 from common.now import now
 from common.visibility import show,hide
 from widgets.NewRulesPopup import NewRulesPopup
 from widgets.RulesPopup import RulesPopup
+
 
 class ParticipantUI(BoxLayout):
 
@@ -80,6 +83,10 @@ class StatusScreen(Screen):
         self.scores = None
         self.statuses = None
 
+        self.ads = KivMob(TestIds.APP) # ADMOB_APP_ID
+        self.ads.new_interstitial(TestIds.INTERSTITIAL) #ADMOB_STATUS_AD_ID
+        self.ads.request_interstitial()
+
     def on_pre_enter(self):
         # reset UIs
         titleLabel = self.ids["titleLabel"]
@@ -93,6 +100,9 @@ class StatusScreen(Screen):
 
         self.statusTask = asyncio.create_task(self.__status())
     
+    def on_resume(self):
+        self.ads.request_interstitial()
+
     async def __status(self):
         try:
             # declare shorthands
@@ -238,6 +248,8 @@ class StatusScreen(Screen):
                     show(self.ids["exitButton"],animation=True)
 
                 if gameInfo["gameEnded"]:
+                    self.ads.show_interstitial()
+
                     infoLabel.text = "Game ended"
                     ps = gameInfo["participants"]
                     filteredP = list(filter(lambda p: p["status"]=='active' and not p["isBot"],ps))

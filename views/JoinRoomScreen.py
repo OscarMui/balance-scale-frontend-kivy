@@ -1,5 +1,6 @@
 import asyncio
 import random
+from kivmob import KivMob, TestIds
 
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
@@ -44,6 +45,11 @@ class JoinRoomScreen(Screen):
         self.store = store
         self.app = App.get_running_app()
 
+        self.ads = KivMob(TestIds.APP) # ADMOB_APP_ID
+        self.ads.new_interstitial(TestIds.INTERSTITIAL) #ADMOB_STATUS_AD_ID
+        self.ads.request_interstitial()
+
+
     def on_pre_enter(self):
         self.gameStarted = False
         self.isReconnect = False
@@ -58,6 +64,8 @@ class JoinRoomScreen(Screen):
         self.ids["exitButton"].background_color = [1,0,0,1]
         self.joinRoomTask = asyncio.create_task(self.__joinRoom())
         self.handleTimerTask = asyncio.create_task(self.__handleTimer())
+
+        self.ads.show_interstitial()
 
     async def __handleTimer(self):
         try:

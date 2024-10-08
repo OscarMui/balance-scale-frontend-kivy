@@ -20,3 +20,5 @@ dist
 .cache
 
 v1.json
+
+common/privateConstants.py
