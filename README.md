@@ -98,6 +98,8 @@ def _cmp(self, other):
 
 First remove `dist` and `build` folder if you have built for MacOS or Windows, and also the existing apks in this directory. Or else the size of the apk and bundle will be very large.
 
+Clean up: (MUST CLEAN v1.json, or else it is included in the app bundle)
+
 ```bash
 rm -rf build dist
 rm -rf .cache
@@ -105,6 +107,7 @@ rm **/*.pyc
 rm *.apk
 rm *.aab 
 rm *.idsig
+rm *.json
 ```
 
 The actual magical command:
@@ -179,7 +182,7 @@ https://kivy.org/doc/stable/guide/packaging-ios.html
 
 ```bash
 toolchain pip install httpx websocket_client certifi httpcore idna sniffio anyio exceptiongroup h11
-toolchain update ../app_ios/tenbin-io
+toolchain update ../app_ios/tenbin-ios
 ```
 
 3. https://github.com/kivy/kivy-ios/issues/901
