@@ -169,7 +169,6 @@ class HomeScreen(Screen):
 
     async def __announcementsTimer(self):
         aWidgets = self.announcementWidgets
-        print(aWidgets)
         try:
             while True: 
                 for aWidget in aWidgets:

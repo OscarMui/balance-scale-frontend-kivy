@@ -236,6 +236,7 @@ class JoinRoomScreen(Screen):
             if self.isReconnect:
                 pass
             self.store.delete('pidV1')
+            self.store.delete('rKeyV1')
 
             self.qGame.put_nowait({
                 "event": "quitGame"

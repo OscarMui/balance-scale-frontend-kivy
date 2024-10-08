@@ -29,8 +29,9 @@ async def logic(qGame, qApp, store):
             print(f'Mode selected: {event["mode"]}')
             if event["mode"] == "online":
                 print("Online mode selected")
-                if store.exists('pidV1') and not store.get('pidV1')["value"] == None:
+                if store.exists('pidV1') and store.exists('rKeyV1') and not store.get('pidV1')["value"] == None and not store.get('rKeyV1')["value"] == None:
                     pid = store.get('pidV1')["value"]
+                    rKey = store.get('rKeyV1')["value"]
                     
                     async with httpx.AsyncClient() as client:
                         timeout = httpx.Timeout(5.0, read=15.0)
@@ -38,6 +39,7 @@ async def logic(qGame, qApp, store):
                             timeout=timeout, 
                             data={
                                 "pid": pid,
+                                "rKey": rKey,
                             },
                         )
                         response = resp.json()
@@ -45,7 +47,7 @@ async def logic(qGame, qApp, store):
                             raise Exception(response["errorMsg"])
                         assert(response["result"]=="success")
                         if(response["canReconnect"]):
-                            game = OnlineGame(qGame, qApp, store, pid=pid)
+                            game = OnlineGame(qGame, qApp, store, pid=pid, rKey=rKey)
                         else:
                             game = OnlineGame(qGame, qApp, store, nickname=event["nickname"])
                         print('Game status check completed')

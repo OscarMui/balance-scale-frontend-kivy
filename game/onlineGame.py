@@ -17,13 +17,14 @@ class OnlineGame:
     nickname = None
     gameInfo = None
 
-    def __init__(self, qGame, qApp, store, nickname=None, pid=None):
+    def __init__(self, qGame, qApp, store, nickname=None, pid=None, rKey=None):
         assert(not (nickname==None and pid == None))
         self.qGame = qGame
         self.qApp = qApp
         self.nickname = nickname
         self.store = store
         self.pid = pid
+        self.rKey = rKey
         self.isReconnect = self.nickname == None
 
 
@@ -87,6 +88,7 @@ class OnlineGame:
                 self.pid = res["id"]
 
                 self.store.put('pidV1', value=self.pid)
+                self.store.put('rKeyV1', value=res["rKey"])
 
                 msg = {
                     "event": "serverConnected",
@@ -113,6 +115,8 @@ class OnlineGame:
             self.socket.sendMsg({
                 "method": "reconnectGame",
                 "pid": self.pid,
+                "rKey": self.rKey,
+
             })
 
             # wait for response
