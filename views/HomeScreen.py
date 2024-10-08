@@ -12,15 +12,17 @@ from kivy.uix.label import Label
 from common.constants import APP_STORE_URL, CLIENT_VERSION, DISCORD_URL, GOOGLE_PLAY_URL, SERVER_URL
 from widgets.RulesPopup import RulesPopup
 from widgets.WrapLabel import WrapLabel
+from widgets.Announcement import Announcement
 
 class HomeScreen(Screen):
     def __init__(self, qGame, qApp, store, name):
         super().__init__(name=name)
-        self.qGame = qGame  
+        self.qGame = qGame
         self.qApp = qApp
         self.store = store
         self.app = App.get_running_app()
         self.allowOnline = False
+        self.announcementWidgets = []
 
         if self.store.exists('nicknameV1'):
             NICKNAME = self.store.get('nicknameV1')["value"]
@@ -31,6 +33,8 @@ class HomeScreen(Screen):
     def on_pre_enter(self):
         if self.app.globalNews == None:
             self.handleApiTask = asyncio.create_task(self.__handleApi())
+        else:
+            self.announcementsTimerTask = asyncio.create_task(self.__announcementsTimer())
     
     async def __handleApi(self):
         print("HTTP server:", SERVER_URL)
@@ -75,6 +79,8 @@ class HomeScreen(Screen):
                 onlineButton.background_color = (0,0.7,0,1)
                 onlineButton.disabled = False
                 self.allowOnline = True
+
+                self.__showAnnouncements(response["news"]["announcements"])
 
         except asyncio.CancelledError as e:
             print('Api task is cancelled', e)
@@ -153,13 +159,35 @@ class HomeScreen(Screen):
         })
 
         self.manager.current = "joinRoom"
-    
+
+    def __showAnnouncements(self,announcements):
+        aLayout = self.ids["announcementsLayout"]
+        self.announcementWidgets = list(map(lambda a: Announcement(a),announcements))
+        for aWidget in self.announcementWidgets:
+            aLayout.add_widget(aWidget)
+        self.announcementsTimerTask = asyncio.create_task(self.__announcementsTimer())
+
+    async def __announcementsTimer(self):
+        aWidgets = self.announcementWidgets
+        print(aWidgets)
+        try:
+            while True: 
+                for aWidget in aWidgets:
+                    aWidget.updateTimer()
+                # Rember to await!
+                await asyncio.sleep(5)
+        except Exception as e:
+            # not too important, so just log it and not do anything
+            print("ERROR __announcementsTimer",repr(e))
+
     def on_pre_leave(self):
         if hasattr(self,"popup"):
             self.popup.dismiss()
         if hasattr(self,"handleApiTask"):
             self.handleApiTask.cancel()
-    
+        if hasattr(self,"announcementsTimerTask"):
+            self.announcementsTimerTask.cancel()
+
     def showRules(self):
         self.popup = RulesPopup(detail=True)
         self.popup.open()

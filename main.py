@@ -21,6 +21,7 @@ from common.constants import SCREEN_SIZE
 
 # We need these imports in order for the .kv files to parse correctly
 from widgets.ImageButton import ImageButton
+from widgets.ImageButtonX import ImageButtonX
 from widgets.WrapLabel import WrapLabel
 from widgets.RulesPopup import RulesPopup
 from widgets.NewRulesPopup import NewRulesPopup
@@ -37,7 +38,9 @@ Builder.load_file(os.path.join("widgets","NewRulesPopup.kv"))
 Builder.load_file(os.path.join("widgets","RulesPopup.kv"))
 Builder.load_file(os.path.join("widgets","StatusPopup.kv"))
 Builder.load_file(os.path.join("widgets","ImageButton.kv"))
+Builder.load_file(os.path.join("widgets","ImageButtonX.kv"))
 Builder.load_file(os.path.join("widgets","WrapLabel.kv"))
+Builder.load_file(os.path.join("widgets","Announcement.kv"))
 
 # Set default screen size to a landscape phone
 if platform == 'android' or platform == "ios":
