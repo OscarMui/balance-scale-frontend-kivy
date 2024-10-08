@@ -1,6 +1,6 @@
 PRODUCTION = 'UAT' # PRD/UAT/DEV
 CLIENT_VERSION = "20240922.0.app"
-APP_VERSION = "1.1.7 (internal beta)"
+APP_VERSION = "1.1.8 (internal beta)"
 
 SCREEN_SIZE = ""
 # "" / "IPAD_LANDSCAPE" / "IPAD_PORTRAIT"
