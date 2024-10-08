@@ -164,7 +164,7 @@ class HomeScreen(Screen):
         aLayout = self.ids["announcementsLayout"]
         self.announcementWidgets = list(map(lambda a: Announcement(a),announcements))
         for aWidget in self.announcementWidgets:
-            aLayout.add_widget(aWidget)
+            aLayout.add_widget(aWidget,1) # 1 is to put them after the label 
         self.announcementsTimerTask = asyncio.create_task(self.__announcementsTimer())
 
     async def __announcementsTimer(self):

@@ -11,3 +11,6 @@ class WrapLabel(Label):
     def set_label_size(self, instance, text):
         self.text_size = (self.width, None)
         self.height = self.texture_size[1]
+
+class LeftWrapLabel(WrapLabel):
+    pass

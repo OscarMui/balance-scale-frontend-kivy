@@ -5,7 +5,7 @@ import datetime
 
 from common.now import now
 from common.visibility import hide, show
-from widgets.WrapLabel import WrapLabel
+from widgets.WrapLabel import LeftWrapLabel, WrapLabel
 
 class Announcement(BoxLayout):
     def __init__(self, a, **kwargs):
@@ -23,10 +23,10 @@ class Announcement(BoxLayout):
         try:
             a = self.a
             if a["type"] == "server":
-                popup = Popup(
+                popup = AnnouncementPopup(
                     title=a["title"], 
-                    content=WrapLabel(text=a["body"]),
-                    size_hint=(0.8, 0.4),
+                    content=LeftWrapLabel(text=a["body"]),
+                    size_hint=(0.8, 1),
                 )
                 popup.open()
             else:
@@ -34,10 +34,10 @@ class Announcement(BoxLayout):
                 if a["shortCode"] == "discord-gaming-session":
                     localTime = datetime.datetime.fromtimestamp(a["eventTime"]//1000)
                     # Format the datetime as a string
-                    timeString = localTime.strftime('%Y-%m-%d %H:%M')
-                    popup = Popup(
+                    timeString = localTime.strftime('%Y-%m-%d %I:%M %p')
+                    popup = AnnouncementPopup(
                         title="Discord Gaming Session", 
-                        content=WrapLabel(text=f"We host gaming sessions on our Discord channel from time to time. The next session would be on {timeString} (your local time). Join our Discord for more info!"),
+                        content=LeftWrapLabel(text=f"We host gaming sessions on our Discord channel from time to time. The next session would be on {timeString} (your local time). Join our Discord for more info!"),
                         size_hint=(0.8, 0.4),
                     )
                     popup.open()
@@ -67,4 +67,12 @@ class Announcement(BoxLayout):
         except Exception as e:
             # non-essential work, catch it and contine with other things
             print("Error in Announcement.py update timer",repr(e))
-    
+
+
+class AnnouncementPopup(Popup):
+    def __init__(self, title, content, **kwargs):
+        super(AnnouncementPopup, self).__init__(**kwargs)
+
+        self.title = title
+        self.ids["popupScrollView"].add_widget(content)
+        

@@ -2,6 +2,7 @@
 <Announcement>:
     orientation: "vertical"
     halign: "center"
+    size_hint: (None, None)
     ImageButtonX:
         id: btn
         background_normal: "assets/announcement.png"
@@ -18,3 +19,13 @@
         halign: "left"
         valign: "middle"
         bold: True
+
+<AnnouncementPopup>:
+    size_hint: 0.8,0.5
+    title: ""
+    ScrollView:
+        id: popupScrollView
+        do_scroll_x: False
+    
+
+

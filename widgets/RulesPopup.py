@@ -4,13 +4,10 @@ from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.button import Button
 
-from widgets.WrapLabel import WrapLabel
+from widgets.WrapLabel import LeftWrapLabel, WrapLabel
 from widgets.ImageButton import ImageButton
 from common.constants import APP_VERSION, CLIENT_VERSION, DISCORD_URL, PRODUCTION
 from common.visibility import hide
-
-class LeftWrapLabel(WrapLabel):
-    pass
 
 # A very specific class that does what we want to achieve in this popup
 class ShowAnswerButton(ImageButton):

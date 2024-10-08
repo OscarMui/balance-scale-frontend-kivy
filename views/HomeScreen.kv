@@ -81,9 +81,11 @@
         BoxLayout:
             id: announcementsLayout
             orientation: "vertical"
-            size_hint: 0.055, None
-            pos_hint: {'x': 0.02, 'top': 0.83}
-            spacing: 60
+            size_hint: 0.055, 0.8
+            pos_hint: {'x': 0.02, 'top': 0.93}
+            spacing: 30
+            Label: # dummy label at the back to top align the announcements
+                size_hint: None,1
         # ImageButton:
         #     background_normal: "assets/google-play.png"
         #     background_down: "assets/google-play.png"
