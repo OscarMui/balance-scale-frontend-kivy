@@ -119,7 +119,7 @@ class StatusScreen(Screen):
                 
                 # prepare prevScore - clear it if round == 2 (first time visiting this screen in a game)
                 # for animation only, persists between rounds
-                if gameInfo["round"] == 2:
+                if gameInfo["round"] == 2 or self.scores == None or self.statuses == None:
                     self.scores = [0 for p in ps]
                     self.statuses = ['active' for p in ps]
 
@@ -198,7 +198,7 @@ class StatusScreen(Screen):
                 if 3 in gameInfo["justAppliedRules"]:
                     infoLabel.color = (0,1,1,1)
                     infoLabel.text = "Rule applied: If a player chooses the exact correct number, they win the round and all other players lose two points."
-
+                
                 for i in range(len(pus)):
                     pu = pus[i]
                     if pu["id"] not in gameInfo["winners"]:
