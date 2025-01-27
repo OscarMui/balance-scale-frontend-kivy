@@ -130,7 +130,7 @@ $ANDROIDSDK/build-tools/35.0.0/zipalign -v -p 4 orig.apk aligned.apk
 $ANDROIDSDK/build-tools/35.0.0/apksigner sign --ks ~/kidprof.jks --out signed.apk aligned.apk
 ```
 
-Clean:
+Clean: (MUST CLEAN v1.json, or else it is included in the app bundle)
 
 ```bash
 rm -rf build dist
@@ -139,6 +139,7 @@ rm **/*.pyc
 rm *.apk
 rm *.aab 
 rm *.idsig
+rm v1.json
 ```
 
 View logs:
@@ -153,7 +154,7 @@ $ANDROIDSDK/platform-tools/adb logcat | grep python
 
 Python 3.11.5 is used.
 
-Clean: 
+Clean: (MUST CLEAN v1.json, or else it is included in the app bundle)
 
 ```bash
 rm -rf build dist
@@ -162,6 +163,7 @@ rm **/*.pyc
 rm *.apk
 rm *.aab 
 rm *.idsig
+rm v1.json
 ```
 
 Main instructions:
@@ -231,6 +233,7 @@ rm **/*.pyc
 rm *.apk
 rm *.aab 
 rm *.idsig
+rm v1.json
 ```
 
 Actual code: 
